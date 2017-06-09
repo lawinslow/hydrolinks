@@ -29,6 +29,13 @@ link_to_waterbodies = function(lats, lons, ids){
 
 
   match_res = list()
+  
+  if(nrow(to_check) == 0){
+      ret = data.frame(MATCH_ID = sites$ids)
+      ret$PERMANENT_ID = NA
+      return(ret)
+  }
+  
   #TODO: Finish this
   for(i in 1:nrow(to_check)){
     #get nhd layer
