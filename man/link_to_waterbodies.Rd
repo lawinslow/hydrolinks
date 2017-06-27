@@ -16,4 +16,3 @@ link_to_waterbodies(lats, lons, ids)
 \value{
 Water body permanent IDs
 }
-

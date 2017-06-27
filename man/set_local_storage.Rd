@@ -14,4 +14,3 @@ local storage path}
 Sets internal cache path to local NHD storage
 location. Can be retrieved by \link{local_storage}.
 }
-

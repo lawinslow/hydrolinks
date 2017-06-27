@@ -1,5 +1,5 @@
 pkg_env = new.env()
-pkg_env$local_storage = 'Z:/big_datasets/NHD'
+pkg_env$local_storage = 'C:/Users/tobi/Documents/PA Data/NHD/'
 
 #' @title Path to local NHD storage
 #'
