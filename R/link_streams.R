@@ -1,10 +1,11 @@
-#' @title Link geoshapes to streams
+#' @title Link geopoints to streams
 #'
 #'
-#' @param shapedf SpatialPolygonsDataFrame of shapes to match
-#'
-#'
-#' @return
+#' @param lats Vector of point latitudes
+#' @param lons Vector of point longitudes
+#' @param ids Vector of point identifiers (string or numeric)
+#' 
+#' @return flowline permanent ids
 #'
 #' @import rgdal
 #' @import rgeos
@@ -12,63 +13,7 @@
 #' @import maptools
 #' @import dplyr
 #'
-#' @export link_streams
-
-
-snapPointsToLines <- function( points, lines, maxDist=NA, withAttrs=TRUE, idField=NA) {
-  
-  if (rgeosStatus()) {
-    if (!requireNamespace("rgeos", quietly = TRUE))
-      stop("package rgeos required for snapPointsToLines")
-  } else
-    stop("rgeos not installed")
-  
-  if (class(points) == "SpatialPoints" && missing(withAttrs))
-    withAttrs = FALSE
-  
-  if (class(points) == "SpatialPoints" && withAttrs==TRUE)
-    stop("A SpatialPoints object has no attributes! Please set withAttrs as FALSE.")
-  
-  
-  if (!is.na(maxDist)) {
-    w = rgeos::gWithinDistance(points, lines, dist=maxDist, byid=TRUE)
-    validPoints = apply(w,2,any)
-    validLines = apply(w,1,any)
-    #origPoints = points
-    points = points[validPoints,]
-    lines =  lines[validLines,]
-    #pointIds = pointIds[points %in% origPoints, ]
-  }
-  
-  d = rgeos::gDistance(points, lines, byid=TRUE) 
-  nearest_line_index = apply(d, 2, which.min) # Position of each nearest line in lines object 
-  
-  coordsLines = coordinates(lines)  
-  coordsPoints = coordinates(points)
-  print(nrow(coordsPoints))
-  print(nrow(coordsLines))
-  if(nrow(coordsPoints) == 0){
-    return(NA)
-  }
-  # Get coordinates of nearest points lying on nearest lines
-  mNewCoords = vapply(1:length(points), 
-                      function(x) 
-                        nearestPointOnLine(coordsLines[[nearest_line_index[x]]][[1]], 
-                                           coordsPoints[x,]), FUN.VALUE=c(0,0))
-  
-  # Recover lines' Ids (If no id field has been specified, take the sp-lines id)
-  if (!is.na(idField)) nearest_line_id = lines@data[,idField][nearest_line_index] 
-  else nearest_line_id = sapply(slot(lines, "lines"), function(i) slot(i, "ID"))[nearest_line_index] 
-  
-  # Create data frame and sp points
-  if (withAttrs) df = cbind(points@data, nearest_line_id) 
-  else df = data.frame(nearest_line_id, row.names=names(nearest_line_index))
-  
-  SpatialPointsDataFrame(coords=t(mNewCoords), data=df, 
-                         proj4string=CRS(proj4string(points)))
-}
-
-
+#' @export
 
 link_streams = function(lats, lons, ids, max_dist = 100){
   wbd_shapes = file.path(local_storage(), 'HU4', 'Shape_unzip', '*', 'Shape', 'NHDFlowline_projected.shp')

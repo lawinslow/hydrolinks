@@ -9,7 +9,8 @@ Description: More about what it does (maybe more than one line)
 Imports: rgdal, 
     rgeos,
     sp,
-    maptools
+    maptools,
+    dplyr
 License: MIT
 Encoding: UTF-8
 LazyData: true
