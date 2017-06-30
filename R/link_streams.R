@@ -16,7 +16,6 @@
 #' @export
 
 link_streams = function(lats, lons, ids, max_dist = 100){
-  wbd_shapes = file.path(local_storage(), 'HU4', 'Shape_unzip', '*', 'Shape', 'NHDFlowline_projected.shp')
   load(file=system.file('extdata/nhd_bb_streams_cache.Rdata', package='nhdtools'))
   wbd_bb = bbdf
   
@@ -28,6 +27,8 @@ link_streams = function(lats, lons, ids, max_dist = 100){
   pts = spTransform(pts, CRS("+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs"))
   
   res   = list()
+  
+  matches_found = 0
   
   for(i in 1:nrow(pts@coords)){
     res[[i]] = subset(wbd_bb, xmin <= pts@coords[i,1] & xmax >= pts@coords[i,1] & ymin <= pts@coords[i,2] & ymax >= pts@coords[i,2])
@@ -68,10 +69,14 @@ link_streams = function(lats, lons, ids, max_dist = 100){
       match_res[i*nrow(pts@coords) -nrow(pts@coords) + j] = NA
       next()
     }
+    matches_found = matches_found + nrow(matches)
     for(j in 1:nrow(matches)){
       match_data = nhd@data[as.numeric(as.character(matches$nearest_line_id[j])) + 1,]
       match_data$MATCH_ID = matches$MATCH_ID[j]
       match_res[[i*nrow(matches) - nrow(matches) + j]] = match_data
+    }
+    if(matches_found == nrow(sites)){
+      break()
     }
   }
   
