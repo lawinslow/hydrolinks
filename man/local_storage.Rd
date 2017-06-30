@@ -10,4 +10,3 @@ local_storage()
 Returns internal cache path to local NHD storage
 location. Can be set by \link{set_local_storage}.
 }
-
