@@ -14,7 +14,7 @@ zip_hash_upload = function(name, files, groups){
 
   for(i in seq_along(ugroups)){
     groupfiles = files[groups == ugroups[i]]
-    tmpfile = file.path(tempdir(), ugroups[i])
+    tmpfile = file.path(tempdir(), paste0(ugroups[i], '.zip'))
     zip(tmpfile, groupfiles, flags = '-j')
 
     itm = item_create(parent_id = head_itm, title = ugroups[i])
@@ -30,4 +30,12 @@ name = 'NHDH'
 nhd_files = Sys.glob('z:/big_datasets/NHD/HU4/Shape_unzip/NHD_H_*_Shape.zip/Shape/*')
 groups    = basename(dirname(dirname(nhd_files)))
 nhdh_files = zip_hash_upload(name, nhd_files, groups)
+
+
+name = 'hydrolakes'
+hl_files = Sys.glob('z:/big_datasets/hydrolakes/*/HydroLAKES_polys_v10*')
+groups    = basename(dirname(nhd_files))
+zhres = zip_hash_upload(name, nhd_files, groups)
+
+write.csv(nhdh'inst/extdata/hydrolakes.csv', row.names=FALSE)
 
