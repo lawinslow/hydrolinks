@@ -4,7 +4,7 @@
 \alias{link_to_waterbodies}
 \title{Link geopoints to Waterbodies}
 \usage{
-link_to_waterbodies(lats, lons, ids)
+link_to_waterbodies(lats, lons, ids, dataset = "nhd")
 }
 \arguments{
 \item{lats}{Vector of point latitudes}
@@ -12,6 +12,8 @@ link_to_waterbodies(lats, lons, ids)
 \item{lons}{Vector of point longitudes}
 
 \item{ids}{Vector of point identifiers (string or numeric)}
+
+\item{dataset}{Character name of dataset to link against. Can be either "nhd" or "hydrolakes"}
 }
 \value{
 Water body permanent IDs

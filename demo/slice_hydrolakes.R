@@ -20,7 +20,7 @@ for(i in c(1:50)){
            driver = "ESRI Shapefile")
   bbdf[i,2:3] = slice@bbox[1,]
   bbdf[i,4:5] = slice@bbox[2,]
-  bbdf[i,1] = file.path(hydrolakes_path, paste0("hydrolakes_", i), "HydroLAKES_polys_v10.shp")
+  bbdf[i,1] = paste0("hydrolakes_", i, ".zip")
 }
 
 save(bbdf, file='inst/extdata/hydrolakes_bb_cache.Rdata')

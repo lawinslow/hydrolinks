@@ -42,15 +42,15 @@ bbdf = data.frame(file=character(), xmin=numeric(), xmax=numeric(), ymin=numeric
 for(i in 1:length(bboxes)){
   bbdf[i,2:3] = bboxes[[i]][1,]
   bbdf[i,4:5] = bboxes[[i]][2,]
-  bbdf[i,1] = shapefiles[i]
+  bbdf[i,1] = basename(dirname(dirname(shapefiles[i])))
 }
 
 bbdf_streams = data.frame(file=character(), xmin=numeric(), xmax=numeric(), ymin=numeric(), ymax=numeric(), stringsAsFactors = FALSE)
 for(i in 1:length(bboxes_streams)){
   bbdf_streams[i,2:3] = bboxes_streams[[i]][1,]
   bbdf_streams[i,4:5] = bboxes_streams[[i]][2,]
-  bbdf_streams[i,1] = shapefiles_streams[i]
+  bbdf_streams[i,1] = basename(dirname(dirname(shapefiles_streams[i])))
 }
-bbdf_streams$file = gsub("NHDFlowline.shp", "NHDFlowline_projected.shp", bbd_streams$file)
+bbdf_streams$file = gsub("NHDFlowline.shp", "NHDFlowline_projected.shp", bbdf_streams$file)
 save(bbdf_streams, file='inst/extdata/nhd_bb_streams_cache.Rdata')
 save(bbdf, file='inst/extdata/nhd_bb_cache.Rdata')

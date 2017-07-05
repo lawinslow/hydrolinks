@@ -17,7 +17,7 @@
 
 link_streams = function(lats, lons, ids, max_dist = 100){
   load(file=system.file('extdata/nhd_bb_streams_cache.Rdata', package='nhdtools'))
-  wbd_bb = bbdf
+  wbd_bb = bbdf_streams
   
   sites = data.frame(lats, lons, ids)
   xy = cbind(sites$lons, sites$lats)
@@ -47,21 +47,12 @@ link_streams = function(lats, lons, ids, max_dist = 100){
   
   for(i in 1:nrow(to_check)){
     #get nhd layer
-    nhd       = readOGR(to_check[i,'file'])
+    check_dl_file(system.file("extdata/nhdh.csv", package = "nhdtools"), to_check[i, 'file'])
+    
+    nhd       = readOGR(file.path(local_path(), "unzip", to_check[i,'file'], "NHDFlowline_projected.shp"))
     
     ids = rep(NA, length(sites$lats))
     
-    
-    # for(j in 1:nrow(pts@coords)){
-    #   matches = snapPointsToLines(pts[j], nhd, maxDist = 10, idField = ids)
-    #   if(is.na(matches)){
-    #     match_res[i*nrow(pts@coords) -nrow(pts@coords) + j] = NA
-    #     next()
-    #   }
-    #   match_data = nhd@data[as.numeric(as.character(matches$nearest_line_id)) + 1,]
-    #   match_data$MATCH_ID = sites$ids[j]
-    #   match_res[[i*nrow(pts@coords) - nrow(pts@coords) + j]] = match_data
-    # }
     bbox = wbd_bb[wbd_bb$file == to_check[i, 'file'], ]
     pts = pts[bbox$xmin <= pts@coords[, 1] & bbox$xmax >= pts@coords[,1] & bbox$ymin <= pts@coords[,2] & bbox$ymax >= pts@coords[,2],]
     matches = snapPointsToLines(pts, nhd, maxDist = max_dist, idField = ids)
