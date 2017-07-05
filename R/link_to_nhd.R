@@ -14,12 +14,17 @@
 #'
 #' @export
 link_to_waterbodies = function(lats, lons, ids, dataset = "nhd"){
-  
+  dl_file = ""
+  id_column = ""
   if(tolower(dataset) == "nhd"){
     load(file=system.file('extdata/nhd_bb_cache.Rdata', package='nhdtools'))
+    dl_file = "extdata/nhdh.csv"
+    id_column = "PERMANENT_"
   }
   else if(tolower(dataset) == "hydrolakes"){
     load(file=system.file('extdata/hydrolakes_bb_cache.Rdata', package='nhdtools'))
+    dl_file = "extdata/hydrolakes.csv"
+    id_column = "Hylak_id"
   }
   else{
     stop("Invalid dataset name!")
@@ -47,14 +52,6 @@ link_to_waterbodies = function(lats, lons, ids, dataset = "nhd"){
   #TODO: Finish this
   for(i in 1:nrow(to_check)){
     #get nhd layer
-    dl_file = ""
-    
-    if(tolower(dataset) == "nhd"){
-      dl_file = "extdata/nhdh.csv"
-    }
-    else if(tolower(dataset) == "hydrolakes"){
-      dl_file = "extdata/hydrolakes.csv"
-    }
     check_dl_file(system.file(dl_file, package = "nhdtools"), to_check[i, 'file'])
     
     shapefile_name = ""
@@ -81,11 +78,6 @@ link_to_waterbodies = function(lats, lons, ids, dataset = "nhd"){
   }
 
   unique_matches = unique(do.call(rbind, match_res))
-  #return matches that have non-NA value PREMANENT_ID
-  if(tolower(dataset) == "nhd"){
-    return(unique_matches[!is.na(unique_matches$PERMANENT_), ])
-  }
-  else if(tolower(dataset) == "hydrolakes"){
-    return(unique_matches[!is.na(unique_matches$Hylak_id), ])
-  }
+  #return matches that have non-NA value id
+  return(unique_matches[!is.na(unique_matches[,id_column]),])
 }
