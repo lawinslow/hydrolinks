@@ -1,7 +1,7 @@
 Package: nhdtools
 Type: Package
 Title: What the Package Does (Title Case)
-Version: 0.3.0
+Version: 0.4.0
 Author: Who wrote it
 Maintainer: The package maintainer <yourself@somewhere.net>
 Description: More about what it does (maybe more than one line)
@@ -10,7 +10,10 @@ Imports: rgdal,
     rgeos,
     sp,
     maptools,
-    dplyr
+    dplyr,
+    httr,
+    tools,
+    rappdirs
 License: MIT
 Encoding: UTF-8
 LazyData: true
