@@ -6,7 +6,7 @@ sites = whatWQPsites(siteType ="Lake, Reservoir, Impoundment")
 nhd = link_to_waterbodies(sites$LatitudeMeasure, sites$LongitudeMeasure, sites$MonitoringLocationIdentifier)
 
 conus = USAboundaries::cb_2014_us_state_20m[!USAboundaries::cb_2014_us_state_20m@data$geoid %in% c('72', '02', '15'),]
-wqp_points = SpatialPoints(cbind(sites$LongitudeMeasure, sites$LatitudeMeasure),
+wqp_points = SpatialPosints(cbind(sites$LongitudeMeasure, sites$LatitudeMeasure),
                            proj4string = conus@proj4string)
 wqp_conus = over(wqp_points, conus)
 wqp_conus = wqp_conus[!is.na(wqp_conus$statefp),]

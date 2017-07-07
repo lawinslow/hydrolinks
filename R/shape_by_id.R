@@ -7,6 +7,7 @@
 #' 
 #' @return data table linking ids to filenames which contain them.
 #' @import dplyr
+#' @import rgdal
 #' 
 #' @export
 
@@ -26,7 +27,13 @@ waterbody_shape_by_id = function(PERMANENT_match = NULL, GNIS_ID_match = NULL, G
   else if(!is.null(REACHCODE_match))
     shape = filter(shape, GNIS_NAME %in% GNIS_NAME_match)
   shape = collect(shape)
-  return(shape)
+  files = unique(shape$file)
+  shapes = list()
+  for(i in 1:length(file)){
+    check_dl_file(system.file("extdata/nhdh.csv", package="nhdtools"), fname = files[i])
+    shapes[[i]] = readOGR(file.path(local_path(), "unzip", files[i], "NHDWaterbody.shp"))
+  }
+  return(do.call(rbind, shapes))
 }
 
 
@@ -36,6 +43,7 @@ waterbody_shape_by_id = function(PERMANENT_match = NULL, GNIS_ID_match = NULL, G
 #' 
 #' @return data table linking ids to filenames which contain them.
 #' @import dplyr
+#' @import rgdal
 #' 
 #' @export
 
@@ -46,5 +54,11 @@ flowline_shape_by_id = function(PERMANENT_match){
     tbl("flowline_ids") %>%
     filter(PERMANENT_ %in% PERMANENT_match) %>%
     collect()
-  return(shape)
+  shapes = list()
+  files = unique(shape$file)
+  for(i in 1:length(file)){
+    check_dl_file(system.file("extdata/nhdh.csv", package="nhdtools"), fname = files[i])
+    shapes[[i]] = readOGR(file.path(local_path(), "unzip", files[i], "NHDFlowline_projected.shp"))
+  }
+  return(do.call(rbind, shapes))
 }
