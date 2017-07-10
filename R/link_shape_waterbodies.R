@@ -1,25 +1,27 @@
 #' @title Link geoshapes to Waterbodies
+#' 
+#' @description Link geoshapes to waterbodies
 #'
 #'
 #' @param shapedf SpatialPolygonsDataFrame of shapes to match
 #'
 #'
-#' @return
+#' @return matching waterbody attributes
 #'
 #' @import rgdal
-#' @import rgeos
+#' @importFrom rgeos gIntersects gConvexHull
 #' @import sp
 #'
 #' @export
 link_shape_waterbodies = function(shapedf){
-
+  bbdf = NULL
   wbd_shapes = file.path(local_storage(), 'HU4', 'Shape_unzip', '*', 'Shape', 'NHDWaterbody.shp')
   load(file=system.file('extdata/nhd_bb_cache.Rdata', package='nhdtools'))
   wbd_bb = bbs_to_sp(bbdf)
 
   #project input to NHD
   shapedf = spTransform(shapedf, CRS(nhd_proj))
-  shapeout = rgeos::gConvexHull(shapedf)
+  shapeout = gConvexHull(shapedf)
 
   matches = gIntersects(shapeout, wbd_bb, byid = TRUE)
   filematches = rownames(matches)[matches]
@@ -29,6 +31,7 @@ link_shape_waterbodies = function(shapedf){
   for(i in 1:length(filematches)){
     #get nhd layer
     nhd       = readOGR(filematches[i])
+    FTYPE = NULL
     nhd = subset(nhd, FTYPE %in% c('390', '361', '436'))
 
     tmp = gIntersects(shapedf, nhd, byid=TRUE, returnDense=FALSE)

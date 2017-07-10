@@ -11,6 +11,7 @@
 #' @import httr
 #' @import tools
 #' @import rappdirs
+#' @import utils
 
 check_dl_file = function(master_file, fname = NULL, md5check = TRUE, dest=local_path()){
   files = read.csv(master_file)

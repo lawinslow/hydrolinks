@@ -1,5 +1,6 @@
 #' @title Link geopoints to Waterbodies
-#'
+#' 
+#' @description Link geopoints to waterbodies in a geospatial dataset.
 #'
 #' @param lats Vector of point latitudes
 #' @param lons Vector of point longitudes
@@ -16,6 +17,7 @@
 link_to_waterbodies = function(lats, lons, ids, dataset = "nhd"){
   dl_file = ""
   id_column = ""
+  bbdf = NULL
   if(tolower(dataset) == "nhd"){
     load(file=system.file('extdata/nhd_bb_cache.Rdata', package='nhdtools'))
     dl_file = "extdata/nhdh.csv"
@@ -33,7 +35,8 @@ link_to_waterbodies = function(lats, lons, ids, dataset = "nhd"){
 
   sites = data.frame(lats, lons, ids)
   res   = list()
-
+  
+  xmin = xmax = ymin = ymax = NULL
   for(i in 1:nrow(sites)){
     res[[i]] = subset(wbd_bb, xmin <= sites[i,'lons'] & xmax >= sites[i,'lons'] & ymin <= sites[i,'lats'] & ymax >= sites[i,'lats'])
   }

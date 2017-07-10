@@ -13,7 +13,8 @@ Imports: rgdal,
     dplyr,
     httr,
     tools,
-    rappdirs
+    rappdirs,
+    methods
 License: MIT
 Encoding: UTF-8
 LazyData: true

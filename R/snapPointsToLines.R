@@ -1,3 +1,5 @@
+#' @importFrom rgeos gDistance gWithinDistance
+
 snapPointsToLines <- function( points, lines, maxDist=NA, withAttrs=TRUE, idField=NA) {
   
   if (rgeosStatus()) {

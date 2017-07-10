@@ -17,5 +17,10 @@ waterbody_shape_by_id(PERMANENT_match = NULL, GNIS_ID_match = NULL,
 \item{REACHCODE_match}{filer using REACHCODE}
 }
 \value{
-data table linking ids to filenames which contain them.
+SpatialPointsDataFrame containing polygons with associated IDs.
+}
+\description{
+Get shapefiles containing waterbodies with specified IDs. If one argument is provided, no 
+other arguments will be used to filter. Arguments are checked in order: PERMANENT_match, GNIS_ID_match,
+GNIS_NAME_match, REACHCODE_match.
 }

@@ -10,5 +10,8 @@ flowline_shape_by_id(PERMANENT_match)
 \item{PERMANENT_match}{filter using PERMANENT_}
 }
 \value{
-data table linking ids to filenames which contain them.
+SpatialPointsDataFrame containing polygons with associated IDs.
+}
+\description{
+Get shapefiles containing flowlines with specified IDs.
 }

@@ -1,21 +1,23 @@
-#' @title Link geopoints to streams
+#' @title Link geopoints to flowlines
 #'
+#' @description Link geopoints to flowlines in the NHD
 #'
 #' @param lats Vector of point latitudes
 #' @param lons Vector of point longitudes
 #' @param ids Vector of point identifiers (string or numeric)
+#' @param max_dist numeric maximum line snapping distance in meters
 #' 
 #' @return flowline permanent ids
 #'
 #' @import rgdal
-#' @import rgeos
 #' @import sp
 #' @import maptools
 #' @import dplyr
 #'
 #' @export
 
-link_streams = function(lats, lons, ids, max_dist = 100){
+link_flowlines = function(lats, lons, ids, max_dist = 100){
+  bbdf_streams = NULL
   load(file=system.file('extdata/nhd_bb_streams_cache.Rdata', package='nhdtools'))
   wbd_bb = bbdf_streams
   
@@ -23,12 +25,15 @@ link_streams = function(lats, lons, ids, max_dist = 100){
   xy = cbind(sites$lons, sites$lats)
   not_na = which(!is.na(sites$lats) & !is.na(sites$lons))
   pts = SpatialPointsDataFrame(xy[not_na, , drop=FALSE], proj4string=CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"), data=data.frame(ids[not_na, drop=FALSE]))
+  ids.not_na..drop...FALSE. = NULL
   pts@data = rename(pts@data, MATCH_ID = ids.not_na..drop...FALSE.)
   pts = spTransform(pts, CRS("+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs"))
   
   res   = list()
   
   matches_found = 0
+  
+  xmin = xmax = ymin = ymax = NULL
   
   for(i in 1:nrow(pts@coords)){
     res[[i]] = subset(wbd_bb, xmin <= pts@coords[i,1] & xmax >= pts@coords[i,1] & ymin <= pts@coords[i,2] & ymax >= pts@coords[i,2])

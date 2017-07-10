@@ -10,5 +10,8 @@ link_shape_waterbodies(shapedf)
 \item{shapedf}{SpatialPolygonsDataFrame of shapes to match}
 }
 \value{
-
+matching waterbody attributes
+}
+\description{
+Link geoshapes to waterbodies
 }
