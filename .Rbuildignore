@@ -1,2 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
+northAmProj.prj
+northAmProj.proj4string
+figures/
+wqp_sites_linked.RData
