@@ -18,3 +18,6 @@ link_to_waterbodies(lats, lons, ids, dataset = "nhd")
 \value{
 Water body permanent IDs
 }
+\description{
+Link geopoints to waterbodies in a geospatial dataset.
+}
