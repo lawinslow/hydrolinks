@@ -1,11 +1,17 @@
 Package: nhdtools
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Hydrologic Network Linking Data and Tools
 Version: 0.4.1
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Authors@R: c( person("Tobi", "Hahn", role = c("aut"), 
+      email = "hahnt2@rpi.edu"),
+    person("Luke", "Winslow", role = c("aut", "cre"), 
+      email = "lawinslow@gmail.com"),
+    person("Taylor", "Leach", role = c("ctb"), 
+      email = "leacht@rpi.edu"),
+    person("Kevin", "Rose", role = c("ths"),
+      email = "rosek4@rpi.edu"))
+Description: Tools to link geographic data with hydrologic network, including lakes, streams and rivers. 
+    Includes automated download of U.S. National Hydrography Network and other hydrolayers.
 Imports: rgdal, 
     rgeos,
     sp,
