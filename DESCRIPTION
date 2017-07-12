@@ -20,7 +20,8 @@ Imports: rgdal,
     httr,
     tools,
     rappdirs,
-    methods
+    methods,
+    dbplyr
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
