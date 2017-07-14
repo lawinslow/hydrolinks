@@ -20,6 +20,7 @@ check_dl_file = function(master_file, fname = NULL, md5check = TRUE, dest=local_
   }
   apply(files, 1, function(x){
     if(!file.exists(file.path(dest, x["filename"]))){
+      print(paste0("Downloading ", x["filename"]))
       r = RETRY("GET", url=x["url"], write_disk(file.path(dest,x["filename"]), overwrite=TRUE), times = 2)
       stop_for_status(r)
       if(!file.exists(file.path(dest, x["filename"]))){
@@ -38,6 +39,7 @@ check_dl_file = function(master_file, fname = NULL, md5check = TRUE, dest=local_
   if(md5check){
     apply(files, 1, function(x){
       if(md5sum(file.path(dest, x["filename"])) != x["md5"]){
+        print(paste0("Redownloading ", x["filename"]))
         r = RETRY("GET", url=x["url"], write_disk(file.path(dest, x["filename"]), overwrite=TRUE))
         stop_for_status(r)
         if(!file.exists(file.path(dest, x["filename"]))){
@@ -57,9 +59,37 @@ check_dl_file = function(master_file, fname = NULL, md5check = TRUE, dest=local_
 }
 
 local_path = function(){
-  path = rappdirs::user_data_dir(appname = 'nhdtools', version=packageVersion('nhdtools'))
+  path = ""
+  pathFile = file.path(rappdirs::user_data_dir(appname = 'nhdtools', version=packageVersion('nhdtools')), "path")
+  if(!file.exists(pathFile)){
+    path = rappdirs::user_data_dir(appname = 'nhdtools', version=packageVersion('nhdtools'))
+  }
+  else{
+    path = readChar(pathFile, file.info(pathFile)$size)
+  }
   if(!file.exists(path)){
     dir.create(path, recursive = TRUE)
   }
   return(path)
+}
+
+
+#' @title Set local files path
+#'
+#' @param path character path to new local files path. If null, path will be reset to default user data directory location.
+#'
+#' @export
+set_local_files_path = function(path = NULL){
+  if(!is.null(path)){
+    if(!file.exists(path)){
+      dir.create(path, recursive = TRUE)
+    }
+    write(path, file = file.path(rappdirs::user_data_dir(appname = 'nhdtools', version=packageVersion('nhdtools')), "path"))
+  }
+  else{
+    pathFile = file.path(rappdirs::user_data_dir(appname = 'nhdtools', version=packageVersion('nhdtools')), "path")
+    if(file.exists(pathfile)){
+      file.remove(pathFile)
+    }
+  }
 }

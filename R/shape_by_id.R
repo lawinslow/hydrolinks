@@ -35,14 +35,16 @@ waterbody_shape_by_id = function(PERMANENT_match = NULL, GNIS_ID_match = NULL, G
   shape = collect(shape)
   files = unique(shape$file)
   shapes = list()
-  for(i in 1:length(file)){
-    check_dl_file(system.file("extdata/nhdh.csv", package="nhdtools"), fname = files[i])
-    shapes[[i]] = readOGR(file.path(local_path(), "unzip", files[i], "NHDWaterbody.shp"))
+  if(length(files) > 0){
+    for(i in 1:length(files)){
+      check_dl_file(system.file("extdata/nhdh.csv", package="nhdtools"), fname = files[i])
+      shapes[[i]] = readOGR(file.path(local_path(), "unzip", files[i], "NHDWaterbody.shp"))
+    }
+    if(length(shapes) > 1)
+      return(do.call(rbind, shapes))
+    else
+      return(shapes[[1]])
   }
-  if(length(shapes) > 1)
-    return(do.call(rbind, shapes))
-  else
-    return(shapes[[1]])
 }
 
 
@@ -70,12 +72,14 @@ flowline_shape_by_id = function(PERMANENT_match){
     collect()
   shapes = list()
   files = unique(shape$file)
-  for(i in 1:length(file)){
-    check_dl_file(system.file("extdata/nhdh.csv", package="nhdtools"), fname = files[i])
-    shapes[[i]] = readOGR(file.path(local_path(), "unzip", files[i], "NHDFlowline_projected.shp"))
+  if(length(files) > 0){
+    for(i in 1:length(files)){
+      check_dl_file(system.file("extdata/nhdh.csv", package="nhdtools"), fname = files[i])
+      shapes[[i]] = readOGR(file.path(local_path(), "unzip", files[i], "NHDFlowline_projected.shp"))
+    }
+    if(length(shapes) > 1)
+      return(do.call(rbind, shapes))
+    else
+      return(shapes[[1]])
   }
-  if(length(shapes) > 1)
-    return(do.call(rbind, shapes))
-  else
-    return(shapes[[1]])
 }
