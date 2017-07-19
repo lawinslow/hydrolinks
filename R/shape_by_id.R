@@ -1,18 +1,18 @@
 #' @title Link IDs to warterbody shapefiles
-#' 
-#' @description Get shapefiles containing waterbodies with specified IDs. If one argument is provided, no 
+#'
+#' @description Get shapefiles containing waterbodies with specified IDs. If one argument is provided, no
 #' other arguments will be used to filter. Arguments are checked in order: PERMANENT_match, GNIS_ID_match,
 #' GNIS_NAME_match, REACHCODE_match.
-#' 
+#'
 #' @param PERMANENT_match filter using PERMANENT_
 #' @param GNIS_ID_match filter using GNIS_ID
 #' @param GNIS_NAME_match filter using GNIS_NAME
 #' @param REACHCODE_match filer using REACHCODE
-#' 
+#'
 #' @return SpatialPointsDataFrame containing polygons with associated IDs.
 #' @import dplyr
 #' @import rgdal
-#' 
+#'
 #' @export
 
 
@@ -21,9 +21,9 @@ waterbody_shape_by_id = function(PERMANENT_match = NULL, GNIS_ID_match = NULL, G
   id_db = src_sqlite(file.path(local_path(), "unzip", "waterbody_ids.zip", "waterbody_ids.sqlite3"))
   shape = id_db %>%
     tbl("waterbody_ids")
-  
+
   PERMANENT_ = GNIS_ID = GNIS_NAME = REACHCODE = NULL
-  
+
   if(!is.null(PERMANENT_match))
     shape = filter(shape, PERMANENT_ %in% PERMANENT_match)
   else if(!is.null(GNIS_ID_match))
@@ -47,23 +47,24 @@ waterbody_shape_by_id = function(PERMANENT_match = NULL, GNIS_ID_match = NULL, G
 
 
 #' @title Link IDs to flowline shapefiles
-#' 
+#'
 #' @description Get shapefiles containing flowlines with specified IDs.
-#' 
+#'
 #' @param PERMANENT_match filter using PERMANENT_
-#' 
+#'
 #' @return SpatialPointsDataFrame containing polygons with associated IDs.
 #' @import dplyr
 #' @import rgdal
-#' 
+#' @import dbplyr
+#'
 #' @export
 
 flowline_shape_by_id = function(PERMANENT_match){
   check_dl_file(system.file("extdata/id_db.csv", package = "nhdtools"), fname = "flowline_ids.zip")
   id_db = src_sqlite(file.path(local_path(), "unzip", "flowline_ids.zip", "flowline_ids.sqlite3"))
-  
+
   PERMANENT_ = NULL
-  
+
   shape = id_db %>%
     tbl("flowline_ids") %>%
     filter(PERMANENT_ %in% PERMANENT_match) %>%
