@@ -68,13 +68,8 @@ link_flowlines = function(lats, lons, ids, max_dist = 100){
 
     matches = snapPointsToLines(pts, nhd, maxDist = max_dist, idField = ids)
     if(is.na(matches)){
-<<<<<<< HEAD
       match_res[i*nrow(pts@coords) -nrow(pts@coords) + 1] = NA
-      next()
-=======
-      match_res[i*nrow(pts@coords) -nrow(pts@coords) + j] = NA
       next
->>>>>>> 315e7b0ff07e2c9774ade2c262eb753b648b4dc9
     }
     matches_found = matches_found + nrow(matches)
     for(j in 1:nrow(matches)){
