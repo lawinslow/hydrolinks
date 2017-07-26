@@ -16,7 +16,7 @@
 #'
 #' @export
 
-link_flowlines = function(lats, lons, ids, max_dist = 100){
+link_to_flowlines = function(lats, lons, ids, max_dist = 100){
   bbdf_streams = NULL
   load(file=system.file('extdata/nhd_bb_streams_cache.Rdata', package='hydrolinks'))
   wbd_bb = bbdf_streams
