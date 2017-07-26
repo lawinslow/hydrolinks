@@ -18,7 +18,7 @@
 
 link_flowlines = function(lats, lons, ids, max_dist = 100){
   bbdf_streams = NULL
-  load(file=system.file('extdata/nhd_bb_streams_cache.Rdata', package='nhdtools'))
+  load(file=system.file('extdata/nhd_bb_streams_cache.Rdata', package='hydrolinks'))
   wbd_bb = bbdf_streams
 
   sites = data.frame(lats, lons, ids)
@@ -52,7 +52,7 @@ link_flowlines = function(lats, lons, ids, max_dist = 100){
 
   for(i in 1:nrow(to_check)){
     #get nhd layer
-    check_dl_file(system.file("extdata/nhdh.csv", package = "nhdtools"), to_check[i, 'file'])
+    check_dl_file(system.file("extdata/nhdh.csv", package = "hydrolinks"), to_check[i, 'file'])
 
     nhd       = readOGR(file.path(local_path(), "unzip", to_check[i,'file'], "NHDFlowline_projected.shp"))
 

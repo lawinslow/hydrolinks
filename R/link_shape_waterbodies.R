@@ -16,7 +16,7 @@
 link_shape_waterbodies = function(shapedf){
   bbdf = NULL
   wbd_shapes = file.path(local_storage(), 'HU4', 'Shape_unzip', '*', 'Shape', 'NHDWaterbody.shp')
-  load(file=system.file('extdata/nhd_bb_cache.Rdata', package='nhdtools'))
+  load(file=system.file('extdata/nhd_bb_cache.Rdata', package='hydrolinks'))
   wbd_bb = bbs_to_sp(bbdf)
 
   #project input to NHD

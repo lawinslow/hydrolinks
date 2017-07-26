@@ -38,8 +38,8 @@ tables = list()
 for(i in 1:length(gdbs)){
   tables[[i]] = read_csv(paste0(file_path_sans_ext(dirname(gdbs[i])), ".csv"), 
                          col_types = list(col_character(), col_character(), col_character(), col_character()))
-  changes_from = changes[changes$shape.PERMANENT_ %in% tables[[i]]$From_Permanent_Identifier, ]
-  changes_to = changes[changes$shape.PERMANENT_ %in% tables[[i]]$To_Permanent_Identifier, ]
+  changes_from = changes[[i]][changes[[i]]$shape.PERMANENT_ %in% tables[[i]]$From_Permanent_Identifier, ]
+  changes_to = changes[[i]][changes[[i]]$shape.PERMANENT_ %in% tables[[i]]$To_Permanent_Identifier, ]
   for(j in 1:nrow(changes_from)){
     tables[[i]][tables[[i]]$From_Permanent_Identifier == changes_from$shape.PERMANENT_[j], ] = changes_from$shape.WBAREA_PER[j]
     tables[[i]][tables[[i]]$To_Permanent_Identifier == changes_to$shape.PERMANENT_[j], ] = changes_to$shape.WBAREA_PER[j]
