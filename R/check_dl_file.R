@@ -66,6 +66,7 @@ local_path = function(){
   }
   else{
     path = readChar(pathFile, file.info(pathFile)$size)
+    path = gsub("[\r\n]", "", path)
   }
   if(!file.exists(path)){
     dir.create(path, recursive = TRUE)
