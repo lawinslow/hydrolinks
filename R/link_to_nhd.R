@@ -19,12 +19,12 @@ link_to_waterbodies = function(lats, lons, ids, dataset = "nhd"){
   id_column = ""
   bbdf = NULL
   if(tolower(dataset) == "nhd"){
-    load(file=system.file('extdata/nhd_bb_cache.Rdata', package='nhdtools'))
+    load(file=system.file('extdata/nhd_bb_cache.Rdata', package='hydrolinks'))
     dl_file = "extdata/nhdh.csv"
     id_column = "PERMANENT_"
   }
   else if(tolower(dataset) == "hydrolakes"){
-    load(file=system.file('extdata/hydrolakes_bb_cache.Rdata', package='nhdtools'))
+    load(file=system.file('extdata/hydrolakes_bb_cache.Rdata', package='hydrolinks'))
     dl_file = "extdata/hydrolakes.csv"
     id_column = "Hylak_id"
   }
@@ -55,7 +55,7 @@ link_to_waterbodies = function(lats, lons, ids, dataset = "nhd"){
   #TODO: Finish this
   for(i in 1:nrow(to_check)){
     #get nhd layer
-    check_dl_file(system.file(dl_file, package = "nhdtools"), to_check[i, 'file'])
+    check_dl_file(system.file(dl_file, package = "hydrolinks"), to_check[i, 'file'])
     
     shapefile_name = ""
     if(tolower(dataset) == "nhd"){

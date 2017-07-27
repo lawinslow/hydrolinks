@@ -17,7 +17,7 @@
 
 
 waterbody_shape_by_id = function(PERMANENT_match = NULL, GNIS_ID_match = NULL, GNIS_NAME_match = NULL, REACHCODE_match = NULL){
-  check_dl_file(system.file("extdata/id_db.csv", package = "nhdtools"), fname = "waterbody_ids.zip")
+  check_dl_file(system.file("extdata/id_db.csv", package = "hydrolinks"), fname = "waterbody_ids.zip")
   id_db = src_sqlite(file.path(local_path(), "unzip", "waterbody_ids.zip", "waterbody_ids.sqlite3"))
   shape = id_db %>%
     tbl("waterbody_ids")
@@ -37,7 +37,7 @@ waterbody_shape_by_id = function(PERMANENT_match = NULL, GNIS_ID_match = NULL, G
   shapes = list()
   if(length(files) > 0){
     for(i in 1:length(files)){
-      check_dl_file(system.file("extdata/nhdh.csv", package="nhdtools"), fname = files[i])
+      check_dl_file(system.file("extdata/nhdh.csv", package="hydrolinks"), fname = files[i])
       shapes[[i]] = readOGR(file.path(local_path(), "unzip", files[i], "NHDWaterbody.shp"))
     }
     if(length(shapes) > 1)
@@ -62,7 +62,7 @@ waterbody_shape_by_id = function(PERMANENT_match = NULL, GNIS_ID_match = NULL, G
 #' @export
 
 flowline_shape_by_id = function(PERMANENT_match){
-  check_dl_file(system.file("extdata/id_db.csv", package = "nhdtools"), fname = "flowline_ids.zip")
+  check_dl_file(system.file("extdata/id_db.csv", package = "hydrolinks"), fname = "flowline_ids.zip")
   id_db = src_sqlite(file.path(local_path(), "unzip", "flowline_ids.zip", "flowline_ids.sqlite3"))
 
   PERMANENT_ = NULL
@@ -75,7 +75,7 @@ flowline_shape_by_id = function(PERMANENT_match){
   files = unique(shape$file)
   if(length(files) > 0){
     for(i in 1:length(files)){
-      check_dl_file(system.file("extdata/nhdh.csv", package="nhdtools"), fname = files[i])
+      check_dl_file(system.file("extdata/nhdh.csv", package="hydrolinks"), fname = files[i])
       shapes[[i]] = readOGR(file.path(local_path(), "unzip", files[i], "NHDFlowline_projected.shp"))
     }
     if(length(shapes) > 1)

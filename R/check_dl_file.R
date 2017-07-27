@@ -60,12 +60,13 @@ check_dl_file = function(master_file, fname = NULL, md5check = TRUE, dest=local_
 
 local_path = function(){
   path = ""
-  pathFile = file.path(rappdirs::user_data_dir(appname = 'nhdtools', version=packageVersion('nhdtools')), "path")
+  pathFile = file.path(rappdirs::user_data_dir(appname = 'hydrolinks', version=packageVersion('hydrolinks')), "path")
   if(!file.exists(pathFile)){
-    path = rappdirs::user_data_dir(appname = 'nhdtools', version=packageVersion('nhdtools'))
+    path = rappdirs::user_data_dir(appname = 'hydrolinks', version=packageVersion('hydrolinks'))
   }
   else{
     path = readChar(pathFile, file.info(pathFile)$size)
+    path = gsub("[\r\n]", "", path)
   }
   if(!file.exists(path)){
     dir.create(path, recursive = TRUE)
@@ -84,11 +85,11 @@ set_local_files_path = function(path = NULL){
     if(!file.exists(path)){
       dir.create(path, recursive = TRUE)
     }
-    write(path, file = file.path(rappdirs::user_data_dir(appname = 'nhdtools', version=packageVersion('nhdtools')), "path"))
+    write(path, file = file.path(rappdirs::user_data_dir(appname = 'hydrolinks', version=packageVersion('hydrolinks')), "path"))
   }
   else{
-    pathFile = file.path(rappdirs::user_data_dir(appname = 'nhdtools', version=packageVersion('nhdtools')), "path")
-    if(file.exists(pathfile)){
+    pathFile = file.path(rappdirs::user_data_dir(appname = 'hydrolinks', version=packageVersion('hydrolinks')), "path")
+    if(file.exists(pathFile)){
       file.remove(pathFile)
     }
   }
