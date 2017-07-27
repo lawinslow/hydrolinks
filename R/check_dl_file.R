@@ -76,6 +76,8 @@ local_path = function(){
 
 
 #' @title Set local files path
+#' 
+#' @description Set location of local data file cache
 #'
 #' @param path character path to new local files path. If null, path will be reset to default user data directory location.
 #'
