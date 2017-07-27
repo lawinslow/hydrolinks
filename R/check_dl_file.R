@@ -89,7 +89,7 @@ set_local_files_path = function(path = NULL){
   }
   else{
     pathFile = file.path(rappdirs::user_data_dir(appname = 'hydrolinks', version=packageVersion('hydrolinks')), "path")
-    if(file.exists(pathfile)){
+    if(file.exists(pathFile)){
       file.remove(pathFile)
     }
   }

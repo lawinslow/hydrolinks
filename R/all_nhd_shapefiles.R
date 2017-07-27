@@ -8,7 +8,5 @@
 #'
 #' @export
 all_nhd_shapefiles = function(){
-
-  return(Sys.glob(file.path(local_storage(), 'HU4', 'Shape_unzip', '*.zip', 'Shape', '*.shp')))
-
+  return(read.csv(system.file("extdata/nhdh.csv", package = "hydrolinks"))$filename)
 }
