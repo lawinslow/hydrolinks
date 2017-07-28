@@ -14,7 +14,7 @@
 #' @import sp
 #'
 #' @export
-link_to_waterbodies = function(lats, lons, ids, dataset = "nhd"){
+link_to_waterbodies = function(lats, lons, ids, dataset = "nhd", buffer = 0){
   dl_file = ""
   id_column = ""
   bbdf = NULL
@@ -59,13 +59,17 @@ link_to_waterbodies = function(lats, lons, ids, dataset = "nhd"){
     
     shapefile_name = ""
     if(tolower(dataset) == "nhd"){
-      shapefile_name = "NHDWaterbody.shp"
+      shapefile_name = "NHDWaterbody_projected.shp"
     }
     else if(tolower(dataset) == "hydrolakes"){
       shapefile_name = "HydroLAKES_polys_v10.shp"
     }
     
     nhd       = readOGR(file.path(local_path(), "unzip", to_check[i,'file'], shapefile_name))
+    
+    if(buffer > 0){
+      nhd = gBuffer(nhd, byid = TRUE, width = buffer)
+    }
 
     ids = rep(NA, length(sites$lats))
 
@@ -73,7 +77,8 @@ link_to_waterbodies = function(lats, lons, ids, dataset = "nhd"){
 
     xy = cbind(sites$lons, sites$lats)
 
-    pts = SpatialPoints(xy[not_na, , drop=FALSE], proj4string=CRS(proj4string(nhd)))
+    pts = SpatialPoints(xy[not_na, , drop=FALSE], proj4string=CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))
+    pts = spTransform(pts, CRS("+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs"))
     matches = over(pts, nhd, fn = NULL, returnList = FALSE)
 
     matches$MATCH_ID = sites$ids[not_na]

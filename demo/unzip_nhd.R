@@ -1,8 +1,8 @@
-library(nhdtools)
+library(hydrolinks)
 library(rgdal)
 library(parallel)
 
-zipfiles = Sys.glob(file.path(local_storage(), 'HU4', 'Shape', '*Shape.zip'))
+zipfiles = Sys.glob(file.path(local_path(), '*Shape.zip'))
 dest = file.path(local_storage(), 'HU4', 'Shape_unzip')
 
 unzip_wbd = function(zipfile){

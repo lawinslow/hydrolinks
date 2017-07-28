@@ -58,6 +58,13 @@ check_dl_file = function(master_file, fname = NULL, md5check = TRUE, dest=local_
   }
 }
 
+#' @title Get local files path
+#' 
+#' @description Get path to cached data files
+#' 
+#' @export
+
+
 local_path = function(){
   path = ""
   pathFile = file.path(rappdirs::user_data_dir(appname = 'hydrolinks', version=packageVersion('hydrolinks')), "path")
