@@ -16,7 +16,7 @@
 #' @import rgeos
 #'
 #' @export
-match_waterbody_centroids = function(lats, lons, ids, dataset = "nhd", max_dist = 100){
+link_waterbody_centroids = function(lats, lons, ids, dataset = "nhd", max_dist = 25){
   dl_file = ""
   id_column = ""
   bbdf = NULL
