@@ -13,6 +13,7 @@
 #'
 #' @import rgdal
 #' @import sp
+#' @import rgeos
 #'
 #' @export
 match_waterbody_centroids = function(lats, lons, ids, dataset = "nhd", max_dist = 100){
@@ -77,16 +78,32 @@ match_waterbody_centroids = function(lats, lons, ids, dataset = "nhd", max_dist 
     
     pts = SpatialPoints(xy[not_na, , drop=FALSE], proj4string=CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))
     pts = spTransform(pts, CRS("+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs"))
-    matches = gWithinDistance(pts, gCentroid(nhd, byid = TRUE), dist = max_dist, byid = TRUE)
-    matches = nhd@data[matches,]
-    if(nrow(matches) == 0){
-      next
+    centroids = SpatialPoints(data.frame(nhd$centroid_x, nhd$centroid_y), proj4string = CRS("+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs"))
+    matches = centroid_distance(nhd, pts, max_dist, sites$ids[not_na])
+    if(!is.null(matches)){
+      for(i in 1:length(matches)){
+        match_res = c(match_res, matches[[i]]@data)
+      }
     }
-    matches$MATCH_ID = sites$ids[not_na]
-    match_res[[i]] = matches
   }
   
-  unique_matches = unique(do.call(rbind, match_res))
+  unique_matches = unique(bind_rows(match_res))
   #return matches that have non-NA value id
   return(unique_matches[!is.na(unique_matches[,id_column]),])
+}
+
+centroid_distance = function(shape, pts, max_dist, match_id){
+  result = c()
+  for(i in 1:nrow(pts@coords)){
+    match = sqrt(abs(pts@coords[i, 1] - shape$centroid_x)^2 + abs(pts@coords[i, 2] - shape$centroid_y)^2) <= max_dist
+    matching_features = shape[match,]
+    if(nrow(matching_features) == 0){
+      next
+    }
+    for(j in 1:nrow(matching_features)){
+      result = c(result, matching_features[j,])
+      result[[j]]$MATCH_ID = match_id[i]
+    }
+  }
+  return(result)
 }

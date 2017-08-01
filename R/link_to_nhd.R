@@ -11,6 +11,7 @@
 #' @return Water body permanent IDs
 #'
 #' @import rgdal
+#' @import rgeos
 #' @import sp
 #'
 #' @export
