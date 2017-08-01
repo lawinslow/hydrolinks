@@ -50,7 +50,7 @@ link_to_flowlines = function(lats, lons, ids, max_dist = 100){
     match_res = list()
     
     if(nrow(to_check) == 0){
-      ret = data.frame(MATCH_ID = sites$ids)
+      ret = data.frame(MATCH_ID = sites[[i]]$ids)
       ret$PERMANENT_ID = NA
       next
     }
@@ -60,7 +60,7 @@ link_to_flowlines = function(lats, lons, ids, max_dist = 100){
       
       nhd       = readOGR(file.path(local_path(), "unzip", to_check[k,'file'], "NHDFlowline_projected.shp"))
       
-      ids = rep(NA, length(sites$lats))
+      #ids = rep(NA, length(sites$lats))
       
       bbox = wbd_bb[wbd_bb$file == to_check[k, 'file'], ]
       pts = pts[bbox$xmin <= pts@coords[, 1] & bbox$xmax >= pts@coords[,1] & bbox$ymin <= pts@coords[,2] & bbox$ymax >= pts@coords[,2],]
@@ -72,14 +72,14 @@ link_to_flowlines = function(lats, lons, ids, max_dist = 100){
       
       matches = snapPointsToLines(pts, nhd, maxDist = max_dist)
       if(is.na(matches)){
-        match_res[k*nrow(pts@coords) -nrow(pts@coords) + 1] = NA
+        #match_res[k*nrow(pts@coords) -nrow(pts@coords) + 1] = NA
         next
       }
-      #matches_found = matches_found + nrow(matches)
-      for(j in 1:nrow(matches)){
-        match_data = nhd@data[as.numeric(as.character(matches$nearest_line_id[j])) + 1,]
-        match_data$MATCH_ID = matches$MATCH_ID[j]
-        match_res[[k*nrow(matches) - nrow(matches) + j]] = match_data
+      matches_found = matches_found + nrow(matches)
+      for(l in 1:nrow(matches)){
+        match_data = nhd@data[as.numeric(as.character(matches$nearest_line_id[l])) + 1,]
+        match_data$MATCH_ID = matches$MATCH_ID[l]
+        match_res[[k*nrow(matches) - nrow(matches) + l]] = match_data
       }
       #if(matches_found == nrow(sites)){
       #  break

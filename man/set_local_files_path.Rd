@@ -9,3 +9,6 @@ set_local_files_path(path = NULL)
 \arguments{
 \item{path}{character path to new local files path. If null, path will be reset to default user data directory location.}
 }
+\description{
+Set location of local data file cache
+}

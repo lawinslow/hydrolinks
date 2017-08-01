@@ -58,6 +58,13 @@ check_dl_file = function(master_file, fname = NULL, md5check = TRUE, dest=local_
   }
 }
 
+#' @title Get local files path
+#' 
+#' @description Get path to cached data files
+#' 
+#' @export
+
+
 local_path = function(){
   path = ""
   pathFile = file.path(rappdirs::user_data_dir(appname = 'hydrolinks', version=packageVersion('hydrolinks')), "path")
@@ -76,6 +83,8 @@ local_path = function(){
 
 
 #' @title Set local files path
+#' 
+#' @description Set location of local data file cache
 #'
 #' @param path character path to new local files path. If null, path will be reset to default user data directory location.
 #'

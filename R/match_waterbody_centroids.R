@@ -1,21 +1,22 @@
-#' @title Link geopoints to Waterbodies
+#' @title Link geopoints to Waterbodies by centroids
 #' 
-#' @description Link geopoints to waterbodies in a geospatial dataset.
+#' @description Link geopoints to a waterbody with the closest centroid a geospatial dataset
 #'
 #' @param lats Vector of point latitudes
 #' @param lons Vector of point longitudes
 #' @param ids Vector of point identifiers (string or numeric)
 #' @param dataset Character name of dataset to link against. Can be either "nhd" or "hydrolakes"
+#' @param max_dist maximum distance between points and centroids to match
 #'
 #'
 #' @return Water body permanent IDs
 #'
 #' @import rgdal
-#' @import rgeos
 #' @import sp
+#' @import rgeos
 #'
 #' @export
-link_to_waterbodies = function(lats, lons, ids, dataset = "nhd", buffer = 0){
+link_waterbody_centroids = function(lats, lons, ids, dataset = "nhd", max_dist = 25){
   dl_file = ""
   id_column = ""
   bbdf = NULL
@@ -33,7 +34,7 @@ link_to_waterbodies = function(lats, lons, ids, dataset = "nhd", buffer = 0){
     stop("Invalid dataset name!")
   }
   wbd_bb = bbdf
-
+  
   sites = data.frame(lats, lons, ids)
   res   = list()
   
@@ -41,16 +42,16 @@ link_to_waterbodies = function(lats, lons, ids, dataset = "nhd", buffer = 0){
   for(i in 1:nrow(sites)){
     res[[i]] = subset(wbd_bb, xmin <= sites[i,'lons'] & xmax >= sites[i,'lons'] & ymin <= sites[i,'lats'] & ymax >= sites[i,'lats'])
   }
-
+  
   to_check = unique(do.call(rbind, res))
-
-
+  
+  
   match_res = list()
   
   if(nrow(to_check) == 0){
-      ret = data.frame(MATCH_ID = sites$ids)
-      ret$PERMANENT_ID = NA
-      return(ret)
+    ret = data.frame(MATCH_ID = sites$ids)
+    ret$PERMANENT_ID = NA
+    return(ret)
   }
   
   #TODO: Finish this
@@ -68,25 +69,41 @@ link_to_waterbodies = function(lats, lons, ids, dataset = "nhd", buffer = 0){
     
     nhd       = readOGR(file.path(local_path(), "unzip", to_check[i,'file'], shapefile_name))
     
-    if(buffer > 0){
-      nhd = gBuffer(nhd, byid = TRUE, width = buffer)
-    }
-
+    
     ids = rep(NA, length(sites$lats))
-
+    
     not_na = which(!is.na(sites$lats) & !is.na(sites$lons))
-
+    
     xy = cbind(sites$lons, sites$lats)
-
+    
     pts = SpatialPoints(xy[not_na, , drop=FALSE], proj4string=CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))
     pts = spTransform(pts, CRS("+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs"))
-    matches = over(pts, nhd, fn = NULL, returnList = FALSE)
-
-    matches$MATCH_ID = sites$ids[not_na]
-    match_res[[i]] = matches
+    centroids = SpatialPoints(data.frame(nhd$centroid_x, nhd$centroid_y), proj4string = CRS("+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs"))
+    matches = centroid_distance(nhd, pts, max_dist, sites$ids[not_na])
+    if(!is.null(matches)){
+      for(i in 1:length(matches)){
+        match_res = c(match_res, matches[[i]]@data)
+      }
+    }
   }
-
-  unique_matches = unique(do.call(rbind, match_res))
+  
+  unique_matches = unique(bind_rows(match_res))
   #return matches that have non-NA value id
   return(unique_matches[!is.na(unique_matches[,id_column]),])
+}
+
+centroid_distance = function(shape, pts, max_dist, match_id){
+  result = c()
+  for(i in 1:nrow(pts@coords)){
+    match = sqrt(abs(pts@coords[i, 1] - shape$centroid_x)^2 + abs(pts@coords[i, 2] - shape$centroid_y)^2) <= max_dist
+    matching_features = shape[match,]
+    if(nrow(matching_features) == 0){
+      next
+    }
+    for(j in 1:nrow(matching_features)){
+      result = c(result, matching_features[j,])
+      result[[j]]$MATCH_ID = match_id[i]
+    }
+  }
+  return(result)
 }

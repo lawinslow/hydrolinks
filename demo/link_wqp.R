@@ -1,9 +1,10 @@
 library(dataRetrieval)
-library(nhdtools)
+library(hydrolinks)
 
 sites = whatWQPsites(siteType ="Stream")
 
-nhd = link_flowlines(sites$LatitudeMeasure, sites$LongitudeMeasure, sites$MonitoringLocationIdentifier)
+nhd = link_to_flowlines(sites$LatitudeMeasure, sites$LongitudeMeasure, sites$MonitoringLocationIdentifier)
+
 
 conus = USAboundaries::cb_2014_us_state_20m[!USAboundaries::cb_2014_us_state_20m@data$geoid %in% c('72', '02', '15'),]
 wqp_points = SpatialPoints(cbind(sites$LongitudeMeasure, sites$LatitudeMeasure),
