@@ -81,15 +81,19 @@ link_waterbody_centroids = function(lats, lons, ids, dataset = "nhd", max_dist =
     centroids = SpatialPoints(data.frame(nhd$centroid_x, nhd$centroid_y), proj4string = CRS("+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs"))
     matches = centroid_distance(nhd, pts, max_dist, sites$ids[not_na])
     if(!is.null(matches)){
-      for(i in 1:length(matches)){
-        match_res = c(match_res, matches[[i]]@data)
+      for(j in 1:length(matches)){
+        match_res[[j]] = matches[[j]]@data
       }
     }
   }
   
   unique_matches = unique(bind_rows(match_res))
   #return matches that have non-NA value id
-  return(unique_matches[!is.na(unique_matches[,id_column]),])
+  if(nrow(unique_matches) > 0)
+    return(unique_matches[!is.na(unique_matches[,id_column]),])
+  else{
+    return(NULL)
+  }
 }
 
 centroid_distance = function(shape, pts, max_dist, match_id){
@@ -101,8 +105,8 @@ centroid_distance = function(shape, pts, max_dist, match_id){
       next
     }
     for(j in 1:nrow(matching_features)){
+      matching_features$MATCH_ID = match_id[i]
       result = c(result, matching_features[j,])
-      result[[j]]$MATCH_ID = match_id[i]
     }
   }
   return(result)
