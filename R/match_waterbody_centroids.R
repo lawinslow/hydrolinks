@@ -78,7 +78,7 @@ link_waterbody_centroids = function(lats, lons, ids, dataset = "nhd", max_dist =
     
     pts = SpatialPoints(xy[not_na, , drop=FALSE], proj4string=CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))
     pts = spTransform(pts, CRS("+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs"))
-    centroids = SpatialPoints(data.frame(nhd$centroid_x, nhd$centroid_y), proj4string = CRS("+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs"))
+    centroids = SpatialPointsDataFrame(data.frame(nhd$centroid_x, nhd$centroid_y), nhd@data, proj4string = CRS("+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs"))
     centroids = gBuffer(centroids, byid = TRUE, width = max_dist)
     matches = over(pts, centroids)
     #if(!is.null(matches)){
@@ -86,6 +86,7 @@ link_waterbody_centroids = function(lats, lons, ids, dataset = "nhd", max_dist =
     #    match_res[[j]] = matches[[j]]@data
     #  }
     #}
+    #match_data = nhd@data[!is.na(matches),]
     matches$MATCH_ID = sites$ids
     match_res[[i]] = matches
   }
