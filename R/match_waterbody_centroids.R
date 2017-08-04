@@ -70,7 +70,7 @@ link_waterbody_centroids = function(lats, lons, ids, dataset = "nhd", max_dist =
     nhd       = readOGR(file.path(local_path(), "unzip", to_check[i,'file'], shapefile_name))
     
     
-    ids = rep(NA, length(sites$lats))
+    #ids = rep(NA, length(sites$lats))
     
     not_na = which(!is.na(sites$lats) & !is.na(sites$lons))
     
@@ -79,12 +79,15 @@ link_waterbody_centroids = function(lats, lons, ids, dataset = "nhd", max_dist =
     pts = SpatialPoints(xy[not_na, , drop=FALSE], proj4string=CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))
     pts = spTransform(pts, CRS("+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs"))
     centroids = SpatialPoints(data.frame(nhd$centroid_x, nhd$centroid_y), proj4string = CRS("+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs"))
-    matches = centroid_distance(nhd, pts, max_dist, sites$ids[not_na])
-    if(!is.null(matches)){
-      for(j in 1:length(matches)){
-        match_res[[j]] = matches[[j]]@data
-      }
-    }
+    centroids = gBuffer(centroids, byid = TRUE, width = max_dist)
+    matches = over(pts, centroids)
+    #if(!is.null(matches)){
+    #  for(j in 1:length(matches)){
+    #    match_res[[j]] = matches[[j]]@data
+    #  }
+    #}
+    matches$MATCH_ID = sites$ids
+    match_res[[i]] = matches
   }
   
   unique_matches = unique(bind_rows(match_res))
