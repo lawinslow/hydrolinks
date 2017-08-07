@@ -1,9 +1,9 @@
 library(dataRetrieval)
 library(hydrolinks)
 
-sites = whatWQPsites(siteType ="Stream")
+sites = whatWQPsites(siteType ="Lake, Reservoir, Impoundment")
 
-nhd = link_to_flowlines(sites$LatitudeMeasure, sites$LongitudeMeasure, sites$MonitoringLocationIdentifier)
+centroids_1 = link_waterbody_centroids(sites$LatitudeMeasure[1], sites$LongitudeMeasure[1], sites$MonitoringLocationIdentifier[1], max_dist = 25)
 
 
 conus = USAboundaries::cb_2014_us_state_20m[!USAboundaries::cb_2014_us_state_20m@data$geoid %in% c('72', '02', '15'),]

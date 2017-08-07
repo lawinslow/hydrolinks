@@ -71,6 +71,6 @@ for(i in 1:length(bbdf_streams$file)){
 distances = rbindlist(distances)
 colnames(distances) = c("PERMANENT_", "LENGTHKM")
 distances = rename(distances, PERMANENT_ = From_Permanent_Id)
-flowtable = merge(flowtable, distances, by="From_Permanent_Id")
+flowtable = merge(flowtable, distances, by="From_Permanent_Identifier")
 ids_db = src_sqlite("flowtable.sqlite3", create = TRUE)
 copy_to(ids_db, flowtable, overwrite = TRUE, temporary = FALSE, indexes = list("From_Permanent_Identifier","To_Permanent_Identifier"))
