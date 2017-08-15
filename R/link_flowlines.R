@@ -26,14 +26,16 @@ link_to_flowlines = function(lats, lons, ids, max_dist = 100, dataset = "nhdh"){
     load(file=system.file('extdata/nhd_bb_streams_cache.Rdata', package='hydrolinks'))
     dl_file = "extdata/nhdh.csv"
     id_column = "PERMANENT_"
+    wbd_bb = bbdf_streams
   }
   else if(tolower(dataset) == "nhdplus"){
-    load(file=system.file('nhdplus_fowline_bb_cache.rdata', package='hydrolinks'))
+    load(file=system.file('extdata/nhdplus_flowline_bb_cache.rdata', package='hydrolinks'))
     dl_file = "extdata/nhdplus.csv"
     id_column = "COMID"
+    wbd_bb = bbdf_flowline
   }
   
-  wbd_bb = bbdf_streams
+  
   
   sites = data.frame(lats, lons, ids)
   xy = cbind(sites$lons, sites$lats)
@@ -66,7 +68,7 @@ link_to_flowlines = function(lats, lons, ids, max_dist = 100, dataset = "nhdh"){
   
   for(i in 1:nrow(to_check)){
     #get nhd layer
-    check_dl_file(system.file(dl_file, package = "hydrolinks"), to_check[i, 'file'])
+    #check_dl_file(system.file(dl_file, package = "hydrolinks"), to_check[i, 'file'])
     nhd       = readOGR(file.path(local_path(), "unzip", to_check[i,'file'], "NHDFlowline_projected.shp"))
     nhd = gBuffer(nhd, byid = TRUE, width = max_dist)
     matches = over(pts, nhd)
@@ -74,7 +76,7 @@ link_to_flowlines = function(lats, lons, ids, max_dist = 100, dataset = "nhdh"){
     match_res[[i]] = matches
   }
   
-  unique_matches = unique(do.call(rbind, match_res))
+  unique_matches = unique(bind_rows(match_res))
   #return matches that have non-NA value PREMANENT_ID
   return(unique_matches[!is.na(unique_matches[,id_column]), ])
 }

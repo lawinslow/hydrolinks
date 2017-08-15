@@ -50,5 +50,6 @@ save(bbdf_flowline, file = "inst/extdata/nhdplus_flowline_bb_cache.rdata")
 dir.create(file.path(nhd_path, "zip"))
 output_zip = file.path(nhd_path, "zip", paste0(basename(regions), ".zip"))
 for(i in 1:length(regions)){
-  zip(output_zip[i], Sys.glob(file.path(dest, regions[i], "*_projected.shp")))
+  setwd(file.path(dest, regions[i]))
+  zip(output_zip[i], Sys.glob("*_projected.*"))
 }
