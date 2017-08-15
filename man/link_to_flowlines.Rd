@@ -4,7 +4,7 @@
 \alias{link_to_flowlines}
 \title{Link geopoints to flowlines}
 \usage{
-link_to_flowlines(lats, lons, ids, max_dist = 100)
+link_to_flowlines(lats, lons, ids, max_dist = 100, dataset = "nhdh")
 }
 \arguments{
 \item{lats}{Vector of point latitudes}
@@ -14,6 +14,8 @@ link_to_flowlines(lats, lons, ids, max_dist = 100)
 \item{ids}{Vector of point identifiers (string or numeric)}
 
 \item{max_dist}{numeric maximum line snapping distance in meters}
+
+\item{dataset}{Character name of dataset to link against. Can be either "nhdh" or "nhdplus"}
 }
 \value{
 flowline permanent ids

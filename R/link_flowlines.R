@@ -6,6 +6,7 @@
 #' @param lons Vector of point longitudes
 #' @param ids Vector of point identifiers (string or numeric)
 #' @param max_dist numeric maximum line snapping distance in meters
+#' @param dataset Character name of dataset to link against. Can be either "nhdh" or "nhdplus"
 #'
 #' @return flowline permanent ids
 #'
@@ -17,9 +18,21 @@
 #'
 #' @export
 
-link_to_flowlines = function(lats, lons, ids, max_dist = 100){
+link_to_flowlines = function(lats, lons, ids, max_dist = 100, dataset = "nhdh"){
+  dl_file = ""
+  id_column = ""
   bbdf_streams = NULL
-  load(file=system.file('extdata/nhd_bb_streams_cache.Rdata', package='hydrolinks'))
+  if(tolower(dataset) == "nhdh"){
+    load(file=system.file('extdata/nhd_bb_streams_cache.Rdata', package='hydrolinks'))
+    dl_file = "extdata/nhdh.csv"
+    id_column = "PERMANENT_"
+  }
+  else if(tolower(dataset) == "nhdplus"){
+    load(file=system.file('nhdplus_fowline_bb_cache.rdata', package='hydrolinks'))
+    dl_file = "extdata/nhdplus.csv"
+    id_column = "COMID"
+  }
+  
   wbd_bb = bbdf_streams
   
   sites = data.frame(lats, lons, ids)
@@ -53,7 +66,7 @@ link_to_flowlines = function(lats, lons, ids, max_dist = 100){
   
   for(i in 1:nrow(to_check)){
     #get nhd layer
-    check_dl_file(system.file("extdata/nhdh.csv", package = "hydrolinks"), to_check[i, 'file'])
+    check_dl_file(system.file(dl_file, package = "hydrolinks"), to_check[i, 'file'])
     nhd       = readOGR(file.path(local_path(), "unzip", to_check[i,'file'], "NHDFlowline_projected.shp"))
     nhd = gBuffer(nhd, byid = TRUE, width = max_dist)
     matches = over(pts, nhd)
@@ -63,5 +76,5 @@ link_to_flowlines = function(lats, lons, ids, max_dist = 100){
   
   unique_matches = unique(do.call(rbind, match_res))
   #return matches that have non-NA value PREMANENT_ID
-  return(unique_matches[!is.na(unique_matches$PERMANENT_), ])
+  return(unique_matches[!is.na(unique_matches[,id_column]), ])
 }
