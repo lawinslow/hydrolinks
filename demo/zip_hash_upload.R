@@ -3,6 +3,26 @@ library(sbtools)
 library(R.utils)
 authenticate_sb('lawinslow@gmail.com')
 
+
+hash_upload = function(name, files){
+
+  head_itm = item_create(title = name)
+
+  out = data.frame(filename = files)
+  out$url = NA
+  out$md5 = NA
+
+  for(i in seq_along(files)){
+    itm = item_create(parent_id = head_itm, title = basename(files[i]))
+    item_append_files(itm, files[i])
+    flist = item_list_files(itm)
+    out$url[i] = flist$url
+    out$md5[i] = tools::md5sum(files[i])
+  }
+  return(out)
+}
+
+
 zip_hash_upload = function(name, files, groups){
 
   head_itm = item_create(title = name)
@@ -37,5 +57,14 @@ hl_files = Sys.glob('z:/big_datasets/hydrolakes/*/HydroLAKES_polys_v10*')
 groups    = basename(dirname(nhd_files))
 zhres = zip_hash_upload(name, nhd_files, groups)
 
-write.csv(nhdh'inst/extdata/hydrolakes.csv', row.names=FALSE)
+write.csv(zhres, 'inst/extdata/hydrolakes.csv', row.names=FALSE)
+
+
+name = 'nhdplusv2'
+nhdpfiles = Sys.glob('b:/shared/zip/*')
+nhdp = hash_upload(name, nhdpfiles)
+
+write.csv(nhdp, 'inst/extdata/nhdplusv2.csv', row.names=FALSE)
+
+
 
