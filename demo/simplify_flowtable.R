@@ -1,3 +1,6 @@
+library(readr)
+library(tools)
+
 gdbs = Sys.glob(file.path("D:", "lakes", "NHD", "unzip", "*", "*GDB.gdb"))
 dest = file.path("D:", "lakes", "NHD", "unzip")
 
@@ -16,13 +19,15 @@ for(i in 1:length(gdbs)){
   tables[[i]] = left_join(tables[[i]], changes_to, by="To_Permanent_Identifier")
   tables[[i]]$To_Permanent_Identifier[!is.na(tables[[i]]$shape.WBAREA_PER)] = as.character(tables[[i]]$shape.WBAREA_PER[!is.na(tables[[i]]$shape.WBAREA_PER)])
   tables[[i]]$shape.WBAREA_PER = NULL
+  tables[[i]] = tables[[i]][tables[[i]]$From_Permanent_Identifier != tables[[i]]$To_Permanent_Identifier,]
 }
 
-flowtable = rbind_list(tables)
+flowtable = bind_rows(tables)
 
-flowtable = flowtable[,c(3,4,5)]
+
 load("distances.RData")
 distances = rename(distances, From_Permanent_Identifier = PERMANENT_)
 flowtable = left_join(flowtable, distances, by="From_Permanent_Identifier")
+flowtable = flowtable[,c(3,4,5)]
 ids_db = src_sqlite("flowtable.sqlite3", create = TRUE)
 copy_to(ids_db, flowtable, overwrite = TRUE, temporary = FALSE, indexes = list("From_Permanent_Identifier","To_Permanent_Identifier"))

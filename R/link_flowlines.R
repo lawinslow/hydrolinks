@@ -6,7 +6,7 @@
 #' @param lons Vector of point longitudes
 #' @param ids Vector of point identifiers (string or numeric)
 #' @param max_dist numeric maximum line snapping distance in meters
-#' @param dataset Character name of dataset to link against. Can be either "nhdh" or "nhdplus"
+#' @param dataset Character name of dataset to link against. Can be either "nhdh" or "nhdplusv2"
 #'
 #' @return flowline permanent ids
 #'
@@ -28,11 +28,14 @@ link_to_flowlines = function(lats, lons, ids, max_dist = 100, dataset = "nhdh"){
     id_column = "PERMANENT_"
     wbd_bb = bbdf_streams
   }
-  else if(tolower(dataset) == "nhdplus"){
+  else if(tolower(dataset) == "nhdplusv2"){
     load(file=system.file('extdata/nhdplus_flowline_bb_cache.rdata', package='hydrolinks'))
-    dl_file = "extdata/nhdplus.csv"
+    dl_file = "extdata/nhdplusv2.csv"
     id_column = "COMID"
     wbd_bb = bbdf_flowline
+  }
+  else{
+    stop("Invalid dataset name!")
   }
   
   
@@ -68,7 +71,7 @@ link_to_flowlines = function(lats, lons, ids, max_dist = 100, dataset = "nhdh"){
   
   for(i in 1:nrow(to_check)){
     #get nhd layer
-    #check_dl_file(system.file(dl_file, package = "hydrolinks"), to_check[i, 'file'])
+    check_dl_file(system.file(dl_file, package = "hydrolinks"), to_check[i, 'file'])
     nhd       = readOGR(file.path(local_path(), "unzip", to_check[i,'file'], "NHDFlowline_projected.shp"))
     nhd = gBuffer(nhd, byid = TRUE, width = max_dist)
     matches = over(pts, nhd)

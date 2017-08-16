@@ -12,6 +12,7 @@
 #' @import tools
 #' @import rappdirs
 #' @import utils
+#' @export
 
 check_dl_file = function(master_file, fname = NULL, md5check = TRUE, dest=local_path()){
   files = read.csv(master_file)

@@ -13,7 +13,7 @@ link_to_waterbodies(lats, lons, ids, dataset = "nhdh", buffer = 0)
 
 \item{ids}{Vector of point identifiers (string or numeric)}
 
-\item{dataset}{Character name of dataset to link against. Can be either "nhdh", "hydrolakes", or "nhdplus"}
+\item{dataset}{Character name of dataset to link against. Can be either "nhdh", "hydrolakes", or "nhdplusv2"}
 }
 \value{
 Water body permanent IDs

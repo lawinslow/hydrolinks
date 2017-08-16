@@ -15,7 +15,7 @@ link_to_flowlines(lats, lons, ids, max_dist = 100, dataset = "nhdh")
 
 \item{max_dist}{numeric maximum line snapping distance in meters}
 
-\item{dataset}{Character name of dataset to link against. Can be either "nhdh" or "nhdplus"}
+\item{dataset}{Character name of dataset to link against. Can be either "nhdh" or "nhdplusv2"}
 }
 \value{
 flowline permanent ids

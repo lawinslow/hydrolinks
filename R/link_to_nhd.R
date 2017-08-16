@@ -5,7 +5,7 @@
 #' @param lats Vector of point latitudes
 #' @param lons Vector of point longitudes
 #' @param ids Vector of point identifiers (string or numeric)
-#' @param dataset Character name of dataset to link against. Can be either "nhdh", "hydrolakes", or "nhdplus"
+#' @param dataset Character name of dataset to link against. Can be either "nhdh", "hydrolakes", or "nhdplusv2"
 #'
 #'
 #' @return Water body permanent IDs
@@ -29,9 +29,9 @@ link_to_waterbodies = function(lats, lons, ids, dataset = "nhdh", buffer = 0){
     dl_file = "extdata/hydrolakes.csv"
     id_column = "Hylak_id"
   }
-  else if(tolower(dataset) == "nhdplus"){
+  else if(tolower(dataset) == "nhdplusv2"){
     load(file=system.file('extdata/nhdplus_waterbody_bb_cache.rdata', package='hydrolinks'))
-    dl_file = "extdata/nhdplus.csv"
+    dl_file = "extdata/nhdplusv2.csv"
     id_column = "COMID"
   }
   else{
@@ -64,7 +64,7 @@ link_to_waterbodies = function(lats, lons, ids, dataset = "nhdh", buffer = 0){
     check_dl_file(system.file(dl_file, package = "hydrolinks"), to_check[i, 'file'])
     
     shapefile_name = ""
-    if(tolower(dataset) == "nhdh" || tolower(dataset) == "nhdplus"){
+    if(tolower(dataset) == "nhdh" || tolower(dataset) == "nhdplusv2"){
       shapefile_name = "NHDWaterbody_projected.shp"
     }
     else if(tolower(dataset) == "hydrolakes"){
