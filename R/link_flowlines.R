@@ -18,7 +18,8 @@
 #'
 #' @export
 
-link_to_flowlines = function(lats, lons, ids, max_dist = 100, dataset = "nhdh"){
+link_to_flowlines = function(lats, lons, ids, max_dist = 100, dataset = c("nhdh", "nhdplusv2")){
+  dataset = match.arg(dataset)
   dl_file = ""
   id_column = ""
   bbdf_streams = NULL
@@ -33,9 +34,6 @@ link_to_flowlines = function(lats, lons, ids, max_dist = 100, dataset = "nhdh"){
     dl_file = "extdata/nhdplusv2.csv"
     id_column = "COMID"
     wbd_bb = bbdf_flowline
-  }
-  else{
-    stop("Invalid dataset name!")
   }
   
   

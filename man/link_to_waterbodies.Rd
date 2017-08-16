@@ -4,7 +4,8 @@
 \alias{link_to_waterbodies}
 \title{Link geopoints to Waterbodies}
 \usage{
-link_to_waterbodies(lats, lons, ids, dataset = "nhdh", buffer = 0)
+link_to_waterbodies(lats, lons, ids, dataset = c("nhdh", "hydrolakes",
+  "nhdplusv2"), buffer = 0)
 }
 \arguments{
 \item{lats}{Vector of point latitudes}

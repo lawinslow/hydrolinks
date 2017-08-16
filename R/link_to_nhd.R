@@ -15,7 +15,8 @@
 #' @import sp
 #'
 #' @export
-link_to_waterbodies = function(lats, lons, ids, dataset = "nhdh", buffer = 0){
+link_to_waterbodies = function(lats, lons, ids, dataset = c("nhdh", "hydrolakes", "nhdplusv2"), buffer = 0){
+  dataset = match.arg(dataset)
   dl_file = ""
   id_column = ""
   if(tolower(dataset) == "nhdh"){
@@ -35,9 +36,6 @@ link_to_waterbodies = function(lats, lons, ids, dataset = "nhdh", buffer = 0){
     dl_file = "extdata/nhdplusv2.csv"
     id_column = "COMID"
     wbd_bb = bbdf_waterbody
-  }
-  else{
-    stop("Invalid dataset name!")
   }
   
 

@@ -4,7 +4,8 @@
 \alias{link_to_flowlines}
 \title{Link geopoints to flowlines}
 \usage{
-link_to_flowlines(lats, lons, ids, max_dist = 100, dataset = "nhdh")
+link_to_flowlines(lats, lons, ids, max_dist = 100, dataset = c("nhdh",
+  "nhdplusv2"))
 }
 \arguments{
 \item{lats}{Vector of point latitudes}

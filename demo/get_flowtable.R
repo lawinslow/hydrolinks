@@ -6,14 +6,15 @@ library(hydrolinks)
 
 load("inst/extdata/nhd_bb_streams_cache.Rdata")
 changes = list()
-for(file in bbdf_streams$file){
+for(i in 42:length(bbdf_streams$file)){
+  file = bbdf_streams$file[i]
   check_dl_file(system.file("extdata/nhdh.csv", package="nhdtools"), fname = file)
   shape = readOGR(file.path(local_path(), "unzip", file, "NHDFlowline_projected.shp"))
   waterbody = readOGR(file.path(local_path(), "unzip", file, "NHDWaterbody_projected.shp"))
   shape = shape[!is.na(shape$WBAREA_PER),]
   shape = shape[shape$WBAREA_PER %in% waterbody$PERMANENT_,]
   change = data.frame(shape$PERMANENT_, shape$WBAREA_PER)
-  changes = c(changes, list(change))
+  changes[[i]] = change
 }
 
 changes = rbind_list(changes)
