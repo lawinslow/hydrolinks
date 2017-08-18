@@ -1,9 +1,18 @@
 traverse_flowlines = function(g, distance, start, direction = "out"){
   nodes = c()
-  to_check = c()
-  to_check = sapply(neighbors(g, start, direction), function(x){
-    to_check[x] = to_check[x] + x$LENGTHKM
-  })
+  n = neighbors(g, start, direction)
+  to_check = n$LENGTHKM
+  names(to_check) = n$ID
+  # to_check = apply(neighbors(g, start, direction), 1, function(x){
+  #   to_check = c(to_check, x["LENGTHKM"])
+  #   names(to_check) = c(names(to_check), x["ID"])
+  #   # if(!is.null(to_check[x["ID"]])){
+  #   #   to_check[x["ID"]] = to_check[x["ID"]] + x["LENGTHKM"]
+  #   # }
+  #   # else{
+  #   #   to_check[x["ID"]] = x["LENGTHKM"]
+  #   # }
+  # })
   if(distance == 0){
     return(to_check)
   }
@@ -11,11 +20,12 @@ traverse_flowlines = function(g, distance, start, direction = "out"){
   while(1){
     next_check = c()
     to_check = to_check[to_check != 0]
-    nodes = c(nodes, to_check)
+    nodes = c(nodes, names(to_check))
     for(j in 1:length(to_check)){
-      next_check = c(next_check,sapply(neighbors(g, names(to_check)[j], direction), function(x){
-        to_check[x] = to_check[x] + x$LENGTHKM
-      }))
+        n = neighbors(g, names(to_check)[j], direction)
+        next_check_tmp = n$LENGTHKM + to_check[j]
+        names(next_check_tmp) = n$ID
+        next_check = c(next_check, next_check_tmp)
     }
     for(j in names(next_check)){
       if(next_check[j] > distance){
@@ -46,5 +56,6 @@ neighbors = function(db, node, direction){
     ret = data.frame(graph$From_Permanent_Identifier, graph$LENGTHKM)
   }
   colnames(ret) = c("ID", "LENGTHKM")
+  ret$ID = as.character(ret$ID)
   return(ret)
 }

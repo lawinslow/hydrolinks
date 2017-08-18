@@ -2,14 +2,19 @@ library(rgdal)
 library(tools)
 library(readr)
 library(dplyr)
+library(hydrolinks)
 
+load("inst/extdata/nhd_bb_streams_cache.Rdata")
 changes = list()
-for(file in bbdf_streams$file){
+for(i in 42:length(bbdf_streams$file)){
+  file = bbdf_streams$file[i]
   check_dl_file(system.file("extdata/nhdh.csv", package="nhdtools"), fname = file)
   shape = readOGR(file.path(local_path(), "unzip", file, "NHDFlowline_projected.shp"))
+  waterbody = readOGR(file.path(local_path(), "unzip", file, "NHDWaterbody_projected.shp"))
   shape = shape[!is.na(shape$WBAREA_PER),]
+  shape = shape[shape$WBAREA_PER %in% waterbody$PERMANENT_,]
   change = data.frame(shape$PERMANENT_, shape$WBAREA_PER)
-  changes = c(changes, list(change))
+  changes[[i]] = change
 }
 
 changes = rbind_list(changes)
@@ -71,6 +76,6 @@ for(i in 1:length(bbdf_streams$file)){
 distances = rbindlist(distances)
 colnames(distances) = c("PERMANENT_", "LENGTHKM")
 distances = rename(distances, PERMANENT_ = From_Permanent_Id)
-flowtable = merge(flowtable, distances, by="From_Permanent_Id")
+flowtable = merge(flowtable, distances, by="From_Permanent_Identifier")
 ids_db = src_sqlite("flowtable.sqlite3", create = TRUE)
 copy_to(ids_db, flowtable, overwrite = TRUE, temporary = FALSE, indexes = list("From_Permanent_Identifier","To_Permanent_Identifier"))

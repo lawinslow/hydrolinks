@@ -12,6 +12,7 @@
 #' @import tools
 #' @import rappdirs
 #' @import utils
+#' @export
 
 check_dl_file = function(master_file, fname = NULL, md5check = TRUE, dest=local_path()){
   files = read.csv(master_file)
@@ -75,7 +76,7 @@ local_path = function(){
     path = readChar(pathFile, file.info(pathFile)$size)
     path = gsub("[\r\n]", "", path)
   }
-  if(!file.exists(path)){
+  if(!dir.exists(path)){
     dir.create(path, recursive = TRUE)
   }
   return(path)
@@ -91,7 +92,7 @@ local_path = function(){
 #' @export
 set_local_files_path = function(path = NULL){
   if(!is.null(path)){
-    if(!file.exists(path)){
+    if(!dir.exists(path)){
       dir.create(path, recursive = TRUE)
     }
     write(path, file = file.path(rappdirs::user_data_dir(appname = 'hydrolinks', version=packageVersion('hydrolinks')), "path"))
