@@ -6,12 +6,14 @@
 #' @param distance maximum distance to traverse in km
 #' @param start character node to start
 #' @param direction character; either "out" or "in"
+#' 
+#' @import dplyr
 #'
 #' @return list of nodes traversed
 #' 
 #' @export
 #'
-#' @examples traverse_flowlines(src_sqlite("flowtable.sqlite3"), 1000, "141329377", "out")
+#' @examples \dontrun{traverse_flowlines(src_sqlite("flowtable.sqlite3"), 1000, "141329377", "out")}
 traverse_flowlines = function(g, distance, start, direction = c("out", "in")){
   direction = match.arg(direction)
   nodes = c()
