@@ -1,5 +1,5 @@
 #' @title Link geoshapes to Waterbodies
-#' 
+#'
 #' @description Link geoshapes to waterbodies
 #'
 #'
@@ -30,7 +30,7 @@ link_shape_waterbodies = function(shapedf){
   #TODO: Finish this
   for(i in 1:length(filematches)){
     #get nhd layer
-    nhd       = readOGR(filematches[i])
+    nhd       = readOGR(filematches[i], stringsAsFactors=FALSE)
     FTYPE = NULL
     nhd = subset(nhd, FTYPE %in% c('390', '361', '436'))
 

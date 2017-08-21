@@ -1,5 +1,5 @@
 #' @title Link geopoints to Waterbodies by centroids
-#' 
+#'
 #' @description Link geopoints to a waterbody with the closest centroid a geospatial dataset
 #'
 #' @param lats Vector of point latitudes
@@ -34,31 +34,31 @@ link_waterbody_centroids = function(lats, lons, ids, dataset = "nhd", max_dist =
     stop("Invalid dataset name!")
   }
   wbd_bb = bbdf
-  
+
   sites = data.frame(lats, lons, ids)
   res   = list()
-  
+
   xmin = xmax = ymin = ymax = NULL
   for(i in 1:nrow(sites)){
     res[[i]] = subset(wbd_bb, xmin <= sites[i,'lons'] & xmax >= sites[i,'lons'] & ymin <= sites[i,'lats'] & ymax >= sites[i,'lats'])
   }
-  
+
   to_check = unique(do.call(rbind, res))
-  
-  
+
+
   match_res = list()
-  
+
   if(nrow(to_check) == 0){
     ret = data.frame(MATCH_ID = sites$ids)
     ret$PERMANENT_ID = NA
     return(ret)
   }
-  
+
   #TODO: Finish this
   for(i in 1:nrow(to_check)){
     #get nhd layer
     check_dl_file(system.file(dl_file, package = "hydrolinks"), to_check[i, 'file'])
-    
+
     shapefile_name = ""
     if(tolower(dataset) == "nhd"){
       shapefile_name = "NHDWaterbody_projected.shp"
@@ -66,16 +66,16 @@ link_waterbody_centroids = function(lats, lons, ids, dataset = "nhd", max_dist =
     else if(tolower(dataset) == "hydrolakes"){
       shapefile_name = "HydroLAKES_polys_v10.shp"
     }
-    
-    nhd       = readOGR(file.path(local_path(), "unzip", to_check[i,'file'], shapefile_name))
-    
-    
+
+    nhd       = readOGR(file.path(local_path(), "unzip", to_check[i,'file'], shapefile_name), stringsAsFactors=FALSE)
+
+
     #ids = rep(NA, length(sites$lats))
-    
+
     not_na = which(!is.na(sites$lats) & !is.na(sites$lons))
-    
+
     xy = cbind(sites$lons, sites$lats)
-    
+
     pts = SpatialPoints(xy[not_na, , drop=FALSE], proj4string=CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))
     pts = spTransform(pts, CRS("+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs"))
     centroids = SpatialPointsDataFrame(data.frame(nhd$centroid_x, nhd$centroid_y), nhd@data, proj4string = CRS("+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs"))
@@ -90,7 +90,7 @@ link_waterbody_centroids = function(lats, lons, ids, dataset = "nhd", max_dist =
     matches$MATCH_ID = sites$ids
     match_res[[i]] = matches
   }
-  
+
   unique_matches = unique(bind_rows(match_res))
   #return matches that have non-NA value id
   if(nrow(unique_matches) > 0)

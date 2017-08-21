@@ -1,5 +1,5 @@
 #' @title Link geopoints to Waterbodies
-#' 
+#'
 #' @description Link geopoints to waterbodies in a geospatial dataset.
 #'
 #' @param lats Vector of point latitudes
@@ -37,18 +37,18 @@ link_to_waterbodies = function(lats, lons, ids, dataset = c("nhdh", "hydrolakes"
     id_column = "COMID"
     wbd_bb = bbdf_waterbody
   }
-  
+
 
   sites = data.frame(lats, lons, ids)
   not_na = which(!is.na(sites$lats) & !is.na(sites$lons))
-  
+
   xy = cbind(sites$lons, sites$lats)
-  
+
   pts = SpatialPoints(xy[not_na, , drop=FALSE], proj4string=CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))
   pts = spTransform(pts, CRS("+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs"))
 
   res   = list()
-  
+
   xmin = xmax = ymin = ymax = NULL
   for(i in 1:nrow(sites)){
     res[[i]] = subset(wbd_bb, xmin <= pts@coords[i,1] & xmax >= pts@coords[i,1] & ymin <= pts@coords[i,2] & ymax >= pts@coords[i,2])
@@ -58,18 +58,18 @@ link_to_waterbodies = function(lats, lons, ids, dataset = c("nhdh", "hydrolakes"
 
 
   match_res = list()
-  
+
   if(nrow(to_check) == 0){
       ret = data.frame(MATCH_ID = sites$ids)
       ret$PERMANENT_ID = NA
       return(ret)
   }
-  
+
   #TODO: Finish this
   for(i in 1:nrow(to_check)){
     #get nhd layer
     check_dl_file(system.file(dl_file, package = "hydrolinks"), to_check[i, 'file'])
-    
+
     shapefile_name = ""
     if(tolower(dataset) == "nhdh" || tolower(dataset) == "nhdplusv2"){
       shapefile_name = "NHDWaterbody_projected.shp"
@@ -77,9 +77,9 @@ link_to_waterbodies = function(lats, lons, ids, dataset = c("nhdh", "hydrolakes"
     else if(tolower(dataset) == "hydrolakes"){
       shapefile_name = "HydroLAKES_polys_v10_projected.shp"
     }
-    
-    nhd       = readOGR(file.path(local_path(), "unzip", to_check[i,'file'], shapefile_name))
-    
+
+    nhd       = readOGR(file.path(local_path(), "unzip", to_check[i,'file'], shapefile_name), stringsAsFactors=FALSE)
+
     if(buffer > 0){
       nhd = gBuffer(nhd, byid = TRUE, width = buffer)
     }
