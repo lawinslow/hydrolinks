@@ -22,5 +22,7 @@ list of nodes traversed
 traverse hydrological network
 }
 \examples{
+\dontrun{
 traverse_flowlines(src_sqlite("flowtable.sqlite3"), 1000, "141329377", "out")
+}
 }

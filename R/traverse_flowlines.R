@@ -13,7 +13,10 @@
 #' 
 #' @export
 #'
-#' @examples \dontrun{traverse_flowlines(src_sqlite("flowtable.sqlite3"), 1000, "141329377", "out")}
+#' @examples 
+#' \dontrun{ 
+#' traverse_flowlines(src_sqlite("flowtable.sqlite3"), 1000, "141329377", "out")
+#' }
 traverse_flowlines = function(g, distance, start, direction = c("out", "in")){
   direction = match.arg(direction)
   nodes = c()
