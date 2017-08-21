@@ -49,13 +49,12 @@ traverse_flowlines = function(g, distance, start, direction = c("out", "in")){
     }
     for(j in names(next_check)){
       if(next_check[j] > distance){
-        break
+        nodes = c(nodes, names(to_check))
+        return(nodes)
       }
     }
     to_check = next_check
   }
-  nodes = c(nodes, to_check)
-  return(nodes)
 }
 
 neighbors = function(db, node, direction){
