@@ -6,7 +6,7 @@ library(hydrolinks)
 
 load("inst/extdata/nhd_bb_streams_cache.Rdata")
 changes = list()
-for(i in 42:length(bbdf_streams$file)){
+for(i in 170:length(bbdf_streams$file)){
   file = bbdf_streams$file[i]
   check_dl_file(system.file("extdata/nhdh.csv", package="nhdtools"), fname = file)
   shape = readOGR(file.path(local_path(), "unzip", file, "NHDFlowline_projected.shp"))
@@ -16,8 +16,7 @@ for(i in 42:length(bbdf_streams$file)){
   change = data.frame(shape$PERMANENT_, shape$WBAREA_PER)
   changes[[i]] = change
 }
-
-changes = rbind_list(changes)
+save(changes, file = "changes.RData")
 
 zipfiles = Sys.glob(file.path("D:", "lakes", "NHD", "GDB", "*GDB.zip"))
 dest = file.path("D:", "lakes", "NHD", "unzip")

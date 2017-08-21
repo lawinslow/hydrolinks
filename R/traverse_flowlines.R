@@ -1,4 +1,24 @@
-traverse_flowlines = function(g, distance, start, direction = "out"){
+#' @title traverse_flowlines
+#' 
+#' @description traverse hydrological network
+#'
+#' @param g network graph - load using \code{\link[dplyr]{src_sqlite}}
+#' @param distance maximum distance to traverse in km
+#' @param start character node to start
+#' @param direction character; either "out" or "in"
+#' 
+#' @import dplyr
+#'
+#' @return list of nodes traversed
+#' 
+#' @export
+#'
+#' @examples 
+#' \dontrun{ 
+#' traverse_flowlines(src_sqlite("flowtable.sqlite3"), 1000, "141329377", "out")
+#' }
+traverse_flowlines = function(g, distance, start, direction = c("out", "in")){
+  direction = match.arg(direction)
   nodes = c()
   n = neighbors(g, start, direction)
   to_check = n$LENGTHKM

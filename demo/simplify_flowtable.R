@@ -1,10 +1,13 @@
 library(readr)
 library(tools)
+library(dplyr)
 
 gdbs = Sys.glob(file.path("D:", "lakes", "NHD", "unzip", "*", "*GDB.gdb"))
 dest = file.path("D:", "lakes", "NHD", "unzip")
 
 tables = list()
+
+load("changes.RData")
 
 for(i in 1:length(gdbs)){
   tables[[i]] = read_csv(paste0(file_path_sans_ext(dirname(gdbs[i])), ".csv"), 
