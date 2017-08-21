@@ -38,7 +38,7 @@ waterbody_shape_by_id = function(PERMANENT_match = NULL, GNIS_ID_match = NULL, G
   if(length(files) > 0){
     for(i in 1:length(files)){
       check_dl_file(system.file("extdata/nhdh.csv", package="hydrolinks"), fname = files[i])
-      shapes[[i]] = readOGR(file.path(local_path(), "unzip", files[i], "NHDWaterbody.shp"))
+      shapes[[i]] = readOGR(file.path(local_path(), "unzip", files[i], "NHDWaterbody.shp"), stringsAsFactors=FALSE)
     }
     if(length(shapes) > 1)
       return(do.call(rbind, shapes))
@@ -76,7 +76,7 @@ flowline_shape_by_id = function(PERMANENT_match){
   if(length(files) > 0){
     for(i in 1:length(files)){
       check_dl_file(system.file("extdata/nhdh.csv", package="hydrolinks"), fname = files[i])
-      shapes[[i]] = readOGR(file.path(local_path(), "unzip", files[i], "NHDFlowline_projected.shp"))
+      shapes[[i]] = readOGR(file.path(local_path(), "unzip", files[i], "NHDFlowline_projected.shp"), stringsAsFactors=FALSE)
     }
     if(length(shapes) > 1)
       return(do.call(rbind, shapes))
