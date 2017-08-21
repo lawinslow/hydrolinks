@@ -31,7 +31,7 @@ traverse_flowlines = function(g, distance, start, direction = c("out", "in")){
   }
   while(1){
     next_check = c()
-    #to_check = to_check[to_check != 0]
+    to_check = to_check[names(to_check) != "0"]
     nodes = rbind(nodes, cbind(names(to_check), to_check))
     for(j in 1:length(to_check)){
         n = neighbors(g, names(to_check)[j], direction)
@@ -53,6 +53,8 @@ traverse_flowlines = function(g, distance, start, direction = c("out", "in")){
 }
 
 neighbors = function(db, node, direction){
+  From_Permanent_Identifier = NULL
+  To_Permanent_Identifier = NULL
   graph = db %>%
     tbl("flowtable")
   if(direction == "out"){
