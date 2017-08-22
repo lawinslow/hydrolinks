@@ -12,7 +12,7 @@
 #' @return Water body permanent IDs
 #'
 #' @import rgdal
-#' @import rgeos
+#' @importFrom rgeos gBuffer
 #' @import sp
 #'
 #' @export

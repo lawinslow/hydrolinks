@@ -12,8 +12,7 @@
 #'
 #' @import rgdal
 #' @import sp
-#' @import maptools
-#' @import rgeos
+#' @importFrom rgeos gBuffer
 #' @import dplyr
 #'
 #' @export
