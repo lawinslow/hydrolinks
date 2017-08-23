@@ -57,7 +57,6 @@ waterbody_shape_by_id = function(PERMANENT_match = NULL, GNIS_ID_match = NULL, G
 #' @return SpatialPointsDataFrame containing polygons with associated IDs.
 #' @import dplyr
 #' @import rgdal
-#' @import dbplyr
 #'
 #' @export
 

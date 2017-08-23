@@ -12,8 +12,7 @@
 #'
 #' @import rgdal
 #' @import sp
-#' @import maptools
-#' @import rgeos
+#' @importFrom rgeos gBuffer
 #' @import dplyr
 #'
 #' @export
@@ -23,6 +22,7 @@ link_to_flowlines = function(lats, lons, ids, max_dist = 100, dataset = c("nhdh"
   dl_file = ""
   id_column = ""
   bbdf_streams = NULL
+  bbdf_flowline = NULL
   if(tolower(dataset) == "nhdh"){
     load(file=system.file('extdata/nhd_bb_streams_cache.Rdata', package='hydrolinks'))
     dl_file = "extdata/nhdh.csv"

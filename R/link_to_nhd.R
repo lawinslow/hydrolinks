@@ -6,12 +6,13 @@
 #' @param lons Vector of point longitudes
 #' @param ids Vector of point identifiers (string or numeric)
 #' @param dataset Character name of dataset to link against. Can be either "nhdh", "hydrolakes", or "nhdplusv2"
+#' @param buffer Numeric width of polygon buffer in m
 #'
 #'
 #' @return Water body permanent IDs
 #'
 #' @import rgdal
-#' @import rgeos
+#' @importFrom rgeos gBuffer
 #' @import sp
 #'
 #' @export
@@ -19,6 +20,8 @@ link_to_waterbodies = function(lats, lons, ids, dataset = c("nhdh", "hydrolakes"
   dataset = match.arg(dataset)
   dl_file = ""
   id_column = ""
+  bbdf = NULL
+  bbdf_waterbody = NULL
   if(tolower(dataset) == "nhdh"){
     load(file=system.file('extdata/nhd_bb_cache_projected.Rdata', package='hydrolinks'))
     dl_file = "extdata/nhdh.csv"
