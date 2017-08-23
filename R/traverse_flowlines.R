@@ -1,26 +1,27 @@
 #' @title traverse_flowlines
-#' 
+#'
 #' @description traverse hydrological network
 #'
 #' @param g network graph - load using \code{\link[dplyr]{src_sqlite}}
 #' @param distance maximum distance to traverse in km
 #' @param start character node to start
 #' @param direction character; either "out" or "in"
-#' 
+#'
 #' @import dplyr
 #'
 #' @return list of nodes traversed
-#' 
+#'
 #' @export
 #'
-#' @examples 
-#' \dontrun{ 
+#' @examples
+#' \dontrun{
 #' traverse_flowlines(src_sqlite("flowtable.sqlite3"), 1000, "141329377", "out")
 #' }
 traverse_flowlines = function(g, distance, start, direction = c("out", "in")){
   direction = match.arg(direction)
   nodes = data.frame()
   n = neighbors(g, start, direction)
+  n$LENGTHKM[is.na(n$LENGTHKM)] = 0
   to_check = n$LENGTHKM
   names(to_check) = n$ID
   if(distance == 0){
@@ -40,6 +41,15 @@ traverse_flowlines = function(g, distance, start, direction = c("out", "in")){
         names(next_check_tmp) = n$ID
         next_check = c(next_check, next_check_tmp)
     }
+
+    #We need a stop condition where all further neighbors go nowhere
+    if(all(names(next_check) == '0')){
+      nodes = rbind(nodes, cbind(names(to_check), to_check))
+      rownames(nodes) = c(1:nrow(nodes))
+      colnames(nodes) = c("PERMANENT_", "LENGTHKM")
+      return(nodes)
+    }
+
     for(j in names(next_check)){
       if(next_check[j] > distance){
         nodes = rbind(nodes, cbind(names(to_check), to_check))
