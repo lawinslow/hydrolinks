@@ -15,13 +15,11 @@ Description: Tools to link geographic data with hydrologic network, including la
 Imports: rgdal, 
     rgeos,
     sp,
-    maptools,
     dplyr,
     httr,
     tools,
     rappdirs,
-    methods,
-    dbplyr
+    sf
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
