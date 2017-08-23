@@ -13,7 +13,7 @@
 #'
 #' @import rgdal
 #' @import sp
-#' @import rgeos
+#' @importFrom rgeos gBuffer
 #'
 #' @export
 link_waterbody_centroids = function(lats, lons, ids, dataset = "nhd", max_dist = 25){

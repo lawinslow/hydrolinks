@@ -10,9 +10,7 @@
 #'
 #' @return flowline permanent ids
 #'
-#' @import rgdal
-#' @import sp
-#' @importFrom rgeos gBuffer
+#' @import sf
 #' @import dplyr
 #'
 #' @export
@@ -41,10 +39,13 @@ link_to_flowlines = function(lats, lons, ids, max_dist = 100, dataset = c("nhdh"
   sites = data.frame(lats, lons, ids)
   xy = cbind(sites$lons, sites$lats)
   not_na = which(!is.na(sites$lats) & !is.na(sites$lons))
-  pts = SpatialPointsDataFrame(xy[not_na, , drop=FALSE], proj4string=CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"), data=data.frame(ids[not_na, drop=FALSE]))
-  ids.not_na..drop...FALSE. = NULL
-  pts@data = rename(pts@data, MATCH_ID = ids.not_na..drop...FALSE.)
-  pts = spTransform(pts, CRS("+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs"))
+  pts = list()
+  xy = xy[not_na, , drop = FALSE]
+  for(i in 1:nrow(xy)){
+    pts[[i]] = st_point(c(xy[i, 1], xy[i, 2]))
+  }
+  pts = st_sf(MATCH_ID = ids[not_na, drop = FALSE], geom = st_sfc(pts), row.names = c(1:nrow(sites)), crs = nhd_proj)
+  pts = st_transform(pts, st_crs(nhd_projected_proj))
 
   res   = list()
 
@@ -52,8 +53,8 @@ link_to_flowlines = function(lats, lons, ids, max_dist = 100, dataset = c("nhdh"
 
   xmin = xmax = ymin = ymax = NULL
 
-  for(i in 1:nrow(pts@coords)){
-    res[[i]] = subset(wbd_bb, xmin <= pts@coords[i,1] & xmax >= pts@coords[i,1] & ymin <= pts@coords[i,2] & ymax >= pts@coords[i,2])
+  for(i in 1:nrow(pts)){
+    res[[i]] = subset(wbd_bb, xmin <= pts$geom[[i]][1] & xmax >= pts$geom[[i]][1] & ymin <= pts$geom[[i]][2] & ymax >= pts$geom[[i]][2])
   }
 
   to_check = unique(do.call(rbind, res))
@@ -70,11 +71,27 @@ link_to_flowlines = function(lats, lons, ids, max_dist = 100, dataset = c("nhdh"
   for(i in 1:nrow(to_check)){
     #get nhd layer
     check_dl_file(system.file(dl_file, package = "hydrolinks"), to_check[i, 'file'])
-    nhd       = readOGR(file.path(local_path(), "unzip", to_check[i,'file'], "NHDFlowline_projected.shp"), stringsAsFactors=FALSE)
-    nhd = gBuffer(nhd, byid = TRUE, width = max_dist)
-    matches = over(pts, nhd)
-    matches$MATCH_ID = sites$ids
-    match_res[[i]] = matches
+    nhd       = st_read(file.path(local_path(), "unzip", to_check[i,'file'], "NHDFlowline_projected.shp"), stringsAsFactors=FALSE)
+    st_crs(nhd) = nhd_projected_proj
+    nhd_buffer = st_buffer(nhd, max_dist)
+    matches = st_intersects(pts, nhd_buffer)
+    if(length(unlist(matches)) == 0){
+      next
+    }
+    matches_multiple = which(lengths(matches) > 1)
+    if(length(matches_multiple) > 0){
+      for(j in 1:length(matches_multiple)){
+        nhd_rows = nhd[matches[matches_multiple][[j]],]
+        distance = st_distance(pts[matches_multiple[j], ], nhd_rows)
+        matches[matches_multiple][[j]] = which.min(distance[1,])
+      }
+    }
+    matches[lengths(matches) == 0] = NA
+    nhd_matched = nhd[unlist(matches),]
+    nhd_matched$MATCH_ID = sites$ids
+    nhd_matched = nhd_matched[,,drop = TRUE]
+    nhd_matched$geometry = NULL
+    match_res[[i]] = nhd_matched
   }
 
   unique_matches = unique(bind_rows(match_res))
