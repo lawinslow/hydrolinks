@@ -11,36 +11,53 @@
 #'
 #' @return Water body permanent IDs
 #'
-#' @import rgdal
-#' @import sp
-#' @importFrom rgeos gBuffer
+#' @import sf
 #'
 #' @export
-link_waterbody_centroids = function(lats, lons, ids, dataset = "nhd", max_dist = 25){
+link_waterbody_centroids = function(lats, lons, ids, dataset = c("nhdh", "nhdplusv2", "hydrolakes"), max_dist = 25){
+  dataset = match.arg(dataset)
   dl_file = ""
   id_column = ""
   bbdf = NULL
-  if(tolower(dataset) == "nhd"){
-    load(file=system.file('extdata/nhd_bb_cache.Rdata', package='hydrolinks'))
+  bbdf_waterbody = NULL
+  if(tolower(dataset) == "nhdh"){
+    load(file=system.file('extdata/nhd_bb_cache_projected.Rdata', package='hydrolinks'))
     dl_file = "extdata/nhdh.csv"
     id_column = "PERMANENT_"
+    wbd_bb = bbdf
   }
   else if(tolower(dataset) == "hydrolakes"){
-    load(file=system.file('extdata/hydrolakes_bb_cache.Rdata', package='hydrolinks'))
+    load(file=system.file('extdata/hydrolakes_bb_cache_projected.Rdata', package='hydrolinks'))
     dl_file = "extdata/hydrolakes.csv"
     id_column = "Hylak_id"
+    wbd_bb = bbdf
   }
-  else{
-    stop("Invalid dataset name!")
+  else if(tolower(dataset) == "nhdplusv2"){
+    load(file=system.file('extdata/nhdplus_waterbody_bb_cache.rdata', package='hydrolinks'))
+    dl_file = "extdata/nhdplusv2.csv"
+    id_column = "COMID"
+    wbd_bb = bbdf_waterbody
   }
-  wbd_bb = bbdf
 
   sites = data.frame(lats, lons, ids)
+  not_na = which(!is.na(sites$lats) & !is.na(sites$lons))
+  
+  xy = cbind(sites$lons, sites$lats)
+  xy = xy[not_na, , drop = FALSE]
+  
+  pts = list()
+  for(i in 1:nrow(xy)){
+    pts[[i]] = st_point(c(xy[i, 1], xy[i,2]))
+  }
+  
+  pts = st_sf(MATCH_ID = ids[not_na, drop = FALSE], geom = st_sfc(pts), row.names = c(1:nrow(sites)), crs = nhd_proj)
+  pts = st_transform(pts, st_crs(nhd_projected_proj))
+  
   res   = list()
 
   xmin = xmax = ymin = ymax = NULL
-  for(i in 1:nrow(sites)){
-    res[[i]] = subset(wbd_bb, xmin <= sites[i,'lons'] & xmax >= sites[i,'lons'] & ymin <= sites[i,'lats'] & ymax >= sites[i,'lats'])
+  for(i in 1:nrow(pts)){
+    res[[i]] = subset(wbd_bb, xmin <= pts$geom[[i]][1] & xmax >= pts$geom[[i]][1] & ymin <= pts$geom[[i]][2] & ymax >= pts$geom[[i]][2])
   }
 
   to_check = unique(do.call(rbind, res))
@@ -54,41 +71,48 @@ link_waterbody_centroids = function(lats, lons, ids, dataset = "nhd", max_dist =
     return(ret)
   }
 
-  #TODO: Finish this
+  
   for(i in 1:nrow(to_check)){
-    #get nhd layer
+    #get waterbody layer
     check_dl_file(system.file(dl_file, package = "hydrolinks"), to_check[i, 'file'])
 
     shapefile_name = ""
-    if(tolower(dataset) == "nhd"){
+    if(tolower(dataset) == "nhdh" || tolower(dataset) == "nhdplusv2"){
       shapefile_name = "NHDWaterbody_projected.shp"
     }
     else if(tolower(dataset) == "hydrolakes"){
-      shapefile_name = "HydroLAKES_polys_v10.shp"
+      shapefile_name = "HydroLAKES_polys_v10_projected.shp"
     }
 
-    nhd       = readOGR(file.path(local_path(), "unzip", to_check[i,'file'], shapefile_name), stringsAsFactors=FALSE)
+    nhd       = st_read(file.path(local_path(), "unzip", to_check[i,'file'], shapefile_name), stringsAsFactors=FALSE)
 
-
-    #ids = rep(NA, length(sites$lats))
-
-    not_na = which(!is.na(sites$lats) & !is.na(sites$lons))
-
-    xy = cbind(sites$lons, sites$lats)
-
-    pts = SpatialPoints(xy[not_na, , drop=FALSE], proj4string=CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))
-    pts = spTransform(pts, CRS("+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs"))
-    centroids = SpatialPointsDataFrame(data.frame(nhd$centroid_x, nhd$centroid_y), nhd@data, proj4string = CRS("+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs"))
-    centroids = gBuffer(centroids, byid = TRUE, width = max_dist)
-    matches = over(pts, centroids)
-    #if(!is.null(matches)){
-    #  for(j in 1:length(matches)){
-    #    match_res[[j]] = matches[[j]]@data
-    #  }
-    #}
-    #match_data = nhd@data[!is.na(matches),]
-    matches$MATCH_ID = sites$ids
-    match_res[[i]] = matches
+    centroids = list()
+    for(j in 1:nrow(nhd)){
+      centroids[[j]] = st_point(c(nhd$centroid_x[j], nhd$centroid_y[j]))
+    }
+    
+    nhd_data = nhd[,,drop=TRUE]
+    nhd_data$geometry = NULL
+    centroids = st_sf(nhd_data, geometry = st_sfc(centroids), crs = nhd_projected_proj)
+    centroids_buffer = st_buffer(centroids, max_dist)
+    matches = st_intersects(pts, centroids_buffer)
+    if(length(unlist(matches)) == 0){
+      next
+    }
+    matches_multiple = which(lengths(matches) > 1)
+    if(length(matches_multiple) > 0){
+      for(j in 1:length(matches_multiple)){
+        nhd_rows = centroids[matches[matches_multiple][[j]],]
+        distance = st_distance(pts[matches_multiple[j], ], nhd_rows)
+        matches[matches_multiple][[j]] = which.min(distance[1,])
+      }
+    }
+    matches[lengths(matches) == 0] = NA
+    nhd_matched = centroids[unlist(matches),]
+    nhd_matched$MATCH_ID = sites$ids
+    nhd_matched = nhd_matched[,,drop = TRUE]
+    nhd_matched$geometry = NULL
+    match_res[[i]] = nhd_matched
   }
 
   unique_matches = unique(bind_rows(match_res))
@@ -98,20 +122,4 @@ link_waterbody_centroids = function(lats, lons, ids, dataset = "nhd", max_dist =
   else{
     return(NULL)
   }
-}
-
-centroid_distance = function(shape, pts, max_dist, match_id){
-  result = c()
-  for(i in 1:nrow(pts@coords)){
-    match = sqrt(abs(pts@coords[i, 1] - shape$centroid_x)^2 + abs(pts@coords[i, 2] - shape$centroid_y)^2) <= max_dist
-    matching_features = shape[match,]
-    if(nrow(matching_features) == 0){
-      next
-    }
-    for(j in 1:nrow(matching_features)){
-      matching_features$MATCH_ID = match_id[i]
-      result = c(result, matching_features[j,])
-    }
-  }
-  return(result)
 }

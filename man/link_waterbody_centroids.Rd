@@ -4,7 +4,8 @@
 \alias{link_waterbody_centroids}
 \title{Link geopoints to Waterbodies by centroids}
 \usage{
-link_waterbody_centroids(lats, lons, ids, dataset = "nhd", max_dist = 25)
+link_waterbody_centroids(lats, lons, ids, dataset = c("nhdh", "nhdplusv2",
+  "hydrolakes"), max_dist = 25)
 }
 \arguments{
 \item{lats}{Vector of point latitudes}
