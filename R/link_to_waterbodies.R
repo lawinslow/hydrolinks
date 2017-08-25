@@ -45,7 +45,7 @@ link_to_waterbodies = function(lats, lons, ids, dataset = c("nhdh", "hydrolakes"
 
   xy = cbind(sites$lons, sites$lats)
   xy = xy[not_na, , drop = FALSE]
-  
+
   pts = list()
   for(i in 1:nrow(xy)){
     pts[[i]] = st_point(c(xy[i, 1], xy[i,2]))
@@ -53,7 +53,7 @@ link_to_waterbodies = function(lats, lons, ids, dataset = c("nhdh", "hydrolakes"
 
   pts = st_sf(MATCH_ID = ids[not_na, drop = FALSE], geom = st_sfc(pts), row.names = c(1:nrow(sites)), crs = nhd_proj)
   pts = st_transform(pts, st_crs(nhd_projected_proj))
-  
+
   res   = list()
 
   xmin = xmax = ymin = ymax = NULL
@@ -85,7 +85,11 @@ link_to_waterbodies = function(lats, lons, ids, dataset = c("nhdh", "hydrolakes"
 
     nhd       = st_read(file.path(local_path(), "unzip", to_check[i,'file'], shapefile_name), stringsAsFactors=FALSE)
     st_crs(nhd) = nhd_projected_proj
-    
+
+    if(tolower(dataset) == 'nhdh'){
+      nhd = nhd[nhd$FTYPE %in% c('390', '361', '436'), ]
+    }
+
     if(buffer > 0){
       nhd_buffer = st_buffer(nhd, buffer)
     }
