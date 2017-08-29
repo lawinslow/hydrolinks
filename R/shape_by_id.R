@@ -14,6 +14,7 @@
 #' GNIS_NAME \tab GNIS_NAME \cr
 #' REACHCODE \tab REACHCODE
 #' }
+#' @param match_id ids of features to be matched.
 #'
 #' @return simple features object containing polygons with associated IDs.
 #' @import dplyr
@@ -27,7 +28,6 @@ get_shape_by_id = function(feature_type = c("flowline", "waterbody"), dataset = 
   db_name = paste0(dataset, "_", feature_type, "_ids")
   check_dl_file(system.file("extdata/id_db.csv", package = "hydrolinks"), fname = paste0(db_name, ".zip"))
   id_db = src_sqlite(file.path(local_path(), "unzip", paste0(db_name, ".zip"), paste0(db_name, ".sqlite3")))
-  id_db = src_sqlite(paste0(db_name, ".sqlite3"))
   shape = id_db %>%
     tbl('id_lookup') %>%
     filter_(paste0(match_column, " %in% ", match_id)) %>%
@@ -44,14 +44,16 @@ get_shape_by_id = function(feature_type = c("flowline", "waterbody"), dataset = 
       shapefile_name = "NHDFlowline_projected.shp"
     }
   }
-  else if(dataset == "hydrolinks"){
+  else if(dataset == "hydrolakes"){
     shapefile_name = "HydroLAKES_polys_v10_projected.shp"
   }
   
   if(length(files) > 0){
     for(i in 1:length(files)){
       check_dl_file(system.file(paste0("extdata/", dataset, ".csv"), package = "hydrolinks"), fname = files[i])
-      shapes[[i]] = st_read(file.path(local_path(), "unzip", files[i], shapefile_name))
+      shapefile = st_read(file.path(local_path(), "unzip", files[i], shapefile_name))
+      features = shapefile[shapefile[,match_column, drop = TRUE] %in% match_id,]
+      shapes[[i]] = features
     }
   }
   if(length(shapes) > 1)

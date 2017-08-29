@@ -20,6 +20,8 @@ GNIS_ID \tab GNIS_ID \tab Lake_name \cr
 GNIS_NAME \tab GNIS_NAME \cr
 REACHCODE \tab REACHCODE
 }}
+
+\item{match_id}{ids of features to be matched.}
 }
 \value{
 simple features object containing polygons with associated IDs.
