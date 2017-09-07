@@ -9,9 +9,10 @@
 #'
 #'
 #' @export
-all_shapefiles = function(check_dl=FALSE, dataset = c("nhdh", "hydrolakes", "nhdplusv2")){
+all_shapefiles = function(check_dl=FALSE, dataset = c("nhdh", "hydrolakes", "nhdplusv2"), feature_type = c("waterbody", "flowline")){
 
   dataset = match.arg(dataset)
+  feature_type = match.arg(feature_type)
   dl_file = ""
   id_column = ""
   bbdf = NULL
@@ -40,7 +41,12 @@ all_shapefiles = function(check_dl=FALSE, dataset = c("nhdh", "hydrolakes", "nhd
   }
   shapefile_name = ""
   if(tolower(dataset) == "nhdh" || tolower(dataset) == "nhdplusv2"){
-    shapefile_name = "NHDWaterbody_projected.shp"
+    if(feature_type == "waterbody"){
+      shapefile_name = "NHDWaterbody_projected.shp"
+    }
+    else{
+      shapefile_name = "NHDFlowline_projected.shp"
+    }
   }
   else if(tolower(dataset) == "hydrolakes"){
     shapefile_name = "HydroLAKES_polys_v10_projected.shp"

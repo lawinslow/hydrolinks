@@ -37,19 +37,10 @@ link_to_flowlines = function(lats, lons, ids, max_dist = 100, dataset = c("nhdh"
 
 
   sites = data.frame(lats, lons, ids)
-  xy = cbind(sites$lons, sites$lats)
-  not_na = which(!is.na(sites$lats) & !is.na(sites$lons))
-  pts = list()
-  xy = xy[not_na, , drop = FALSE]
-  for(i in 1:nrow(xy)){
-    pts[[i]] = st_point(c(xy[i, 1], xy[i, 2]))
-  }
-  pts = st_sf(MATCH_ID = ids[not_na, drop = FALSE], geom = st_sfc(pts), row.names = c(1:nrow(sites)), crs = nhd_proj)
+  pts = st_as_sf(sites, coords = c("lons", "lats"), crs = nhd_proj)
   pts = st_transform(pts, st_crs(nhd_projected_proj))
 
   res   = list()
-
-  matches_found = 0
 
   xmin = xmax = ymin = ymax = NULL
 
@@ -58,7 +49,6 @@ link_to_flowlines = function(lats, lons, ids, max_dist = 100, dataset = c("nhdh"
   }
 
   to_check = unique(do.call(rbind, res))
-
 
   match_res = list()
 
@@ -71,27 +61,27 @@ link_to_flowlines = function(lats, lons, ids, max_dist = 100, dataset = c("nhdh"
   for(i in 1:nrow(to_check)){
     #get nhd layer
     check_dl_file(system.file(dl_file, package = "hydrolinks"), to_check[i, 'file'])
-    nhd       = st_read(file.path(local_path(), "unzip", to_check[i,'file'], "NHDFlowline_projected.shp"), stringsAsFactors=FALSE)
-    st_crs(nhd) = nhd_projected_proj
-    nhd_buffer = st_buffer(nhd, max_dist)
-    matches = st_intersects(pts, nhd_buffer)
+    shape       = st_read(file.path(local_path(), "unzip", to_check[i,'file'], "NHDFlowline_projected.shp"), stringsAsFactors=FALSE)
+    st_crs(shape) = nhd_projected_proj
+    shape_buffer = st_buffer(shape, max_dist)
+    matches = st_intersects(pts, shape_buffer)
     if(length(unlist(matches)) == 0){
       next
     }
     matches_multiple = which(lengths(matches) > 1)
     if(length(matches_multiple) > 0){
       for(j in 1:length(matches_multiple)){
-        nhd_rows = nhd[matches[matches_multiple][[j]],]
-        distance = st_distance(pts[matches_multiple[j], ], nhd_rows)
+        shape_rows = shape[matches[matches_multiple][[j]],]
+        distance = st_distance(pts[matches_multiple[j], ], shape_rows)
         matches[matches_multiple][[j]] = which.min(distance[1,])
       }
     }
     matches[lengths(matches) == 0] = NA
-    nhd_matched = nhd[unlist(matches),]
-    nhd_matched$MATCH_ID = sites$ids
-    nhd_matched = nhd_matched[,,drop = TRUE]
-    nhd_matched$geometry = NULL
-    match_res[[i]] = nhd_matched
+    shape_matched = shape[unlist(matches),]
+    shape_matched$MATCH_ID = sites$ids
+    shape_matched = shape_matched[,,drop = TRUE]
+    shape_matched$geometry = NULL
+    match_res[[i]] = shape_matched
   }
 
   unique_matches = unique(bind_rows(match_res))

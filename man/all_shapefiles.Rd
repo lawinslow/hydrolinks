@@ -5,7 +5,7 @@
 \title{Return path to all shapefiles}
 \usage{
 all_shapefiles(check_dl = FALSE, dataset = c("nhdh", "hydrolakes",
-  "nhdplusv2"))
+  "nhdplusv2"), feature_type = c("waterbody", "flowline"))
 }
 \arguments{
 \item{check_dl}{If TRUE, checks to ensure all files for that dataset have been downloaded.
