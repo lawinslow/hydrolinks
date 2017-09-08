@@ -54,7 +54,7 @@ link_to_waterbodies = function(lats, lons, ids, dataset = c("nhdh", "hydrolakes"
   to_check = unique(do.call(rbind, res))
 
   match_res = list()
- 
+
   if(nrow(to_check) == 0){
       ret = data.frame(MATCH_ID = sites$ids)
       ret$PERMANENT_ID = NA
@@ -102,9 +102,9 @@ link_to_waterbodies = function(lats, lons, ids, dataset = c("nhdh", "hydrolakes"
     matches[lengths(matches) == 0] = NA
     shape_matched = shape[unlist(matches),]
     shape_matched$MATCH_ID = sites$ids
-    shape_matched = shape_matched[,,drop = TRUE]
+    #shape_matched = shape_matched[,,drop = TRUE]
     shape_matched$geometry = NULL
-    match_res[[i]] = shape_matched
+    match_res[[i]] = as.data.frame(shape_matched)
   }
 
   unique_matches = unique(bind_rows(match_res))
