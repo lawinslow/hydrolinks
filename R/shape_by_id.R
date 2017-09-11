@@ -30,20 +30,14 @@ get_shape_by_id = function(feature_type = c("flowline", "waterbody"), dataset = 
   #ID cache files alway
   db_name = paste0(dataset, "_", feature_type, "_ids")
 
-  check_dl_file(system.file("extdata/shape_id_cache.csv", package = "hydrolinks"), fname = paste0(db_name, ".zip"))
-
-  #id_db = src_sqlite(file.path(local_path(), 'unzip', paste0(db_name, ".zip"), paste0(db_name, ".sqlite3")))
-  # shape = id_db %>%
-  #   tbl('id_lookup') %>%
-  #   filter_(paste0(match_column, " %in% ", match_id)) %>%
-  #   collect()
-  # files = unique(shape$file)
+  #check_dl_file(system.file("extdata/shape_id_cache.csv", package = "hydrolinks"), fname = paste0(db_name, ".zip"))
 
   con = dbConnect(RSQLite::SQLite(), file.path(local_path(), 'unzip', paste0(db_name, ".zip"), paste0(db_name, ".sqlite3")))
 
   sql = paste0('SELECT * from id_lookup where ', match_column, ' IN (', paste(match_id, collapse = ','), ')')
 
   shape = dbGetQuery(con, sql)
+
   files = unique(shape$file)
 
   dbDisconnect(con)
@@ -66,7 +60,7 @@ get_shape_by_id = function(feature_type = c("flowline", "waterbody"), dataset = 
   if(length(files) > 0){
     for(i in 1:length(files)){
       check_dl_file(system.file(paste0("extdata/", dataset, ".csv"), package = "hydrolinks"), fname = files[i])
-      shapefile = st_read(file.path(local_path(), "unzip", files[i], shapefile_name))
+      shapefile = st_read(file.path(local_path(), "unzip", files[i], shapefile_name), stringsAsFactors = FALSE)
       features = shapefile[shapefile[,match_column, drop = TRUE] %in% match_id,]
       shapes[[i]] = features
     }
