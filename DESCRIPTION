@@ -12,14 +12,14 @@ Authors@R: c( person("Tobi", "Hahn", role = c("aut"),
       email = "rosek4@rpi.edu"))
 Description: Tools to link geographic data with hydrologic network, including lakes, streams and rivers. 
     Includes automated download of U.S. National Hydrography Network and other hydrolayers.
-Imports: rgdal, 
-    rgeos,
+Imports:
     sp,
     dplyr,
     httr,
     tools,
     rappdirs,
-    sf
+    sf,
+    RSQLite
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
