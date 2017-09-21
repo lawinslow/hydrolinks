@@ -19,42 +19,51 @@
 #' }
 traverse_flowlines = function(g, distance, start, direction = c("out", "in")){
   direction = match.arg(direction)
-  nodes = data.frame()
+  nodes = data.frame(stringsAsFactors = FALSE)
   n = neighbors(g, start, direction)
   n$LENGTHKM[is.na(n$LENGTHKM)] = 0
   to_check = n$LENGTHKM
   names(to_check) = n$ID
   if(distance == 0){
-    nodes = cbind(names(to_check), to_check)
+    nodes = cbind(names(to_check), to_check, NA, NA)
     rownames(nodes) = c(1:nrow(nodes))
-    colnames(nodes) = c("PERMANENT_", "LENGTHKM")
+    colnames(nodes) = c("PERMANENT_", "LENGTHKM", "CHILDREN")
     return(nodes)
   }
   while(1){
     next_check = c()
     to_check = to_check[names(to_check) != "0"]
-    nodes = rbind(nodes, cbind(names(to_check), to_check))
+    nodes = rbind(nodes, cbind(names(to_check), to_check, list(NA)), stringsAsFactors=FALSE)
     for(j in 1:length(to_check)){
         n = neighbors(g, names(to_check)[j], direction)
+        nodes[which(nodes[,1] == names(to_check)[j]), 3] = list(n$ID)
         n$LENGTHKM[is.na(n$LENGTHKM)] = 0
         next_check_tmp = n$LENGTHKM + to_check[j]
         names(next_check_tmp) = n$ID
         next_check = c(next_check, next_check_tmp)
     }
+    
+    # if distance is less than zero, continue traversing until an end is reached
+    if(distance < 0 && any(names(next_check) == '0')){
+      nodes = rbind(nodes, cbind(names(to_check), to_check, 0))
+      rownames(nodes) = c(1:nrow(nodes))
+      colnames(nodes) = c("PERMANENT_", "LENGTHKM", "CHILDREN")
+      return(nodes)
+    }
 
     #We need a stop condition where all further neighbors go nowhere
     if(all(names(next_check) == '0')){
-      nodes = rbind(nodes, cbind(names(to_check), to_check))
+      nodes = rbind(nodes, cbind(names(to_check), to_check, 0))
       rownames(nodes) = c(1:nrow(nodes))
-      colnames(nodes) = c("PERMANENT_", "LENGTHKM")
+      colnames(nodes) = c("PERMANENT_", "LENGTHKM", "CHILDREN")
       return(nodes)
     }
 
     for(j in names(next_check)){
-      if(next_check[j] > distance){
-        nodes = rbind(nodes, cbind(names(to_check), to_check))
+      if(distance > 0 && next_check[j] > distance){
+        nodes = rbind(nodes, cbind(names(to_check), to_check, next_check[j]))
         rownames(nodes) = c(1:nrow(nodes))
-        colnames(nodes) = c("PERMANENT_", "LENGTHKM")
+        colnames(nodes) = c("PERMANENT_", "LENGTHKM", "CHILDREN")
         return(nodes)
       }
     }
