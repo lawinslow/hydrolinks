@@ -33,10 +33,13 @@ traverse_flowlines = function(g, distance, start, direction = c("out", "in")){
   while(1){
     next_check = c()
     to_check = to_check[names(to_check) != "0"]
-    nodes = rbind(nodes, cbind(names(to_check), to_check, list(NA)), stringsAsFactors=FALSE)
+    nodes = rbind(nodes, cbind(names(to_check), to_check, NA), stringsAsFactors=FALSE)
     for(j in 1:length(to_check)){
         n = neighbors(g, names(to_check)[j], direction)
-        nodes[which(nodes[,1] == names(to_check)[j]), 3] = list(n$ID)
+        #if(length(n$ID) > 1){
+        #  browser()
+        #}
+        nodes[which(nodes[,1] == names(to_check)[j]), 3] = paste(n$ID, sep = ",", collapse = ",")
         n$LENGTHKM[is.na(n$LENGTHKM)] = 0
         next_check_tmp = n$LENGTHKM + to_check[j]
         names(next_check_tmp) = n$ID
@@ -45,7 +48,7 @@ traverse_flowlines = function(g, distance, start, direction = c("out", "in")){
     
     # if distance is less than zero, continue traversing until an end is reached
     if(distance < 0 && any(names(next_check) == '0')){
-      nodes = rbind(nodes, cbind(names(to_check), to_check, 0))
+      nodes = rbind(nodes, cbind(names(to_check), to_check, "0"))
       rownames(nodes) = c(1:nrow(nodes))
       colnames(nodes) = c("PERMANENT_", "LENGTHKM", "CHILDREN")
       return(nodes)
@@ -53,7 +56,7 @@ traverse_flowlines = function(g, distance, start, direction = c("out", "in")){
 
     #We need a stop condition where all further neighbors go nowhere
     if(all(names(next_check) == '0')){
-      nodes = rbind(nodes, cbind(names(to_check), to_check, 0))
+      nodes = rbind(nodes, cbind(names(to_check), to_check, "0"))
       rownames(nodes) = c(1:nrow(nodes))
       colnames(nodes) = c("PERMANENT_", "LENGTHKM", "CHILDREN")
       return(nodes)
