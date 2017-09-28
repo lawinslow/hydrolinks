@@ -33,6 +33,14 @@ traverse_flowlines = function(g, distance, start, direction = c("out", "in")){
   while(1){
     next_check = c()
     to_check = to_check[names(to_check) != "0"]
+    to_check = to_check[!names(to_check) %in% nodes[,1]]
+    
+    if(length(to_check) == 0){
+      rownames(nodes) = c(1:nrow(nodes))
+      colnames(nodes) = c("PERMANENT_", "LENGTHKM", "CHILDREN")
+      return(nodes)
+    }
+    
     nodes = rbind(nodes, cbind(names(to_check), to_check, NA), stringsAsFactors=FALSE)
     for(j in 1:length(to_check)){
         n = neighbors(g, names(to_check)[j], direction)
@@ -61,6 +69,7 @@ traverse_flowlines = function(g, distance, start, direction = c("out", "in")){
       colnames(nodes) = c("PERMANENT_", "LENGTHKM", "CHILDREN")
       return(nodes)
     }
+    
 
     for(j in names(next_check)){
       if(distance > 0 && next_check[j] > distance){
