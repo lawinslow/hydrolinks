@@ -20,7 +20,13 @@
 traverse_flowlines = function(g, distance, start, direction = c("out", "in")){
   direction = match.arg(direction)
   nodes = data.frame(stringsAsFactors = FALSE)
+  iterations = 0
   n = neighbors(g, start, direction)
+  if(nrow(n) == 0){
+    nodes = cbind(NA, NA, NA)
+    colnames(nodes) = c("PERMANENT_", "LENGTHKM", "CHILDREN")
+    return(nodes)
+  }
   n$LENGTHKM[is.na(n$LENGTHKM)] = 0
   to_check = n$LENGTHKM
   names(to_check) = n$ID
@@ -31,22 +37,36 @@ traverse_flowlines = function(g, distance, start, direction = c("out", "in")){
     return(nodes)
   }
   while(1){
+    iterations = iterations + 1
     next_check = c()
-    to_check = to_check[names(to_check) != "0"]
-    to_check = to_check[!names(to_check) %in% nodes[,1]]
-    
-    if(length(to_check) == 0){
-      rownames(nodes) = c(1:nrow(nodes))
+    if(all(names(to_check) == "0")){
+      nodes = rbind(nodes, cbind(names(to_check), to_check, NA), stringsAsFactors=FALSE)
       colnames(nodes) = c("PERMANENT_", "LENGTHKM", "CHILDREN")
+      nodes = nodes[!is.na(nodes$PERMANENT_),]
       return(nodes)
+    }
+    to_check = to_check[names(to_check) != "0"]
+    if(ncol(nodes) >= 1){
+      to_check = to_check[which(!names(to_check) %in% nodes[,1])]
+      
+      if(length(to_check) == 0){
+        rownames(nodes) = c(1:nrow(nodes))
+        colnames(nodes) = c("PERMANENT_", "LENGTHKM", "CHILDREN")
+        nodes = nodes[!is.na(nodes$PERMANENT_),]
+        return(nodes)
+     } 
     }
     
     nodes = rbind(nodes, cbind(names(to_check), to_check, NA), stringsAsFactors=FALSE)
+    
     for(j in 1:length(to_check)){
         n = neighbors(g, names(to_check)[j], direction)
         #if(length(n$ID) > 1){
         #  browser()
         #}
+        if(ncol(nodes) < 3){
+          browser()
+        }
         nodes[which(nodes[,1] == names(to_check)[j]), 3] = paste(n$ID, sep = ",", collapse = ",")
         n$LENGTHKM[is.na(n$LENGTHKM)] = 0
         next_check_tmp = n$LENGTHKM + to_check[j]
@@ -54,11 +74,23 @@ traverse_flowlines = function(g, distance, start, direction = c("out", "in")){
         next_check = c(next_check, next_check_tmp)
     }
     
+    if(iterations > 10000){
+      nodes = rbind(nodes, cbind(names(to_check), to_check, "STUCK"))
+      rownames(nodes) = c(1:nrow(nodes))
+      colnames(nodes) = c("PERMANENT_", "LENGTHKM", "CHILDREN")
+      nodes = nodes[!is.na(nodes$PERMANENT_),]
+      print(iterations)
+      print("stuck")
+      return(nodes)
+    }
+    
     # if distance is less than zero, continue traversing until an end is reached
     if(distance < 0 && any(names(next_check) == '0')){
       nodes = rbind(nodes, cbind(names(to_check), to_check, "0"))
       rownames(nodes) = c(1:nrow(nodes))
       colnames(nodes) = c("PERMANENT_", "LENGTHKM", "CHILDREN")
+      nodes = nodes[!is.na(nodes$PERMANENT_),]
+      print(iterations)
       return(nodes)
     }
 
@@ -67,6 +99,7 @@ traverse_flowlines = function(g, distance, start, direction = c("out", "in")){
       nodes = rbind(nodes, cbind(names(to_check), to_check, "0"))
       rownames(nodes) = c(1:nrow(nodes))
       colnames(nodes) = c("PERMANENT_", "LENGTHKM", "CHILDREN")
+      nodes = nodes[!is.na(nodes$PERMANENT_),]
       return(nodes)
     }
     
@@ -76,6 +109,7 @@ traverse_flowlines = function(g, distance, start, direction = c("out", "in")){
         nodes = rbind(nodes, cbind(names(to_check), to_check, next_check[j]))
         rownames(nodes) = c(1:nrow(nodes))
         colnames(nodes) = c("PERMANENT_", "LENGTHKM", "CHILDREN")
+        nodes = nodes[!is.na(nodes$PERMANENT_),]
         return(nodes)
       }
     }
