@@ -30,7 +30,7 @@ get_shape_by_id = function(feature_type = c("flowline", "waterbody"), dataset = 
   #ID cache files alway
   db_name = paste0(dataset, "_", feature_type, "_ids")
 
-  #check_dl_file(system.file("extdata/shape_id_cache.csv", package = "hydrolinks"), fname = paste0(db_name, ".zip"))
+  check_dl_file(system.file("extdata/shape_id_cache.csv", package = "hydrolinks"), fname = paste0(db_name, ".zip"))
 
   con = dbConnect(RSQLite::SQLite(), file.path(local_path(), 'unzip', paste0(db_name, ".zip"), paste0(db_name, ".sqlite3")))
 
