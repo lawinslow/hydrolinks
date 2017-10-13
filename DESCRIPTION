@@ -1,7 +1,7 @@
 Package: hydrolinks
 Type: Package
 Title: Hydrologic Network Linking Data and Tools
-Version: 0.4.3
+Version: 0.4.4
 Authors@R: c( person("Tobi", "Hahn", role = c("aut"), 
       email = "hahnt2@rpi.edu"),
     person("Luke", "Winslow", role = c("aut", "cre"), 
@@ -20,6 +20,7 @@ Imports: rgdal,
     tools,
     rappdirs,
     sf
+Suggests: testthat
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
