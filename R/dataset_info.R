@@ -32,17 +32,14 @@ dataset_info = function(dataset, feature_type){
   if(tolower(dataset) == "nhdh"){
     bb_cache_path=system.file('extdata/nhd_bb_cache_projected.Rdata', package='hydrolinks')
     id_column = "PERMANENT_"
-    wbd_bb = bbdf
   }
   else if(tolower(dataset) == "hydrolakes"){
     bb_cache_path = system.file('extdata/hydrolakes_bb_cache_projected.Rdata', package='hydrolinks')
     id_column = "Hylak_id"
-    wbd_bb = bbdf
   }
   else if(tolower(dataset) == "nhdplusv2"){
     bb_cache_path=system.file('extdata/nhdplus_waterbody_bb_cache.rdata', package='hydrolinks')
     id_column = "COMID"
-    wbd_bb = bbdf
   }
 
 
