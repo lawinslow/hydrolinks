@@ -13,6 +13,12 @@
 #' @import sf
 #' @import dplyr
 #'
+#'
+#' @examples
+#'
+#'
+#'
+#'
 #' @export
 
 link_to_flowlines = function(lats, lons, ids, max_dist = 100, dataset = c("nhdh", "nhdplusv2")){

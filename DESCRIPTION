@@ -19,7 +19,8 @@ Imports: rgdal,
     httr,
     tools,
     rappdirs,
-    sf
+    sf,
+    RSQLite
 Suggests: testthat
 License: MIT + file LICENSE
 Encoding: UTF-8
