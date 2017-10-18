@@ -17,24 +17,10 @@
 
 link_to_flowlines = function(lats, lons, ids, max_dist = 100, dataset = c("nhdh", "nhdplusv2")){
   dataset = match.arg(dataset)
-  dl_file = ""
-  id_column = ""
-  bbdf_streams = NULL
-  bbdf_flowline = NULL
-  if(tolower(dataset) == "nhdh"){
-    load(file=system.file('extdata/nhd_bb_streams_cache.Rdata', package='hydrolinks'))
-    dl_file = "extdata/nhdh.csv"
-    id_column = "PERMANENT_"
-    wbd_bb = bbdf_streams
-  }
-  else if(tolower(dataset) == "nhdplusv2"){
-    load(file=system.file('extdata/nhdplus_flowline_bb_cache.rdata', package='hydrolinks'))
-    dl_file = "extdata/nhdplusv2.csv"
-    id_column = "COMID"
-    wbd_bb = bbdf_flowline
-  }
 
-
+  dinfo = dataset_info(dataset, 'flowline')
+  bbdf = NULL
+  load(dinfo$bb_cache_path)
 
   sites = data.frame(lats, lons, ids)
   pts = st_as_sf(sites, coords = c("lons", "lats"), crs = nhd_proj)
@@ -45,23 +31,24 @@ link_to_flowlines = function(lats, lons, ids, max_dist = 100, dataset = c("nhdh"
   xmin = xmax = ymin = ymax = NULL
 
   for(i in 1:nrow(pts)){
-    res[[i]] = subset(wbd_bb, xmin <= pts$geom[[i]][1] & xmax >= pts$geom[[i]][1] & ymin <= pts$geom[[i]][2] & ymax >= pts$geom[[i]][2])
+    res[[i]] = subset(bbdf, xmin <= pts$geom[[i]][1] & xmax >= pts$geom[[i]][1] & ymin <= pts$geom[[i]][2] & ymax >= pts$geom[[i]][2])
   }
 
   to_check = unique(do.call(rbind, res))
 
   match_res = list()
 
+  #in keeping with "no match is data.frame of zero rows"
   if(nrow(to_check) == 0){
-    ret = data.frame(MATCH_ID = sites$ids)
-    ret$PERMANENT_ID = NA
+    ret = data.frame(MATCH_ID = rep(NA, 0))
+    ret[,dinfo$id_column] = rep(NA, 0)
     return(ret)
   }
 
   for(i in 1:nrow(to_check)){
     #get nhd layer
-    check_dl_file(system.file(dl_file, package = "hydrolinks"), to_check[i, 'file'])
-    shape       = st_read(file.path(local_path(), "unzip", to_check[i,'file'], "NHDFlowline_projected.shp"), stringsAsFactors=FALSE)
+    check_dl_file(dinfo$file_index_path, to_check[i, 'file'])
+    shape       = st_read(file.path(local_path(), "unzip", to_check[i,'file'], dinfo$shapefile_name), stringsAsFactors=FALSE)
     st_crs(shape) = nhd_projected_proj
     shape_buffer = st_buffer(shape, max_dist)
     matches = st_intersects(pts, shape_buffer)
@@ -86,5 +73,6 @@ link_to_flowlines = function(lats, lons, ids, max_dist = 100, dataset = c("nhdh"
 
   unique_matches = unique(bind_rows(match_res))
   #return matches that have non-NA value PREMANENT_ID
-  return(unique_matches[!is.na(unique_matches[,id_column]), ])
+  #return(unique_matches[!is.na(unique_matches[,dinfo$id_column]), ])
+  return(unique_matches)
 }

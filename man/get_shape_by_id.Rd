@@ -4,15 +4,18 @@
 \alias{get_shape_by_id}
 \title{Link IDs to warterbody shapefiles}
 \usage{
-get_shape_by_id(feature_type = c("flowline", "waterbody"),
-  dataset = c("nhdh", "nhdplusv2", "hydrolakes"), match_column, match_id)
+get_shape_by_id(match_id, feature_type = c("flowline", "waterbody"),
+  dataset = c("nhdh", "nhdplusv2", "hydrolakes"), match_column)
 }
 \arguments{
+\item{match_id}{ids of features to be matched.}
+
 \item{feature_type}{name of feature layer to match. The hydrolakes dataset does not include a flowline layer.}
 
 \item{dataset}{name of dataset to use for matching.}
 
-\item{match_column}{index containing match ids. Columns indexed by dataset:
+\item{match_column}{index containing match ids. Defaults to dataset ID column.
+Columns indexed by dataset:
 \tabular{lll}{
 nhdh \tab nhdplusv2 \tab hydrolakes \cr
 PERMANENT_ \tab COMID \tab Hylak_id \cr
@@ -20,8 +23,6 @@ GNIS_ID \tab GNIS_ID \tab Lake_name \cr
 GNIS_NAME \tab GNIS_NAME \cr
 REACHCODE \tab REACHCODE
 }}
-
-\item{match_id}{ids of features to be matched.}
 }
 \value{
 simple features object containing polygons with associated IDs.
