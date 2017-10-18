@@ -1,6 +1,8 @@
 #' @title Link geopoints to Waterbodies
 #'
-#' @description Link geopoints to waterbodies in a geospatial dataset.
+#' @description
+#' Link geopoints to waterbodies in a geospatial dataset. Use the
+#' point-in-polygon technique with user-selectable polygon buffer size.
 #'
 #' @param lats Vector of point latitudes
 #' @param lons Vector of point longitudes
@@ -8,11 +10,15 @@
 #' @param dataset Character name of dataset to link against. Can be either "nhdh", "hydrolakes", or "nhdplusv2"
 #' @param buffer Numeric width of polygon buffer in m
 #'
-#'
 #' @return Water body permanent IDs
 #'
 #' @import sf
 #'
+#' @examples
+#' latlon = c(43.108728, -89.418293)
+#' \dontrun{
+#' link_to_waterbodies(latlon[1], latlon[2], 'id1', dataset = 'nhdh')
+#' }
 #' @export
 link_to_waterbodies = function(lats, lons, ids, dataset = c("nhdh", "hydrolakes", "nhdplusv2"), buffer = 0){
   dataset = match.arg(dataset)
@@ -49,7 +55,8 @@ link_to_waterbodies = function(lats, lons, ids, dataset = c("nhdh", "hydrolakes"
     check_dl_file(dinfo$file_index_path, to_check[i, 'file'])
 
     shape         = st_read(file.path(local_path(), "unzip", to_check[i,'file'], dinfo$shapefile_name), stringsAsFactors=FALSE)
-    st_crs(shape) = nhd_projected_proj
+    #st_crs(shape) = nhd_projected_proj
+    shape = st_transform(shape, nhd_projected_proj)
 
     if(tolower(dataset) == 'nhdh'){
       shape = shape[shape$FTYPE %in% c('390', '361', '436'), ]

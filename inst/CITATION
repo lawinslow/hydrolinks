@@ -1,0 +1,43 @@
+citHeader("When citing hydrolinks, please cite both the package and underlying data sources used:")
+
+citEntry(entry = "Article",
+         author = personList(
+           as.person("Mathis L Messager"),
+           as.person("Bernhard Lehner"),
+           as.person("Gunther Grill"),
+           as.person("Irene Nedeva"),
+           as.person("Oliver Schmitt")),
+         title = "Estimating the volume and age of water stored in global lakes using a geo-statistical approach",
+         journal = "In Prep/Review",
+         year = "2016",
+         volume = "7",
+         Issue = "13603",
+         url = "https://www.nature.com/articles/ncomms13603?WT.feed_name=subjects_earth-and-environmental-sciences",
+         textVersion = paste("Messager, M. L., Lehner, B., Grill, G., Nedeva, I., & Schmitt, O. (2016). Estimating the volume and age of water stored in global lakes using a geo-statistical approach. Nature communications, 7, 13603."))
+
+
+citEntry(entry = "techreport",
+         author = personList(
+          as.person("JD Simley"),
+          as.person("JR Carswell")),
+         title = "The national map– hydrography: U.S. Geological Survey Fact Sheet 2009-3054",
+         institution = "U.S. Department of the Interior, U.S. Geological Survey",
+         pages = "3054",
+         year = "2009",
+         textVersion = "Simley, J., Carswell, J., 2009. The national map– hydrography: U.S. Geological Survey Fact Sheet 2009-3054."
+       )
+
+citEntry(entry = "Article",
+         author = personList(
+           as.person("Luke A Winslow"),
+           as.person("Tobi H Hahn"),
+           as.person("Sarah D Princiotta"),
+           as.person("Taylor H Leach"),
+           as.person("Kevin C Rose")),
+         title = "hydrolinks: A new tool to link macroscale to inland water bodies",
+         journal = "In Prep/Review",
+         year = "In Prep",
+         volume = "",
+         Issue = "",
+         url = "",
+         textVersion = paste("Winslow, LA, TH Hahn, SD Princiotta, TH Leach, KC Rose (In Prep/Review) hydrolinks: A new tool to link macroscale to inland water bodies. "))

@@ -55,7 +55,7 @@ dataset_info = function(dataset, feature_type){
 
   if(dataset == "nhdh" || dataset == "nhdplusv2"){
     if(feature_type == "waterbody"){
-      shapefile_name = "NHDWaterbody_projected.shp"
+      shapefile_name = "NHDWaterbody.shp"
     }
     else{
       shapefile_name = "NHDFlowline_projected.shp"

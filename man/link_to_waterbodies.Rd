@@ -22,5 +22,12 @@ link_to_waterbodies(lats, lons, ids, dataset = c("nhdh", "hydrolakes",
 Water body permanent IDs
 }
 \description{
-Link geopoints to waterbodies in a geospatial dataset.
+Link geopoints to waterbodies in a geospatial dataset. Use the
+point-in-polygon technique with user-selectable polygon buffer size.
+}
+\examples{
+latlon = c(43.108728, -89.418293)
+\dontrun{
+link_to_waterbodies(latlon[1], latlon[2], 'id1', dataset = 'nhdh')
+}
 }
