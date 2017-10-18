@@ -13,6 +13,10 @@
 #' @import sf
 #' @import dplyr
 #'
+#'
+#'
+#'
+#'
 #' @export
 
 link_to_flowlines = function(lats, lons, ids, max_dist = 100, dataset = c("nhdh", "nhdplusv2")){
@@ -49,7 +53,9 @@ link_to_flowlines = function(lats, lons, ids, max_dist = 100, dataset = c("nhdh"
     #get nhd layer
     check_dl_file(dinfo$file_index_path, to_check[i, 'file'])
     shape       = st_read(file.path(local_path(), "unzip", to_check[i,'file'], dinfo$shapefile_name), stringsAsFactors=FALSE)
-    st_crs(shape) = nhd_projected_proj
+    #st_crs(shape) = nhd_projected_proj
+    shape = st_transform(shape, nhd_projected_proj)
+
     shape_buffer = st_buffer(shape, max_dist)
     matches = st_intersects(pts, shape_buffer)
     if(length(unlist(matches)) == 0){

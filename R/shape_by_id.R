@@ -37,7 +37,6 @@ get_shape_by_id = function(match_id, feature_type = c("flowline", "waterbody"), 
 
   #ID cache files alway
   db_name = paste0(dataset, "_", feature_type, "_ids")
-
   check_dl_file(dinfo$file_index_path, fname = paste0(db_name, ".zip"))
 
   con = dbConnect(RSQLite::SQLite(), file.path(local_path(), 'unzip', paste0(db_name, ".zip"), paste0(db_name, ".sqlite3")))
@@ -45,6 +44,7 @@ get_shape_by_id = function(match_id, feature_type = c("flowline", "waterbody"), 
   sql = paste0('SELECT * from id_lookup where ', match_column, ' IN (', paste(match_id, collapse = ','), ')')
 
   shape = dbGetQuery(con, sql)
+
   files = unique(shape$file)
 
   dbDisconnect(con)

@@ -3,4 +3,4 @@
 northAmProj.prj
 northAmProj.proj4string
 figures/
-wqp_sites_linked.RData
+.travis.yml

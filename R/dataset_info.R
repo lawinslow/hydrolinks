@@ -30,27 +30,37 @@ dataset_info = function(dataset, feature_type){
   db_path = file.path(local_path(), 'unzip', paste0(db_name, ".zip"), paste0(db_name, ".sqlite3"))
 
   if(tolower(dataset) == "nhdh"){
-    bb_cache_path=system.file('extdata/nhd_bb_cache_projected.Rdata', package='hydrolinks')
+    if(feature_type == "waterbody"){
+      bb_cache_path = system.file('extdata/nhd_bb_cache_projected.Rdata', package='hydrolinks')
+    }
+    else if(feature_type == "flowline"){
+      bb_cache_path = system.file('extdata/nhd_bb_streams_cache.Rdata', package='hydrolinks')
+    }
     id_column = "PERMANENT_"
-    wbd_bb = bbdf
   }
   else if(tolower(dataset) == "hydrolakes"){
     bb_cache_path = system.file('extdata/hydrolakes_bb_cache_projected.Rdata', package='hydrolinks')
     id_column = "Hylak_id"
-    wbd_bb = bbdf
   }
   else if(tolower(dataset) == "nhdplusv2"){
-    bb_cache_path=system.file('extdata/nhdplus_waterbody_bb_cache.rdata', package='hydrolinks')
+    if(feature_type == "waterbody"){
+      bb_cache_path=system.file('extdata/nhdplus_waterbody_bb_cache.rdata', package='hydrolinks')
+    }
+    else if(feature_type == "flowline"){
+      bb_cache_path=system.file('extdata/nhdplus_flowline_bb_cache.rdata', package='hydrolinks')
+    }
     id_column = "COMID"
-    wbd_bb = bbdf
   }
 
 
   if(dataset == "nhdh" || dataset == "nhdplusv2"){
-    if(feature_type == "waterbody"){
+    if(feature_type == "waterbody" && dataset == "nhdh"){
+      shapefile_name = "NHDWaterbody.shp"
+    }
+    else if(feature_type == "waterbody" && dataset == "nhdplusv2"){
       shapefile_name = "NHDWaterbody_projected.shp"
     }
-    else{
+    else if(feature_type == "flowline"){
       shapefile_name = "NHDFlowline_projected.shp"
     }
   }

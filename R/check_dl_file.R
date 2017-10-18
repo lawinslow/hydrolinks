@@ -1,18 +1,17 @@
 #' @title Verify and download data files
-#' 
-#' @description 
+#'
+#' @description
 #' Checks if local data files as defined in master file exist and match MD5 hash. Downloads data if necessary.
-#' 
+#'
 #' @param master_file Character path to master file
 #' @param fname Character vector of specific file names to check
 #' @param md5check boolean
 #' @param dest Character path to download destination
-#' 
+#'
 #' @import httr
 #' @import tools
 #' @import rappdirs
 #' @import utils
-#' @export
 
 check_dl_file = function(master_file, fname = NULL, md5check = TRUE, dest=local_path()){
   files = read.csv(master_file)
@@ -60,9 +59,9 @@ check_dl_file = function(master_file, fname = NULL, md5check = TRUE, dest=local_
 }
 
 #' @title Get local files path
-#' 
+#'
 #' @description Get path to cached data files
-#' 
+#'
 #' @export
 
 
@@ -84,7 +83,7 @@ local_path = function(){
 
 
 #' @title Set local files path
-#' 
+#'
 #' @description Set location of local data file cache
 #'
 #' @param path character path to new local files path. If null, path will be reset to default user data directory location.
