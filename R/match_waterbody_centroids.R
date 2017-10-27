@@ -59,7 +59,7 @@ link_waterbody_centroids = function(lats, lons, ids, dataset = c("nhdh", "nhdplu
     check_dl_file(dinfo$file_index_path, to_check[i, 'file'])
 
     nhd       = st_read(file.path(local_path(), "unzip", to_check[i,'file'], dinfo$shapefile_name), stringsAsFactors=FALSE)
-
+  
     centroids = list()
     for(j in 1:nrow(nhd)){
       centroids[[j]] = st_point(c(nhd$centroid_x[j], nhd$centroid_y[j]))
@@ -86,7 +86,8 @@ link_waterbody_centroids = function(lats, lons, ids, dataset = c("nhdh", "nhdplu
     nhd_matched$MATCH_ID = sites$ids
     nhd_matched = nhd_matched[,,drop = TRUE]
     nhd_matched$geometry = NULL
-    match_res[[i]] = nhd_matched
+    #names(nhd_matched) = toupper(names(nhd_matched))
+    match_res[[i]] = data.frame(nhd_matched, stringsAsFactors = FALSE)
   }
 
   unique_matches = unique(bind_rows(match_res))

@@ -54,10 +54,7 @@ dataset_info = function(dataset, feature_type){
 
 
   if(dataset == "nhdh" || dataset == "nhdplusv2"){
-    if(feature_type == "waterbody" && dataset == "nhdh"){
-      shapefile_name = "NHDWaterbody.shp"
-    }
-    else if(feature_type == "waterbody" && dataset == "nhdplusv2"){
+    if(feature_type == "waterbody"){
       shapefile_name = "NHDWaterbody_projected.shp"
     }
     else if(feature_type == "flowline"){
@@ -65,7 +62,7 @@ dataset_info = function(dataset, feature_type){
     }
   }
   else if(dataset == "hydrolakes"){
-    shapefile_name = "HydroLAKES_polys_v10.shp"
+    shapefile_name = "HydroLAKES_polys_v10_projected.shp"
   }
 
   file_index_path = system.file(paste0("extdata/", dataset, ".csv"), package = "hydrolinks")
