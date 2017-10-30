@@ -32,3 +32,12 @@ Get shapefiles containing waterbodies with specified IDs. If one argument is pro
 other arguments will be used to filter. Arguments are checked in order: PERMANENT_match, GNIS_ID_match,
 GNIS_NAME_match, REACHCODE_match.
 }
+\examples{
+\dontrun{
+
+library(sf)
+shp = get_shape_by_id('143249470', feature_type = 'waterbody', dataset='nhdh')
+plot(st_geometry(shp), col='blue')
+
+}
+}

@@ -13,6 +13,14 @@
 #'
 #' @import sf
 #'
+#' @examples
+#' \dontrun{
+#' centroidpt = c(33.655277, -117.834007)
+#'
+#' #should be item ID 126859554
+#' link_waterbody_centroids( centroidpt[1], centroidpt[2], 'dummyid', dataset='nhdh')
+#' }
+#'
 #' @export
 link_waterbody_centroids = function(lats, lons, ids, dataset = c("nhdh", "nhdplusv2", "hydrolakes"), max_dist = 25){
   dataset = match.arg(dataset)
@@ -59,7 +67,7 @@ link_waterbody_centroids = function(lats, lons, ids, dataset = c("nhdh", "nhdplu
     check_dl_file(dinfo$file_index_path, to_check[i, 'file'])
 
     nhd       = st_read(file.path(local_path(), "unzip", to_check[i,'file'], dinfo$shapefile_name), stringsAsFactors=FALSE)
-  
+
     centroids = list()
     for(j in 1:nrow(nhd)){
       centroids[[j]] = st_point(c(nhd$centroid_x[j], nhd$centroid_y[j]))
