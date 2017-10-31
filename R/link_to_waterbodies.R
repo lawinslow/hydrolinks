@@ -17,7 +17,9 @@
 #' @examples
 #' latlon = c(43.108728, -89.418293)
 #' \dontrun{
+#' #returns linked waterbody site information for that lat/lon
 #' link_to_waterbodies(latlon[1], latlon[2], 'id1', dataset = 'nhdh')
+#'
 #' }
 #' @export
 link_to_waterbodies = function(lats, lons, ids, dataset = c("nhdh", "hydrolakes", "nhdplusv2"), buffer = 0){
