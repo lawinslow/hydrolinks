@@ -29,17 +29,19 @@ link_to_flowlines = function(lats, lons, ids, max_dist = 100, dataset = c("nhdh"
   sites = data.frame(lats, lons, ids)
   pts = st_as_sf(sites, coords = c("lons", "lats"), crs = nhd_proj)
   pts = st_transform(pts, st_crs(nhd_projected_proj))
-
+  st_crs(bbdf) = nhd_projected_proj
+  
   res   = list()
-
+  
   xmin = xmax = ymin = ymax = NULL
-
   for(i in 1:nrow(pts)){
-    res[[i]] = subset(bbdf, xmin <= pts$geom[[i]][1] & xmax >= pts$geom[[i]][1] & ymin <= pts$geom[[i]][2] & ymax >= pts$geom[[i]][2])
+    res = c(res, bbdf[unlist(st_intersects(pts[i,], bbdf)),"file", drop=TRUE])
+    #res[[i]] = subset(bbdf, xmin <= pts$geom[[i]][1] & xmax >= pts$geom[[i]][1] & ymin <= pts$geom[[i]][2] & ymax >= pts$geom[[i]][2])
   }
-
-  to_check = unique(do.call(rbind, res))
-
+  
+  to_check = as.data.frame(unique(do.call(rbind, res)), stringsAsFactors = FALSE)
+  colnames(to_check)[1] = "file"
+  
   match_res = list()
 
   #in keeping with "no match is data.frame of zero rows"
