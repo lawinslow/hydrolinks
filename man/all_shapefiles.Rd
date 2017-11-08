@@ -10,6 +10,10 @@ all_shapefiles(check_dl = FALSE, dataset = c("nhdh", "hydrolakes",
 \arguments{
 \item{check_dl}{If TRUE, checks to ensure all files for that dataset have been downloaded.
 This check takes some time (~30 seconds) to check all files (and much longer to dowload if necessary)}
+
+\item{dataset}{which dataset to return shapefiles from.}
+
+\item{feature_type}{return waterbodies or flowlines. The hydrolakes dataset does not include flowlines.}
 }
 \description{
 Returns list of paths to shapefiles for use in custom processing.

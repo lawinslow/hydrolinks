@@ -76,7 +76,7 @@ link_to_flowlines = function(lats, lons, ids, max_dist = 100, dataset = c("nhdh"
     shape_matched$MATCH_ID = sites$ids
     shape_matched = shape_matched[,,drop = TRUE]
     shape_matched$geometry = NULL
-    match_res[[i]] = shape_matched
+    match_res[[i]] = as.data.frame(shape_matched)
   }
 
   unique_matches = unique(bind_rows(match_res))
