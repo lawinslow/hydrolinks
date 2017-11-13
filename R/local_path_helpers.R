@@ -55,6 +55,10 @@ cache_get_dir = function(){
 #'
 #' @export
 cache_set_dir = function(path = NULL){
+  app_dir = rappdirs::user_data_dir(appname = 'hydrolinks')
+  if(!dir.exists(app_dir)){
+    dir.create(app_dir, recursive = TRUE)
+  }
   if(!is.null(path)){
     if(!dir.exists(path)){
       dir.create(path, recursive = TRUE)
