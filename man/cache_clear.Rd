@@ -6,3 +6,6 @@
 \usage{
 cache_clear()
 }
+\description{
+deletes the currently set cached directory found at \link{cache_get_dir}.
+}

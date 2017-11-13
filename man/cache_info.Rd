@@ -6,6 +6,6 @@
 \usage{
 cache_info()
 }
-\value{
-prints locally cached files and their sizes.
+\description{
+prints files stored at the current cache location and their size in megabytes.
 }

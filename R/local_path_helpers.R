@@ -76,6 +76,7 @@ cache_set_dir = function(path = NULL){
 
 #' @title Remove locally cached files
 #'
+#' @description deletes the currently set cached directory found at \link{cache_get_dir}.
 #'
 #' @export
 cache_clear = function(){
@@ -85,7 +86,8 @@ cache_clear = function(){
 
 #' @title Get local file cache info
 #'
-#' @return prints locally cached files and their sizes.
+#' @description prints files stored at the current cache location and their size in megabytes.
+#' 
 #' @export
 cache_info = function(){
   cat("<hydrolinks cached files>", sep = "\n")
