@@ -13,7 +13,7 @@ geographic data to the hydro networks.
 
 
 hydrolinks will soon be submitted and available on CRAN. Until then, 
-it is available for install direction from github. 
+it is available for install directly from github. 
 
 ```
 library(devtools)

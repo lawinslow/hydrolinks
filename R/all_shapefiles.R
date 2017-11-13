@@ -6,12 +6,9 @@
 #'
 #' @param check_dl If TRUE, checks to ensure all files for that dataset have been downloaded.
 #' This check takes some time (~30 seconds) to check all files (and much longer to dowload if necessary)
-#' @param dataset which dataset to return shapefiles from.
-#' 
-#' @param feature_type return waterbodies or flowlines. The hydrolakes dataset does not include flowlines.
+#' @inheritParams get_shape_by_id
 #'
 #'
-#' @export
 all_shapefiles = function(check_dl=FALSE, dataset = c("nhdh", "hydrolakes", "nhdplusv2"), feature_type = c("waterbody", "flowline")){
 
   dataset = match.arg(dataset)

@@ -18,7 +18,8 @@ Imports:
     tools,
     rappdirs,
     sf,
-    RSQLite
+    RSQLite,
+    units
 Suggests: testthat
 License: MIT + file LICENSE
 Encoding: UTF-8

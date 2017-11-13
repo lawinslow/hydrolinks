@@ -22,8 +22,16 @@
 #' @import sf
 #' @import RSQLite
 #'
+#'
+#' @examples
+#' \dontrun{
+#'
+#' library(sf)
+#' shp = get_shape_by_id('143249470', feature_type = 'waterbody', dataset='nhdh')
+#' plot(st_geometry(shp), col='blue')
+#'
+#' }
 #' @export
-
 get_shape_by_id = function(match_id, feature_type = c("flowline", "waterbody"), dataset = c("nhdh", "nhdplusv2", "hydrolakes"), match_column){
   feature_type = match.arg(feature_type)
   dataset = match.arg(dataset)
@@ -37,7 +45,9 @@ get_shape_by_id = function(match_id, feature_type = c("flowline", "waterbody"), 
 
   #ID cache files alway
   db_name = paste0(dataset, "_", feature_type, "_ids")
-  check_dl_file(dinfo$file_index_path, fname = paste0(db_name, ".zip"))
+
+  #lookup table file info is always in the same file
+  check_dl_file(system.file('extdata/shape_id_cache.csv', package='hydrolinks'), fname = paste0(db_name, ".zip"))
 
   con = dbConnect(RSQLite::SQLite(), file.path(local_path(), 'unzip', paste0(db_name, ".zip"), paste0(db_name, ".sqlite3")))
 

@@ -12,10 +12,16 @@
 #'
 #' @import sf
 #' @import dplyr
+#' @import units
 #'
+#' @examples
+#' \dontrun{
+#' latlon = c(42.703290, -73.702855)
 #'
+#' #should link to hudson river
+#' link_to_flowlines(latlon[1], latlon[2], 'dummyid')
 #'
-#'
+#' }
 #'
 #' @export
 
@@ -58,8 +64,26 @@ link_to_flowlines = function(lats, lons, ids, max_dist = 100, dataset = c("nhdh"
     #st_crs(shape) = nhd_projected_proj
     shape = st_transform(shape, nhd_projected_proj)
 
-    shape_buffer = st_buffer(shape, max_dist)
-    matches = st_intersects(pts, shape_buffer)
+    #LAW: Ok, the buffer-based matching is very slow for a small lat/lon list. Conversely, simple distance is
+    #slow for really long point lists. I'm trying to split the difference here and optimize for both.
+    if(nrow(pts) > 300){ #magic number cutoff! Seems to balance performance
+
+      shape_buffer = st_buffer(shape, max_dist)
+      matches = st_intersects(pts, shape_buffer)
+    }else{
+      units(max_dist) = with(units::ud_units, m) #input max dist is defineda as meters
+
+      matchmat = st_distance(shape, pts)
+      mini = apply(matchmat, 2, which.min)
+      matches = lapply(seq_along(mini), function(i){
+          if(matchmat[mini[i], i] <= max_dist){
+            return(mini[i])
+          }else{
+            return(double(length=0))
+          }
+        })
+    }
+
     if(length(unlist(matches)) == 0){
       next
     }
@@ -74,9 +98,15 @@ link_to_flowlines = function(lats, lons, ids, max_dist = 100, dataset = c("nhdh"
     matches[lengths(matches) == 0] = NA
     shape_matched = shape[unlist(matches),]
     shape_matched$MATCH_ID = sites$ids
-    shape_matched = shape_matched[,,drop = TRUE]
-    shape_matched$geometry = NULL
-    match_res[[i]] = as.data.frame(shape_matched)
+#<<<<<<< HEAD:R/link_flowlines.R
+#    shape_matched = shape_matched[,,drop = TRUE]
+#    shape_matched$geometry = NULL
+#    match_res[[i]] = as.data.frame(shape_matched)
+#=======
+    #shape_matched = shape_matched[,,drop = TRUE]
+    st_geometry(shape_matched) = NULL
+    match_res[[i]] = shape_matched
+#>>>>>>> 701c46c5e6d7cebabfd19a92b5cb8508b5a3befe:R/link_to_flowlines.R
   }
 
   unique_matches = unique(bind_rows(match_res))
