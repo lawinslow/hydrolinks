@@ -10,7 +10,7 @@ id_lookup_rows = list()
 
 for(i in 1:length(files)){
   check_dl_file(system.file("extdata/nhdh.csv", package = "hydrolinks"), fname = files[i])
-  shape = st_read(file.path(local_path(), "unzip", files[i], "NHDWaterbody_projected.shp"))
+  shape = st_read(file.path(cache_get_dir(), "unzip", files[i], "NHDWaterbody_projected.shp"))
   shape = shape[,,drop = TRUE]
   shape$geometry = NULL
   colnames(shape) = tolower(colnames(shape))
@@ -31,7 +31,7 @@ id_lookup = data.frame()
 id_lookup_rows = list()
 
 for(i in 1:length(files)){
-  shape = st_read(file.path(local_path(), "unzip", files[i], "NHDFlowline_projected.shp"))
+  shape = st_read(file.path(cache_get_dir(), "unzip", files[i], "NHDFlowline_projected.shp"))
   shape = shape[,,drop = TRUE]
   shape$geometry = NULL
   colnames(shape) = tolower(colnames(shape))
@@ -55,7 +55,7 @@ id_lookup_rows = list()
 
 for(i in 1:length(files)){
   check_dl_file(system.file("extdata/nhdplusv2.csv", package = "hydrolinks"), fname = files[i])
-  shape = st_read(file.path(local_path(), "unzip", files[i], "NHDWaterbody_projected.shp"))
+  shape = st_read(file.path(cache_get_dir(), "unzip", files[i], "NHDWaterbody_projected.shp"))
   shape = shape[,,drop = TRUE]
   shape$geometry = NULL
   colnames(shape) = tolower(colnames(shape))
@@ -75,7 +75,7 @@ id_lookup = data.frame()
 id_lookup_rows = list()
 
 for(i in 1:length(files)){
-  shape = st_read(file.path(local_path(), "unzip", files[i], "NHDFlowline_projected.shp"))
+  shape = st_read(file.path(cache_get_dir(), "unzip", files[i], "NHDFlowline_projected.shp"))
   shape = shape[,,drop = TRUE]
   shape$geometry = NULL
   colnames(shape) = tolower(colnames(shape))
@@ -98,7 +98,7 @@ id_lookup_rows = list()
 
 for(i in 1:length(files)){
   check_dl_file(system.file("extdata/hydrolakes.csv", package = "hydrolinks"), fname = files[i])
-  shape = st_read(file.path(local_path(), "unzip", files[i], "HydroLAKES_polys_v10_projected.shp"))
+  shape = st_read(file.path(cache_get_dir(), "unzip", files[i], "HydroLAKES_polys_v10_projected.shp"))
   shape = shape[,,drop = TRUE]
   shape$geometry = NULL
   colnames(shape) = tolower(colnames(shape))

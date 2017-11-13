@@ -68,7 +68,7 @@ link_waterbody_centroids = function(lats, lons, ids, dataset = c("nhdh", "nhdplu
     #get waterbody layer
     check_dl_file(dinfo$file_index_path, to_check[i, 'file'])
 
-    nhd       = st_read(file.path(local_path(), "unzip", to_check[i,'file'], dinfo$shapefile_name), stringsAsFactors=FALSE)
+    nhd       = st_read(file.path(cache_get_dir(), "unzip", to_check[i,'file'], dinfo$shapefile_name), stringsAsFactors=FALSE)
 
     centroids = list()
     for(j in 1:nrow(nhd)){
