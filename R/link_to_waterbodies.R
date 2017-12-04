@@ -32,6 +32,7 @@ link_to_waterbodies = function(lats, lons, ids, dataset = c("nhdh", "hydrolakes"
 
 
   sites = data.frame(lats, lons, ids)
+  sites = sites[complete.cases(sites),]
   pts = st_as_sf(sites, coords = c("lons", "lats"), crs = nhd_proj)
   pts = st_transform(pts, st_crs(nhd_projected_proj))
   st_crs(bbdf) = nhd_projected_proj
@@ -96,8 +97,8 @@ link_to_waterbodies = function(lats, lons, ids, dataset = c("nhdh", "hydrolakes"
 
   unique_matches = unique(bind_rows(match_res))
   #return matches that have non-NA value id
-  #return(unique_matches[!is.na(unique_matches[,dinfo$id_column]),])
+  return(unique_matches[!is.na(unique_matches[,dinfo$id_column]),])
 
   #return all matches
-  return(unique_matches)
+  #return(unique_matches)
 }
