@@ -19,7 +19,8 @@ Imports:
     rappdirs,
     sf,
     RSQLite,
-    units
+    units,
+    stats
 Suggests: testthat
 License: MIT + file LICENSE
 Encoding: UTF-8

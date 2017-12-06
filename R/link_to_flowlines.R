@@ -13,6 +13,7 @@
 #' @import sf
 #' @import dplyr
 #' @import units
+#' @importFrom stats complete.cases
 #'
 #' @examples
 #' \dontrun{
@@ -111,7 +112,12 @@ link_to_flowlines = function(lats, lons, ids, max_dist = 100, dataset = c("nhdh"
   }
 
   unique_matches = unique(bind_rows(match_res))
-  #return matches that have non-NA value PREMANENT_ID
-  return(unique_matches[!is.na(unique_matches[,dinfo$id_column]), ])
-  #return(unique_matches)
+  if(nrow(unique_matches) > 0){
+    #return matches that have non-NA value id
+    return(unique_matches[!is.na(unique_matches[,dinfo$id_column]),])
+  }
+  else{
+    #return empty data frame
+    return(unique_matches)
+  }
 }

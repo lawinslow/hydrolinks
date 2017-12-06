@@ -13,6 +13,7 @@
 #' @return Water body permanent IDs
 #'
 #' @import sf
+#' @importFrom stats complete.cases
 #'
 #' @examples
 #' latlon = c(43.108728, -89.418293)
@@ -39,7 +40,6 @@ link_to_waterbodies = function(lats, lons, ids, dataset = c("nhdh", "hydrolakes"
 
   res   = list()
 
-  xmin = xmax = ymin = ymax = NULL
   for(i in 1:nrow(pts)){
     res = c(res, bbdf[unlist(st_intersects(pts[i,], bbdf)),"file", drop=TRUE])
     #res[[i]] = subset(bbdf, xmin <= pts$geom[[i]][1] & xmax >= pts$geom[[i]][1] & ymin <= pts$geom[[i]][2] & ymax >= pts$geom[[i]][2])
@@ -96,9 +96,12 @@ link_to_waterbodies = function(lats, lons, ids, dataset = c("nhdh", "hydrolakes"
   }
 
   unique_matches = unique(bind_rows(match_res))
-  #return matches that have non-NA value id
-  return(unique_matches[!is.na(unique_matches[,dinfo$id_column]),])
-
-  #return all matches
-  #return(unique_matches)
+  if(nrow(unique_matches) > 0){
+    #return matches that have non-NA value id
+    return(unique_matches[!is.na(unique_matches[,dinfo$id_column]),])
+  }
+  else{
+    #return empty data frame
+    return(unique_matches)
+  }
 }
