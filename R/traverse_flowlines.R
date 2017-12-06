@@ -21,7 +21,7 @@ traverse_flowlines = function(g_path, distance, start, direction = c("out", "in"
   # check_dl_file("traversal_graph.csv")
   # g = src_sqlite(file.path(cache_get_dir(), "unzip", "flowtable", "flowtable.sqlite3"))
   # for testing: load from specified path
-  g = src_sqlite("flowtable.sqlite3")
+  g = src_sqlite(g_path)
   direction = match.arg(direction)
   nodes = data.frame(rep(NA, max_depth), rep(NA, max_depth), rep(NA, max_depth), stringsAsFactors = FALSE)
   colnames(nodes) = c("PERMANENT_", "LENGTHKM", "CHILDREN")
