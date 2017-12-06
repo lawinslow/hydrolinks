@@ -1,8 +1,8 @@
 #' @title traverse_flowlines
 #'
 #' @description traverse hydrological network
-#'
-#' @param g network graph - load using \code{\link[dplyr]{src_sqlite}}
+#' 
+#' @param g_path path of flowtable database
 #' @param distance maximum distance to traverse in km
 #' @param start character node to start
 #' @param direction character; either "out" or "in"
@@ -17,7 +17,11 @@
 #' \dontrun{
 #' traverse_flowlines(src_sqlite("flowtable.sqlite3"), 1000, "141329377", "out")
 #' }
-traverse_flowlines = function(g, distance, start, direction = c("out", "in"), max_depth = 10000){
+traverse_flowlines = function(g_path, distance, start, direction = c("out", "in"), max_depth = 10000){
+  # check_dl_file("traversal_graph.csv")
+  # g = src_sqlite(file.path(cache_get_dir(), "unzip", "flowtable", "flowtable.sqlite3"))
+  # for testing: load from specified path
+  g = src_sqlite("flowtable.sqlite3")
   direction = match.arg(direction)
   nodes = data.frame(rep(NA, max_depth), rep(NA, max_depth), rep(NA, max_depth), stringsAsFactors = FALSE)
   colnames(nodes) = c("PERMANENT_", "LENGTHKM", "CHILDREN")

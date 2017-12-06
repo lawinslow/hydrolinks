@@ -4,11 +4,11 @@
 \alias{traverse_flowlines}
 \title{traverse_flowlines}
 \usage{
-traverse_flowlines(g, distance, start, direction = c("out", "in"),
+traverse_flowlines(g_path, distance, start, direction = c("out", "in"),
   max_depth = 10000)
 }
 \arguments{
-\item{g}{network graph - load using \code{\link[dplyr]{src_sqlite}}}
+\item{g_path}{path of flowtable database}
 
 \item{distance}{maximum distance to traverse in km}
 
