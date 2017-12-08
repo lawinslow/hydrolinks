@@ -42,16 +42,18 @@ link_waterbody_centroids = function(lats, lons, ids, dataset = c("nhdh", "nhdplu
 
   pts = st_sf(MATCH_ID = ids[not_na, drop = FALSE], geom = st_sfc(pts), row.names = c(1:nrow(sites)), crs = nhd_proj)
   pts = st_transform(pts, st_crs(nhd_projected_proj))
-
+  st_crs(bbdf) = nhd_projected_proj
+  
   res   = list()
-
+  
   xmin = xmax = ymin = ymax = NULL
   for(i in 1:nrow(pts)){
-    res[[i]] = subset(bbdf, xmin <= pts$geom[[i]][1] & xmax >= pts$geom[[i]][1] & ymin <= pts$geom[[i]][2] & ymax >= pts$geom[[i]][2])
+    res = c(res, bbdf[unlist(st_intersects(pts[i,], bbdf)),"file", drop=TRUE])
+    #res[[i]] = subset(bbdf, xmin <= pts$geom[[i]][1] & xmax >= pts$geom[[i]][1] & ymin <= pts$geom[[i]][2] & ymax >= pts$geom[[i]][2])
   }
-
-  to_check = unique(do.call(rbind, res))
-
+  
+  to_check = as.data.frame(unique(do.call(rbind, res)), stringsAsFactors = FALSE)
+  colnames(to_check)[1] = "file"
 
   match_res = list()
 
@@ -66,7 +68,7 @@ link_waterbody_centroids = function(lats, lons, ids, dataset = c("nhdh", "nhdplu
     #get waterbody layer
     check_dl_file(dinfo$file_index_path, to_check[i, 'file'])
 
-    nhd       = st_read(file.path(local_path(), "unzip", to_check[i,'file'], dinfo$shapefile_name), stringsAsFactors=FALSE)
+    nhd       = st_read(file.path(cache_get_dir(), "unzip", to_check[i,'file'], dinfo$shapefile_name), stringsAsFactors=FALSE)
 
     centroids = list()
     for(j in 1:nrow(nhd)){

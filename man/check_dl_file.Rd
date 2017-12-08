@@ -5,7 +5,7 @@
 \title{Verify and download data files}
 \usage{
 check_dl_file(master_file, fname = NULL, md5check = TRUE,
-  dest = local_path())
+  dest = cache_get_dir())
 }
 \arguments{
 \item{master_file}{Character path to master file}

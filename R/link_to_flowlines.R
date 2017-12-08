@@ -13,6 +13,7 @@
 #' @import sf
 #' @import dplyr
 #' @import units
+#' @importFrom stats complete.cases
 #'
 #' @examples
 #' \dontrun{
@@ -33,19 +34,22 @@ link_to_flowlines = function(lats, lons, ids, max_dist = 100, dataset = c("nhdh"
   load(dinfo$bb_cache_path)
 
   sites = data.frame(lats, lons, ids)
+  sites = sites[complete.cases(sites),]
   pts = st_as_sf(sites, coords = c("lons", "lats"), crs = nhd_proj)
   pts = st_transform(pts, st_crs(nhd_projected_proj))
-
+  st_crs(bbdf) = nhd_projected_proj
+  
   res   = list()
-
+  
   xmin = xmax = ymin = ymax = NULL
-
   for(i in 1:nrow(pts)){
-    res[[i]] = subset(bbdf, xmin <= pts$geom[[i]][1] & xmax >= pts$geom[[i]][1] & ymin <= pts$geom[[i]][2] & ymax >= pts$geom[[i]][2])
+    res = c(res, bbdf[unlist(st_intersects(pts[i,], bbdf)),"file", drop=TRUE])
+    #res[[i]] = subset(bbdf, xmin <= pts$geom[[i]][1] & xmax >= pts$geom[[i]][1] & ymin <= pts$geom[[i]][2] & ymax >= pts$geom[[i]][2])
   }
-
-  to_check = unique(do.call(rbind, res))
-
+  
+  to_check = as.data.frame(unique(do.call(rbind, res)), stringsAsFactors = FALSE)
+  colnames(to_check)[1] = "file"
+  
   match_res = list()
 
   #in keeping with "no match is data.frame of zero rows"
@@ -58,7 +62,7 @@ link_to_flowlines = function(lats, lons, ids, max_dist = 100, dataset = c("nhdh"
   for(i in 1:nrow(to_check)){
     #get nhd layer
     check_dl_file(dinfo$file_index_path, to_check[i, 'file'])
-    shape       = st_read(file.path(local_path(), "unzip", to_check[i,'file'], dinfo$shapefile_name), stringsAsFactors=FALSE)
+    shape       = st_read(file.path(cache_get_dir(), "unzip", to_check[i,'file'], dinfo$shapefile_name), stringsAsFactors=FALSE)
     #st_crs(shape) = nhd_projected_proj
     shape = st_transform(shape, nhd_projected_proj)
 
@@ -96,13 +100,24 @@ link_to_flowlines = function(lats, lons, ids, max_dist = 100, dataset = c("nhdh"
     matches[lengths(matches) == 0] = NA
     shape_matched = shape[unlist(matches),]
     shape_matched$MATCH_ID = sites$ids
+#<<<<<<< HEAD:R/link_flowlines.R
+#    shape_matched = shape_matched[,,drop = TRUE]
+#    shape_matched$geometry = NULL
+#    match_res[[i]] = as.data.frame(shape_matched)
+#=======
     #shape_matched = shape_matched[,,drop = TRUE]
     st_geometry(shape_matched) = NULL
     match_res[[i]] = shape_matched
+#>>>>>>> 701c46c5e6d7cebabfd19a92b5cb8508b5a3befe:R/link_to_flowlines.R
   }
 
   unique_matches = unique(bind_rows(match_res))
-  #return matches that have non-NA value PREMANENT_ID
-  #return(unique_matches[!is.na(unique_matches[,dinfo$id_column]), ])
-  return(unique_matches)
+  if(nrow(unique_matches) > 0){
+    #return matches that have non-NA value id
+    return(unique_matches[!is.na(unique_matches[,dinfo$id_column]),])
+  }
+  else{
+    #return empty data frame
+    return(unique_matches)
+  }
 }

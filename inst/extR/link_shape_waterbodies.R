@@ -54,7 +54,7 @@ link_shape_waterbodies = function(shapesf, dataset = c("nhdh", "nhdplusv2", "hyd
       shapefile_name = "HydroLAKES_polys_v10_projected.shp"
     }
 
-    nhd       = st_read(file.path(local_path(), "unzip", filematches[i], shapefile_name), stringsAsFactors=FALSE)
+    nhd       = st_read(file.path(cache_get_dir(), "unzip", filematches[i], shapefile_name), stringsAsFactors=FALSE)
     st_crs(nhd) = nhd_projected_proj
 
     matches = st_intersects(shapesf, nhd)

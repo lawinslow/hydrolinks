@@ -27,7 +27,7 @@ dataset_info = function(dataset, feature_type){
   feature_type = tolower(feature_type)
 
   db_name = paste0(dataset, "_", feature_type, "_ids")
-  db_path = file.path(local_path(), 'unzip', paste0(db_name, ".zip"), paste0(db_name, ".sqlite3"))
+  db_path = file.path(cache_get_dir(), 'unzip', paste0(db_name, ".zip"), paste0(db_name, ".sqlite3"))
 
   if(tolower(dataset) == "nhdh"){
     if(feature_type == "waterbody"){

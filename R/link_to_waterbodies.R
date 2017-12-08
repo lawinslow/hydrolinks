@@ -13,6 +13,7 @@
 #' @return Water body permanent IDs
 #'
 #' @import sf
+#' @importFrom stats complete.cases
 #'
 #' @examples
 #' latlon = c(43.108728, -89.418293)
@@ -32,17 +33,20 @@ link_to_waterbodies = function(lats, lons, ids, dataset = c("nhdh", "hydrolakes"
 
 
   sites = data.frame(lats, lons, ids)
+  sites = sites[complete.cases(sites),]
   pts = st_as_sf(sites, coords = c("lons", "lats"), crs = nhd_proj)
   pts = st_transform(pts, st_crs(nhd_projected_proj))
+  st_crs(bbdf) = nhd_projected_proj
 
   res   = list()
 
-  xmin = xmax = ymin = ymax = NULL
   for(i in 1:nrow(pts)){
-    res[[i]] = subset(bbdf, xmin <= pts$geom[[i]][1] & xmax >= pts$geom[[i]][1] & ymin <= pts$geom[[i]][2] & ymax >= pts$geom[[i]][2])
+    res = c(res, bbdf[unlist(st_intersects(pts[i,], bbdf)),"file", drop=TRUE])
+    #res[[i]] = subset(bbdf, xmin <= pts$geom[[i]][1] & xmax >= pts$geom[[i]][1] & ymin <= pts$geom[[i]][2] & ymax >= pts$geom[[i]][2])
   }
 
-  to_check = unique(do.call(rbind, res))
+  to_check = as.data.frame(unique(do.call(rbind, res)), stringsAsFactors = FALSE)
+  colnames(to_check)[1] = "file"
 
   match_res = list()
 
@@ -56,7 +60,7 @@ link_to_waterbodies = function(lats, lons, ids, dataset = c("nhdh", "hydrolakes"
     #get waterbody layer
     check_dl_file(dinfo$file_index_path, to_check[i, 'file'])
 
-    shape         = st_read(file.path(local_path(), "unzip", to_check[i,'file'], dinfo$shapefile_name), stringsAsFactors=FALSE)
+    shape         = st_read(file.path(cache_get_dir(), "unzip", to_check[i,'file'], dinfo$shapefile_name), stringsAsFactors=FALSE)
     #st_crs(shape) = nhd_projected_proj
     shape = st_transform(shape, nhd_projected_proj)
 
@@ -92,9 +96,12 @@ link_to_waterbodies = function(lats, lons, ids, dataset = c("nhdh", "hydrolakes"
   }
 
   unique_matches = unique(bind_rows(match_res))
-  #return matches that have non-NA value id
-  #return(unique_matches[!is.na(unique_matches[,dinfo$id_column]),])
-
-  #return all matches
-  return(unique_matches)
+  if(nrow(unique_matches) > 0){
+    #return matches that have non-NA value id
+    return(unique_matches[!is.na(unique_matches[,dinfo$id_column]),])
+  }
+  else{
+    #return empty data frame
+    return(unique_matches)
+  }
 }
