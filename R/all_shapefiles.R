@@ -52,7 +52,7 @@ all_shapefiles = function(check_dl=FALSE, dataset = c("nhdh", "hydrolakes", "nhd
     shapefile_name = "HydroLAKES_polys_v10_projected.shp"
   }
 
-  files = file.path(local_path(), "unzip", read.csv(system.file(dl_file, package = "hydrolinks"))$filename, shapefile_name)
+  files = file.path(cache_get_dir(), "unzip", read.csv(system.file(dl_file, package = "hydrolinks"))$filename, shapefile_name)
 
   return(files)
 }
