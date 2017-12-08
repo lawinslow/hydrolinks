@@ -24,6 +24,6 @@ traverse hydrological network
 }
 \examples{
 \dontrun{
-traverse_flowlines(src_sqlite("flowtable.sqlite3"), 1000, "141329377", "out")
+traverse_flowlines("flowtable.sqlite3", 1000, "141329377", "out")
 }
 }

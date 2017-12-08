@@ -1,7 +1,7 @@
 #' @title traverse_flowlines
 #'
 #' @description traverse hydrological network
-#' 
+#'
 #' @param g_path path of flowtable database
 #' @param distance maximum distance to traverse in km
 #' @param start character node to start
@@ -15,7 +15,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' traverse_flowlines(src_sqlite("flowtable.sqlite3"), 1000, "141329377", "out")
+#' traverse_flowlines("flowtable.sqlite3", 1000, "141329377", "out")
 #' }
 traverse_flowlines = function(g_path, distance, start, direction = c("out", "in"), max_depth = 10000){
   # check_dl_file("traversal_graph.csv")
@@ -46,22 +46,22 @@ traverse_flowlines = function(g_path, distance, start, direction = c("out", "in"
       nodes = nodes[!is.na(nodes$PERMANENT_),]
       return(nodes)
     }
-    
+
     to_check = to_check[names(to_check) != "0"]
     to_check = to_check[which(!(names(to_check) %in% nodes[,1]))]
-    
+
     if(length(to_check) == 0){
       nodes = nodes[!is.na(nodes$PERMANENT_),]
       return(nodes)
     }
-    
+
     if(length(names(to_check)) > 1){
       nodes[c(iterations:(iterations+length(names(to_check)) - 1)), ] = cbind(names(to_check), to_check, NA)
     }
     else{
       nodes[iterations, ] = cbind(names(to_check), to_check, NA)
     }
-    
+
     iterations = iterations + length(to_check)
     for(j in 1:length(to_check)){
       n = neighbors(g, names(to_check)[j], direction)
@@ -73,8 +73,8 @@ traverse_flowlines = function(g_path, distance, start, direction = c("out", "in"
       next_check = c(next_check, next_check_tmp)
     }
     next_check = next_check[unique(names(next_check))]
-    
-    
+
+
     if(iterations > max_depth){
       next_nodes = data.frame(names(next_check), next_check, "STUCK")
       colnames(next_nodes) = c("PERMANENT_", "LENGTHKM", "CHILDREN")
@@ -82,20 +82,20 @@ traverse_flowlines = function(g_path, distance, start, direction = c("out", "in"
       nodes = nodes[!is.na(nodes$PERMANENT_),]
       return(nodes)
     }
-    
+
     # if distance is less than zero, continue traversing until an end is reached
     if(distance < 0 && any(names(next_check) == '0')){
       nodes = nodes[!is.na(nodes$PERMANENT_),]
       return(nodes)
     }
-    
+
     #We need a stop condition where all further neighbors go nowhere
     if(all(names(next_check) == '0')){
       nodes = nodes[!is.na(nodes$PERMANENT_),]
       return(nodes)
     }
-    
-    
+
+
     for(j in names(next_check)){
       if(distance > 0 && next_check[j] > distance){
         nodes = nodes[!is.na(nodes$PERMANENT_),]
