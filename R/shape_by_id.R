@@ -51,7 +51,7 @@ get_shape_by_id = function(match_id, feature_type = c("flowline", "waterbody"), 
 
   con = dbConnect(RSQLite::SQLite(), file.path(cache_get_dir(), 'unzip', paste0(db_name, ".zip"), paste0(db_name, ".sqlite3")))
 
-  sql = paste0('SELECT * from id_lookup where ', match_column, ' IN (', paste(match_id, collapse = ','), ')')
+  sql = paste0("SELECT * from id_lookup where ", match_column, " IN ('", paste(match_id, collapse = "','"), "')")
 
   shape = dbGetQuery(con, sql)
 
