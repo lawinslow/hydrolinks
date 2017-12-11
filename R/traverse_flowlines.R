@@ -52,10 +52,6 @@ traverse_flowlines = function(distance, start, direction = c("out", "in"), max_d
   }
   while(1){
     next_check = c()
-    #if(all(names(to_check) == "0")){
-    #  nodes = nodes[!is.na(nodes$PERMANENT_),]
-    #  return(nodes)
-    #}
     
     to_check = to_check[names(to_check) != "0"]
     to_check = to_check[which(!(names(to_check) %in% nodes[,1]))]
