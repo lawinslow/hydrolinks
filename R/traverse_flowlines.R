@@ -1,11 +1,11 @@
 #' @title traverse_flowlines
 #'
 #' @description traverse hydrological network
-#'
-#' @param g_path path of flowtable database
-#' @param distance maximum distance to traverse in km
+#' 
+#' @param distance maximum distance to traverse in km. If negative, traverse until the ocean (node 0) or max_depth is reached.
 #' @param start character node to start
 #' @param direction character; either "out" or "in"
+#' @param max_depth maximum traversal depth before terminating
 #'
 #' @import dplyr
 #'
@@ -15,21 +15,32 @@
 #'
 #' @examples
 #' \dontrun{
-#' traverse_flowlines("flowtable.sqlite3", 1000, "141329377", "out")
+#' traverse_flowlines(1000, "141329377", "out")
 #' }
-traverse_flowlines = function(g_path, distance, start, direction = c("out", "in"), max_depth = 10000){
+traverse_flowlines = function(distance, start, direction = c("out", "in"), max_depth = 10000){
   # check_dl_file("traversal_graph.csv")
+  check_dl_file(system.file('extdata/shape_id_cache.csv', package='hydrolinks'), fname = "nhdh_flowline_ids.zip")
   # g = src_sqlite(file.path(cache_get_dir(), "unzip", "flowtable", "flowtable.sqlite3"))
-  # for testing: load from specified path
-  g = src_sqlite(g_path)
+  # for testing: load flowtable.sqlite3 from current directory
+  g = src_sqlite("flowtable.sqlite3")
   direction = match.arg(direction)
+  if(start == 0){
+    stop("Cannot traverse from node 0!")
+  }
   nodes = data.frame(rep(NA, max_depth), rep(NA, max_depth), rep(NA, max_depth), stringsAsFactors = FALSE)
   colnames(nodes) = c("PERMANENT_", "LENGTHKM", "CHILDREN")
   iterations = 1
   n = neighbors(g, start, direction)
   if(nrow(n) == 0){
-    nodes = nodes[1, ]
-    return(nodes)
+    flowline = get_shape_by_id(start, feature_type = "flowline", dataset = "nhdh", match_column = "PERMANENT_")
+    if(!is.na(flowline$WBAREA_PER)){
+      warning(paste0("Start ID provided is a virtual flowline inside a waterbody. Continuing from ", flowline$WBAREA_PER))
+      n = neighbors(g, flowline$WBAREA_PER, direction)
+    }
+    else{
+      nodes = nodes[1, ]
+      return(nodes)
+    }
   }
   n$LENGTHKM[is.na(n$LENGTHKM)] = 0
   to_check = n$LENGTHKM
@@ -37,31 +48,30 @@ traverse_flowlines = function(g_path, distance, start, direction = c("out", "in"
   if(distance == 0){
     nodes = cbind(names(to_check), to_check, NA, NA)
     rownames(nodes) = c(1:nrow(nodes))
-    colnames(nodes) = c("PERMANENT_", "LENGTHKM", "CHILDREN")
     return(nodes)
   }
   while(1){
     next_check = c()
-    if(all(names(to_check) == "0")){
-      nodes = nodes[!is.na(nodes$PERMANENT_),]
-      return(nodes)
-    }
-
+    #if(all(names(to_check) == "0")){
+    #  nodes = nodes[!is.na(nodes$PERMANENT_),]
+    #  return(nodes)
+    #}
+    
     to_check = to_check[names(to_check) != "0"]
     to_check = to_check[which(!(names(to_check) %in% nodes[,1]))]
-
+    
     if(length(to_check) == 0){
       nodes = nodes[!is.na(nodes$PERMANENT_),]
       return(nodes)
     }
-
+    
     if(length(names(to_check)) > 1){
       nodes[c(iterations:(iterations+length(names(to_check)) - 1)), ] = cbind(names(to_check), to_check, NA)
     }
     else{
       nodes[iterations, ] = cbind(names(to_check), to_check, NA)
     }
-
+    
     iterations = iterations + length(to_check)
     for(j in 1:length(to_check)){
       n = neighbors(g, names(to_check)[j], direction)
@@ -73,8 +83,8 @@ traverse_flowlines = function(g_path, distance, start, direction = c("out", "in"
       next_check = c(next_check, next_check_tmp)
     }
     next_check = next_check[unique(names(next_check))]
-
-
+    
+    
     if(iterations > max_depth){
       next_nodes = data.frame(names(next_check), next_check, "STUCK")
       colnames(next_nodes) = c("PERMANENT_", "LENGTHKM", "CHILDREN")
@@ -82,20 +92,20 @@ traverse_flowlines = function(g_path, distance, start, direction = c("out", "in"
       nodes = nodes[!is.na(nodes$PERMANENT_),]
       return(nodes)
     }
-
+    
     # if distance is less than zero, continue traversing until an end is reached
     if(distance < 0 && any(names(next_check) == '0')){
       nodes = nodes[!is.na(nodes$PERMANENT_),]
       return(nodes)
     }
-
+    
     #We need a stop condition where all further neighbors go nowhere
     if(all(names(next_check) == '0')){
       nodes = nodes[!is.na(nodes$PERMANENT_),]
       return(nodes)
     }
-
-
+    
+    
     for(j in names(next_check)){
       if(distance > 0 && next_check[j] > distance){
         nodes = nodes[!is.na(nodes$PERMANENT_),]

@@ -4,17 +4,17 @@
 \alias{traverse_flowlines}
 \title{traverse_flowlines}
 \usage{
-traverse_flowlines(g_path, distance, start, direction = c("out", "in"),
+traverse_flowlines(distance, start, direction = c("out", "in"),
   max_depth = 10000)
 }
 \arguments{
-\item{g_path}{path of flowtable database}
-
-\item{distance}{maximum distance to traverse in km}
+\item{distance}{maximum distance to traverse in km. If negative, traverse until the ocean (node 0) or max_depth is reached.}
 
 \item{start}{character node to start}
 
 \item{direction}{character; either "out" or "in"}
+
+\item{max_depth}{maximum traversal depth before terminating}
 }
 \value{
 list of nodes traversed
@@ -24,6 +24,6 @@ traverse hydrological network
 }
 \examples{
 \dontrun{
-traverse_flowlines("flowtable.sqlite3", 1000, "141329377", "out")
+traverse_flowlines(1000, "141329377", "out")
 }
 }
