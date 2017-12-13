@@ -70,9 +70,14 @@ get_shape_by_id = function(match_id, feature_type = c("flowline", "waterbody"), 
       shapes[[i]] = features
     }
   }
-  if(length(shapes) > 1)
+  if(length(shapes) > 1){
     return(do.call(rbind, shapes))
-  else
+  }
+  else if(length(shapes) > 0){
     return(shapes[[1]])
+  }
+  else{
+    return(NA)
+  }
 }
 

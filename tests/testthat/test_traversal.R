@@ -13,7 +13,8 @@ test_that("traversal returns NA for invalid start ID", {
 })
 
 test_that("traversal throws error for 0 start ID", {
-  expect_that(traverse_flowlines(1000, "0", "out"), throws_error("Cannot traverse from node 0!"))
+  expect_error(traverse_flowlines(1000, "0", "out"), "Cannot traverse from node 0!")
+  #expect_that(traverse_flowlines(1000, "0", "out"), throws_error("Cannot traverse from node 0!"))
 })
 
 test_that("traversing from virtual flowlines continues from enclosing waterbody", {
