@@ -2,32 +2,31 @@
 #'
 #' @description traverse hydrological network
 #' 
-#' @param distance maximum distance to traverse in km. If negative, traverse until the ocean (node 0) or max_depth is reached.
+#' @param max_distance maximum distance to traverse in km. If negative, traverse until the ocean (node 0) or max_steps is reached.
 #' @param start character node to start
 #' @param direction character; either "out" or "in"
-#' @param max_depth maximum traversal depth before terminating
+#' @param max_steps maximum traversal steps before terminating
 #'
 #' @import dplyr
 #'
-#' @return list of nodes traversed
+#' @return dataframe of nodes traversed, distance from the start node to each node, and the children of each node.
 #'
 #' @export
 #'
 #' @examples
 #' \dontrun{
 #' traverse_flowlines(1000, "141329377", "out")
+#' # this example traverses until a cycle is found and the end of the network is reached.
 #' }
-traverse_flowlines = function(distance, start, direction = c("out", "in"), max_depth = 10000){
-  # check_dl_file("traversal_graph.csv")
+traverse_flowlines = function(max_distance, start, direction = c("out", "in"), max_steps = 10000){
+  check_dl_file(system.file('extdata/flowtable.csv', package='hydrolinks'))
   check_dl_file(system.file('extdata/shape_id_cache.csv', package='hydrolinks'), fname = "nhdh_flowline_ids.zip")
-  # g = src_sqlite(file.path(cache_get_dir(), "unzip", "flowtable", "flowtable.sqlite3"))
-  # for testing: load flowtable.sqlite3 from current directory
-  g = src_sqlite("flowtable.sqlite3")
+  g = src_sqlite(file.path(cache_get_dir(), "unzip", "flowtable.zip", "flowtable.sqlite3"))
   direction = match.arg(direction)
   if(start == 0){
     stop("Cannot traverse from node 0!")
   }
-  nodes = data.frame(rep(NA, max_depth), rep(NA, max_depth), rep(NA, max_depth), stringsAsFactors = FALSE)
+  nodes = data.frame(rep(NA, max_steps), rep(NA, max_steps), rep(NA, max_steps), stringsAsFactors = FALSE)
   colnames(nodes) = c("PERMANENT_", "LENGTHKM", "CHILDREN")
   iterations = 1
   n = neighbors(g, start, direction)
@@ -45,7 +44,7 @@ traverse_flowlines = function(distance, start, direction = c("out", "in"), max_d
   n$LENGTHKM[is.na(n$LENGTHKM)] = 0
   to_check = n$LENGTHKM
   names(to_check) = n$ID
-  if(distance == 0){
+  if(max_distance == 0){
     nodes = cbind(names(to_check), to_check, NA, NA)
     rownames(nodes) = c(1:nrow(nodes))
     return(nodes)
@@ -53,7 +52,11 @@ traverse_flowlines = function(distance, start, direction = c("out", "in"), max_d
   while(1){
     next_check = c()
     
+    if(all(names(to_check) == "0")){
+      browser()
+    }
     to_check = to_check[names(to_check) != "0"]
+    
     to_check = to_check[which(!(names(to_check) %in% nodes[,1]))]
     
     if(length(to_check) == 0){
@@ -81,7 +84,7 @@ traverse_flowlines = function(distance, start, direction = c("out", "in"), max_d
     next_check = next_check[unique(names(next_check))]
     
     
-    if(iterations > max_depth){
+    if(iterations > max_steps){
       next_nodes = data.frame(names(next_check), next_check, "STUCK")
       colnames(next_nodes) = c("PERMANENT_", "LENGTHKM", "CHILDREN")
       nodes = rbind(nodes, next_nodes)
@@ -89,8 +92,8 @@ traverse_flowlines = function(distance, start, direction = c("out", "in"), max_d
       return(nodes)
     }
     
-    # if distance is less than zero, continue traversing until an end is reached
-    if(distance < 0 && any(names(next_check) == '0')){
+    # if max_distance is less than zero, continue traversing until an end is reached
+    if(max_distance < 0 && any(names(next_check) == '0')){
       nodes = nodes[!is.na(nodes$PERMANENT_),]
       return(nodes)
     }
@@ -103,7 +106,7 @@ traverse_flowlines = function(distance, start, direction = c("out", "in"), max_d
     
     
     for(j in names(next_check)){
-      if(distance > 0 && next_check[j] > distance){
+      if(max_distance > 0 && next_check[j] > max_distance){
         nodes = nodes[!is.na(nodes$PERMANENT_),]
         return(nodes)
       }

@@ -4,20 +4,20 @@
 \alias{traverse_flowlines}
 \title{traverse_flowlines}
 \usage{
-traverse_flowlines(distance, start, direction = c("out", "in"),
-  max_depth = 10000)
+traverse_flowlines(max_distance, start, direction = c("out", "in"),
+  max_steps = 10000)
 }
 \arguments{
-\item{distance}{maximum distance to traverse in km. If negative, traverse until the ocean (node 0) or max_depth is reached.}
+\item{max_distance}{maximum distance to traverse in km. If negative, traverse until the ocean (node 0) or max_steps is reached.}
 
 \item{start}{character node to start}
 
 \item{direction}{character; either "out" or "in"}
 
-\item{max_depth}{maximum traversal depth before terminating}
+\item{max_steps}{maximum traversal steps before terminating}
 }
 \value{
-list of nodes traversed
+dataframe of nodes traversed, distance from the start node to each node, and the children of each node.
 }
 \description{
 traverse hydrological network
@@ -25,5 +25,6 @@ traverse hydrological network
 \examples{
 \dontrun{
 traverse_flowlines(1000, "141329377", "out")
+# this example traverses until a cycle is found and the end of the network is reached.
 }
 }
