@@ -8,7 +8,7 @@
 #' @param max_steps maximum traversal steps before terminating
 #'
 #' @import dplyr
-#'
+#' 
 #' @return dataframe of nodes traversed, distance from the start node to each node, and the children of each node.
 #'
 #' @export
@@ -32,7 +32,7 @@ traverse_flowlines = function(max_distance, start, direction = c("out", "in"), m
   n = neighbors(g, start, direction)
   if(nrow(n) == 0){
     flowline = get_shape_by_id(start, feature_type = "flowline", dataset = "nhdh", match_column = "PERMANENT_")
-    if(!is.na(flowline$WBAREA_PER)){
+    if(!is.na(flowline) && !is.na(flowline$WBAREA_PER)){
       warning(paste0("Start ID provided is a virtual flowline inside a waterbody. Continuing from ", flowline$WBAREA_PER))
       n = neighbors(g, flowline$WBAREA_PER, direction)
     }
@@ -52,9 +52,6 @@ traverse_flowlines = function(max_distance, start, direction = c("out", "in"), m
   while(1){
     next_check = c()
     
-    if(all(names(to_check) == "0")){
-      browser()
-    }
     to_check = to_check[names(to_check) != "0"]
     
     to_check = to_check[which(!(names(to_check) %in% nodes[,1]))]
