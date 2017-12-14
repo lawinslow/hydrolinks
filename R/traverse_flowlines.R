@@ -5,6 +5,7 @@
 #' @param max_distance maximum distance to traverse in km. If negative, traverse until the ocean (node 0) or max_steps is reached.
 #' @param start character node to start
 #' @param direction character; either "out" or "in"
+#' @param dataset which network dataset to traverse. May be either NHD high-res or NHD Plus v2.
 #' @param max_steps maximum traversal steps before terminating
 #'
 #' @import dplyr
@@ -15,29 +16,37 @@
 #'
 #' @examples
 #' \dontrun{
-#' traverse_flowlines(1000, "141329377", "out")
+#' traverse_flowlines(1000, "141329377", "out", "nhdh")
 #' # this example traverses until a cycle is found and the end of the network is reached.
 #' }
-traverse_flowlines = function(max_distance, start, direction = c("out", "in"), max_steps = 10000){
-  check_dl_file(system.file('extdata/flowtable.csv', package='hydrolinks'))
-  check_dl_file(system.file('extdata/shape_id_cache.csv', package='hydrolinks'), fname = "nhdh_flowline_ids.zip")
-  g = src_sqlite(file.path(cache_get_dir(), "unzip", "flowtable.zip", "flowtable.sqlite3"))
+traverse_flowlines = function(max_distance, start, direction = c("out", "in"), dataset = c("nhdh", "nhdplusv2"), max_steps = 10000){
   direction = match.arg(direction)
+  dataset = match.arg(dataset)
+  
+  #db_name = paste0(dataset, "_", "flowtable")
+  db_name = "flowtable"
+  #check_dl_file(system.file("extdata/flowtable.csv", package = "hydrolinks"), fname = paste0(db_name, ".zip"))
+  check_dl_file(system.file('extdata/shape_id_cache.csv', package='hydrolinks'), fname = "nhdh_flowline_ids.zip")
+  
+  con = dbConnect(RSQLite::SQLite(), file.path(cache_get_dir(), 'unzip', paste0(db_name, ".zip"), paste0(db_name, ".sqlite3")))
+  
   if(start == 0){
+    dbDisconnect(con)
     stop("Cannot traverse from node 0!")
   }
   nodes = data.frame(rep(NA, max_steps), rep(NA, max_steps), rep(NA, max_steps), stringsAsFactors = FALSE)
   colnames(nodes) = c("PERMANENT_", "LENGTHKM", "CHILDREN")
   iterations = 1
-  n = neighbors(g, start, direction)
+  n = neighbors(start, direction, dataset, con)
   if(nrow(n) == 0){
     flowline = get_shape_by_id(start, feature_type = "flowline", dataset = "nhdh", match_column = "PERMANENT_")
     if(!is.na(flowline) && !is.na(flowline$WBAREA_PER)){
       warning(paste0("Start ID provided is a virtual flowline inside a waterbody. Continuing from ", flowline$WBAREA_PER))
-      n = neighbors(g, flowline$WBAREA_PER, direction)
+      n = neighbors(flowline$WBAREA_PER, direction, dataset, con)
     }
     else{
       nodes = nodes[1, ]
+      dbDisconnect(con)
       return(nodes)
     }
   }
@@ -47,6 +56,7 @@ traverse_flowlines = function(max_distance, start, direction = c("out", "in"), m
   if(max_distance == 0){
     nodes = cbind(names(to_check), to_check, NA, NA)
     rownames(nodes) = c(1:nrow(nodes))
+    dbDisconnect(con)
     return(nodes)
   }
   while(1){
@@ -58,6 +68,7 @@ traverse_flowlines = function(max_distance, start, direction = c("out", "in"), m
     
     if(length(to_check) == 0){
       nodes = nodes[!is.na(nodes$PERMANENT_),]
+      dbDisconnect(con)
       return(nodes)
     }
     
@@ -70,8 +81,7 @@ traverse_flowlines = function(max_distance, start, direction = c("out", "in"), m
     
     iterations = iterations + length(to_check)
     for(j in 1:length(to_check)){
-      n = neighbors(g, names(to_check)[j], direction)
-      #n = n[]
+      n = neighbors(names(to_check)[j], direction, dataset, con)
       nodes[which(nodes[,1] == names(to_check)[j]), 3] = paste(n$ID, sep = ",", collapse = ",")
       n$LENGTHKM[is.na(n$LENGTHKM)] = 0
       next_check_tmp = n$LENGTHKM + to_check[j]
@@ -86,18 +96,21 @@ traverse_flowlines = function(max_distance, start, direction = c("out", "in"), m
       colnames(next_nodes) = c("PERMANENT_", "LENGTHKM", "CHILDREN")
       nodes = rbind(nodes, next_nodes)
       nodes = nodes[!is.na(nodes$PERMANENT_),]
+      dbDisconnect(con)
       return(nodes)
     }
     
     # if max_distance is less than zero, continue traversing until an end is reached
     if(max_distance < 0 && any(names(next_check) == '0')){
       nodes = nodes[!is.na(nodes$PERMANENT_),]
+      dbDisconnect(con)
       return(nodes)
     }
     
     #We need a stop condition where all further neighbors go nowhere
     if(all(names(next_check) == '0')){
       nodes = nodes[!is.na(nodes$PERMANENT_),]
+      dbDisconnect(con)
       return(nodes)
     }
     
@@ -105,6 +118,7 @@ traverse_flowlines = function(max_distance, start, direction = c("out", "in"), m
     for(j in names(next_check)){
       if(max_distance > 0 && next_check[j] > max_distance){
         nodes = nodes[!is.na(nodes$PERMANENT_),]
+        dbDisconnect(con)
         return(nodes)
       }
     }
@@ -112,24 +126,31 @@ traverse_flowlines = function(max_distance, start, direction = c("out", "in"), m
   }
 }
 
-neighbors = function(db, node, direction){
+neighbors = function(node, direction = c("in", "out"), dataset = c("nhdh", "nhdplusv2"), con){
   From_Permanent_Identifier = NULL
   To_Permanent_Identifier = NULL
-  graph = db %>%
-    tbl("flowtable")
+  
+  direction = match.arg(direction)
+  dataset = match.arg(dataset)
+  dinfo = dataset_info(dataset, "flowline")
+  from_column = dinfo$flowtable_from_column
+  to_column = dinfo$flowtable_to_column
+  
+  sql = ""
+  
   if(direction == "out"){
-    graph = filter(graph, From_Permanent_Identifier %in% node)
+    sql = paste0("SELECT * from flowtable where ", from_column, " IN ('", paste(node, collapse = "','"), "')")
   }
   else if(direction == "in"){
-    graph = filter(graph, To_Permanent_Identifier %in% node)
+    sql = paste0("SELECT * from flowtable where ", to_column, " IN ('", paste(node, collapse = "','"), "')")
   }
-  graph = collect(graph)
+  graph = dbGetQuery(con, sql)
   ret = NULL
   if(direction == "out"){
-    ret = data.frame(graph$To_Permanent_Identifier, graph$LENGTHKM)
+    ret = data.frame(graph[, to_column], graph$LENGTHKM)
   }
   else if(direction == "in"){
-    ret = data.frame(graph$From_Permanent_Identifier, graph$LENGTHKM)
+    ret = data.frame(graph[, from_column], graph$LENGTHKM)
   }
   colnames(ret) = c("ID", "LENGTHKM")
   ret$ID = as.character(ret$ID)

@@ -5,7 +5,7 @@
 \title{traverse_flowlines}
 \usage{
 traverse_flowlines(max_distance, start, direction = c("out", "in"),
-  max_steps = 10000)
+  dataset = c("nhdh", "nhdplusv2"), max_steps = 10000)
 }
 \arguments{
 \item{max_distance}{maximum distance to traverse in km. If negative, traverse until the ocean (node 0) or max_steps is reached.}
@@ -13,6 +13,8 @@ traverse_flowlines(max_distance, start, direction = c("out", "in"),
 \item{start}{character node to start}
 
 \item{direction}{character; either "out" or "in"}
+
+\item{dataset}{which network dataset to traverse. May be either NHD high-res or NHD Plus v2.}
 
 \item{max_steps}{maximum traversal steps before terminating}
 }
@@ -24,7 +26,7 @@ traverse hydrological network
 }
 \examples{
 \dontrun{
-traverse_flowlines(1000, "141329377", "out")
+traverse_flowlines(1000, "141329377", "out", "nhdh")
 # this example traverses until a cycle is found and the end of the network is reached.
 }
 }
