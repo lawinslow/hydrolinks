@@ -5,7 +5,7 @@
 \title{traverse_flowlines}
 \usage{
 traverse_flowlines(max_distance, start, direction = c("out", "in"),
-  dataset = c("nhdh", "nhdplusv2"), max_steps = 10000)
+  dataset = c("nhdh", "nhdplusv2"), max_steps = 10000, db_path = NULL)
 }
 \arguments{
 \item{max_distance}{maximum distance to traverse in km. If negative, traverse until the ocean (node 0) or max_steps is reached.}
