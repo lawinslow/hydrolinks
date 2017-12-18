@@ -17,6 +17,8 @@ traverse_flowlines(max_distance, start, direction = c("out", "in"),
 \item{dataset}{which network dataset to traverse. May be either NHD high-res or NHD Plus v2.}
 
 \item{max_steps}{maximum traversal steps before terminating}
+
+\item{db_path}{manually specify path to flowtable database. Useful for avoiding database locks when running traversals in parallel.}
 }
 \value{
 dataframe of nodes traversed, distance from the start node to each node, and the children of each node.
