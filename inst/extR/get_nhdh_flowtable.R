@@ -1,4 +1,4 @@
-library(rgdal)
+library(sf)
 library(tools)
 library(readr)
 library(dplyr)
@@ -6,11 +6,11 @@ library(hydrolinks)
 
 load("inst/extdata/nhd_bb_streams_cache.Rdata")
 changes = list()
-for(i in 1:length(bbdf_streams$file)){
-  file = bbdf_streams$file[i]
-  check_dl_file(system.file("extdata/nhdh.csv", package="nhdtools"), fname = file)
-  shape = readOGR(file.path(local_path(), "unzip", file, "NHDFlowline_projected.shp"))
-  waterbody = readOGR(file.path(local_path(), "unzip", file, "NHDWaterbody_projected.shp"))
+for(i in 1:length(bbdf$file)){
+  file = bbdf$file[i]
+  check_dl_file(system.file("extdata/nhdh.csv", package="hydrolinks"), fname = file)
+  shape = st_read(file.path(cache_get_dir(), "unzip", file, "NHDFlowline_projected.shp"))
+  waterbody = st_read(file.path(cache_get_dir(), "unzip", file, "NHDWaterbody_projected.shp"))
   shape = shape[!is.na(shape$WBAREA_PER),]
   shape = shape[shape$WBAREA_PER %in% waterbody$PERMANENT_,]
   change = data.frame(shape$PERMANENT_, shape$WBAREA_PER)
@@ -67,12 +67,12 @@ files = list()
 # })
 load("inst/extdata/nhd_bb_streams_cache.Rdata")
 distances = list()
-for(i in 1:length(bbdf_streams$file)){
-  check_dl_file(system.file("extdata/nhdh.csv", package="nhdtools"), fname = bbdf_streams$file[i])
-  shapes = readOGR(file.path(local_path(), "unzip", bbdf_streams$file[i], "NHDFlowline_projected.shp"))
+for(i in 1:length(bbdf$file)){
+  check_dl_file(system.file("extdata/nhdh.csv", package="hydrolinks"), fname = bbdf$file[i])
+  shapes = st_read(file.path(cache_get_dir(), "unzip", bbdf$file[i], "NHDFlowline_projected.shp"))
   distances[[i]] = data.frame(shapes$PERMANENT_, shapes$LENGTHKM)
 }
-distances = rbindlist(distances)
+distances = bind_rows(distances)
 colnames(distances) = c("PERMANENT_", "LENGTHKM")
 distances = rename(distances, PERMANENT_ = From_Permanent_Id)
 flowtable = merge(flowtable, distances, by="From_Permanent_Identifier")

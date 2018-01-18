@@ -1,9 +1,14 @@
 library(hydrolinks)
-library(rgdal)
+library(sf)
 library(parallel)
+source("inst/extR/general_functions.R")
 
-zipfiles = Sys.glob(file.path(local_path(), '*Shape.zip'))
-dest = file.path(local_path(), 'HU4', 'Shape_unzip')
+nhdh_path = "D:/nhdh Shape"
+
+zipfiles = Sys.glob(file.path(nhdh_path, '*Shape.zip'))
+dest = file.path(nhdh_path, 'Shape_unzip')
+
+# unzip shapefiles
 
 unzip_wbd = function(zipfile){
 
@@ -15,50 +20,63 @@ unzip_wbd = function(zipfile){
 
 }
 
-unzip_vaa = function(zipfile){
+unzip_flow = function(zipfile){
   subdest = file.path(dest, basename(zipfile))
-  unzip(zipfile = zipfile, files = paste0('Shape/NHDFlowlineVAA.dbf'), exdir = subdest)
+  unzip(zipfile = zipfile, files = paste0('Shape/NHDFlow.dbf'), exdir = subdest)
 }
   
 lapply(zipfiles, unzip_wbd)
-lapply(zipfiles, unzip_vaa)
+lapply(zipfiles, unzip_flow)
 
+# project shapefiles and extract bounding boxes
 
+shapefiles_lakes = Sys.glob(file.path(nhdh_path,'Shape_unzip', '*', 'Shape', 'NHDWaterbody.shp'))
+shapefiles_streams = Sys.glob(file.path(nhdh_path, 'Shape_unzip', '*', 'Shape', 'NHDFlowline.shp'))
 
-shapefiles = Sys.glob(file.path(local_storage(), 'HU4', 'Shape_unzip', '*', 'Shape', 'NHDWaterbody.shp'))
-shapefiles_streams = Sys.glob(file.path(local_storage(), 'HU4', 'Shape_unzip', '*', 'Shape', 'NHDFlowline.shp'))
-
-getbb = function(shapefile){
-  tmp = readOGR(shapefile)
-  return(tmp@bbox)
-}
-
-getbb_streams = function(shapefile){
-  tmp = readOGR(shapefile)
-  tmp = spTransform(tmp, CRS("+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs"))
-  writeOGR(tmp, dsn = dirname(shapefile), layer = "NHDFlowline_projected", driver = "ESRI Shapefile")
-  return(tmp@bbox)
-}
-
- 
 c1 = makePSOCKcluster(rep('localhost', 8))
-parallel::clusterEvalQ(c1, {library(rgdal)})
-bboxes = parLapplyLB(c1, shapefiles, getbb)
-bboxes_streams = parLapplyLB(c1, shapefiles_streams, getbb_streams)
+parallel::clusterEvalQ(c1, {library(sf)})
 
-bbdf = data.frame(file=character(), xmin=numeric(), xmax=numeric(), ymin=numeric(), ymax=numeric(), stringsAsFactors = FALSE)
-for(i in 1:length(bboxes)){
-  bbdf[i,2:3] = bboxes[[i]][1,]
-  bbdf[i,4:5] = bboxes[[i]][2,]
-  bbdf[i,1] = basename(dirname(dirname(shapefiles[i])))
+lake_args = data.frame(shape_path = shapefiles_lakes, layer = rep("NHDWaterbody_projected", length(shapefiles_lakes)),
+                        output_name = rep(NA, length(shapefiles_lakes)), stringsAsFactors = FALSE)
+for(i in 1:length(shapefiles_lakes)){
+  lake_args[i,3] = basename(dirname(dirname(shapefiles_lakes[i])))
 }
 
-bbdf_streams = data.frame(file=character(), xmin=numeric(), xmax=numeric(), ymin=numeric(), ymax=numeric(), stringsAsFactors = FALSE)
-for(i in 1:length(bboxes_streams)){
-  bbdf_streams[i,2:3] = bboxes_streams[[i]][1,]
-  bbdf_streams[i,4:5] = bboxes_streams[[i]][2,]
-  bbdf_streams[i,1] = basename(dirname(dirname(shapefiles_streams[i])))
+stream_args = data.frame(shape_path = shapefiles_streams, layer = rep("NHDFlowline_projected", length(shapefiles_streams)),
+                       output_name = rep(NA, length(shapefiles_streams)), stringsAsFactors = FALSE)
+for(i in 1:length(shapefiles_streams)){
+  lake_args[i,3] = basename(dirname(dirname(shapefiles_streams[i])))
 }
-bbdf_streams$file = gsub("NHDFlowline.shp", "NHDFlowline_projected.shp", bbdf_streams$file)
-save(bbdf_streams, file='inst/extdata/nhd_bb_streams_cache.Rdata')
-save(bbdf, file='inst/extdata/nhd_bb_cache.Rdata')
+
+bboxes_lakes = parApply(c1, lake_args, project_and_get_bb, MARGIN = 1)
+bboxes_streams = parApplyLB(c1, stream_args, project_and_get_bb, MARGIN = 1)
+
+bbdf = do.call(rbind, bboxes_lakes)
+save(bbdf, file = "inst/extdata/nhd_bb_cache_projected.Rdata")
+
+bbdf = do.call(rbind, bboxes_streams)
+save(bbdf, file = "inst/extdata/nhd_bb_streams_cache.Rdata")
+
+# save projected shapefiles
+
+dir.create(file.path(nhd_path, "zip"))
+output_zip = file.path(nhd_path, "zip", basename(dirname(shapefiles_lakes)))
+for(i in 1:length(output_zip)){
+  setwd(dirname(shapefiles_lakes[i]))
+  zip(output_zip[i], Sys.glob("*_projected.*"))
+}
+
+dir.create(file.path(nhd_path, "zip"))
+output_zip = file.path(nhd_path, "zip", basename(dirname(shapefiles_streams)))
+for(i in 1:length(output_zip)){
+  setwd(dirname(shapefiles_streams[i]))
+  zip(output_zip[i], Sys.glob("*_projected.*"))
+}
+
+# generate id lookup tables
+
+setwd(dest)
+build_id_table(bbdf, "Shape/NHDFlowline_projected.shp", "nhdh_flowline_ids.sqlite3", c("PERMANENT_", "GNIS_ID", "GNIS_NAME", "REACHCODE"))
+
+load("inst/extdata/nhd_bb_cache_projected.Rdata")
+build_id_table(bbdf, "Shape/NHDWaterbody_projected.shp", "nhdh_waterbody_ids.sqlite3", c("PERMANENT_", "GNIS_ID", "GNIS_NAME", "REACHCODE"))
