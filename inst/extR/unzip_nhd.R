@@ -45,11 +45,11 @@ for(i in 1:length(shapefiles_lakes)){
 stream_args = data.frame(shape_path = shapefiles_streams, layer = rep("NHDFlowline_projected", length(shapefiles_streams)),
                        output_name = rep(NA, length(shapefiles_streams)), stringsAsFactors = FALSE)
 for(i in 1:length(shapefiles_streams)){
-  lake_args[i,3] = basename(dirname(dirname(shapefiles_streams[i])))
+  stream_args[i,3] = basename(dirname(dirname(shapefiles_streams[i])))
 }
 
 bboxes_lakes = parApply(c1, lake_args, project_and_get_bb, MARGIN = 1)
-bboxes_streams = parApplyLB(c1, stream_args, project_and_get_bb, MARGIN = 1)
+bboxes_streams = parApply(c1, stream_args, project_and_get_bb, MARGIN = 1)
 
 bbdf = do.call(rbind, bboxes_lakes)
 save(bbdf, file = "inst/extdata/nhd_bb_cache_projected.Rdata")
@@ -59,19 +59,13 @@ save(bbdf, file = "inst/extdata/nhd_bb_streams_cache.Rdata")
 
 # save projected shapefiles
 
-dir.create(file.path(nhd_path, "zip"))
-output_zip = file.path(nhd_path, "zip", basename(dirname(shapefiles_lakes)))
+dir.create(file.path(nhdh_path, "zip"))
+output_zip = file.path(nhdh_path, "zip", basename(dirname(dirname(shapefiles_lakes))))
 for(i in 1:length(output_zip)){
   setwd(dirname(shapefiles_lakes[i]))
   zip(output_zip[i], Sys.glob("*_projected.*"))
 }
 
-dir.create(file.path(nhd_path, "zip"))
-output_zip = file.path(nhd_path, "zip", basename(dirname(shapefiles_streams)))
-for(i in 1:length(output_zip)){
-  setwd(dirname(shapefiles_streams[i]))
-  zip(output_zip[i], Sys.glob("*_projected.*"))
-}
 
 # generate id lookup tables
 
@@ -80,3 +74,8 @@ build_id_table(bbdf, "Shape/NHDFlowline_projected.shp", "nhdh_flowline_ids.sqlit
 
 load("inst/extdata/nhd_bb_cache_projected.Rdata")
 build_id_table(bbdf, "Shape/NHDWaterbody_projected.shp", "nhdh_waterbody_ids.sqlite3", c("PERMANENT_", "GNIS_ID", "GNIS_NAME", "REACHCODE"))
+
+#build flowtable
+raw_tables = Sys.glob(file.path(nhdh_path, 'Shape_unzip', '*', 'Shape', 'NHDFlow.dbf'))
+shape_directories = Sys.glob(file.path(nhdh_path, 'Shape_unzip', '*', 'Shape'))
+format_flowtable(raw_tables, shape_directories, "WBAREA_PER", "FROM_PERMA", "TO_PERMANE", "PERMANENT_", "flowtable_nhdh")
