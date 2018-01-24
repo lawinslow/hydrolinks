@@ -21,7 +21,7 @@ project_and_get_bb = function(args){
 
 build_id_table = function(bbdf, layer, file_name, index_columns, shape_locations = NULL){
   ids = list()
-  
+  index_columns = tolower(index_columns)
   for(i in 1:nrow(bbdf)){
     shape = NULL
     if(is.null(shape_locations)){
@@ -31,6 +31,7 @@ build_id_table = function(bbdf, layer, file_name, index_columns, shape_locations
       shape = st_read(file.path(shape_locations[i], layer), stringsAsFactors = FALSE)
     }
     st_geometry(shape) = NULL
+    colnames(shape) = tolower(colnames(shape))
     shape = shape[,index_columns]
     shape$file = bbdf$file[i]
     ids[[i]] = shape
