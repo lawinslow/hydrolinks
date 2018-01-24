@@ -19,11 +19,17 @@ project_and_get_bb = function(args){
   return(ret)
 }
 
-build_id_table = function(bbdf, layer, file_name, index_columns){
+build_id_table = function(bbdf, layer, file_name, index_columns, shape_locations = NULL){
   ids = list()
   
   for(i in 1:nrow(bbdf)){
-    shape = st_read(file.path(bbdf$file[i], layer))
+    shape = NULL
+    if(is.null(shape_locations)){
+      shape = st_read(file.path(bbdf$file[i], layer), stringsAsFactors = FALSE)
+    }
+    else{
+      shape = st_read(file.path(shape_locations[i], layer), stringsAsFactors = FALSE)
+    }
     st_geometry(shape) = NULL
     shape = shape[,index_columns]
     shape$file = bbdf$file[i]
@@ -31,7 +37,7 @@ build_id_table = function(bbdf, layer, file_name, index_columns){
   }
   id_lookup = bind_rows(ids)
   db = src_sqlite(file_name, create = TRUE)
-  copy_to(db, id_lookup, overwrite = TRUE, temporary = FALSE, indexes = c(index_columns, "file"))
+  copy_to(db, id_lookup, overwrite = TRUE, temporary = FALSE, indexes = list(index_columns, "file"))
 }
 
 format_flowtable = function(raw_tables, shape_directories, wbarea_column, from_column, to_column, id_column, output_name){

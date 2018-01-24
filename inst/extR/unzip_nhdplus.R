@@ -76,10 +76,10 @@ for(i in 1:length(regions)){
 #build id lookup tables
 
 setwd(dest)
-build_id_table(bbdf, "Shape/NHDFlowline_projected.shp", "nhdh_flowline_ids.sqlite3", c("COMID", "GNIS_ID", "GNIS_NAME", "REACHCODE"))
+build_id_table(bbdf, "NHDFlowline_projected.shp", "nhdh_flowline_ids.sqlite3", c("COMID", "GNIS_ID", "GNIS_NAME", "REACHCODE"))
 
 load("inst/extdata/nhd_bb_cache_projected.Rdata")
-build_id_table(bbdf, "Shape/NHDWaterbody_projected.shp", "nhdh_waterbody_ids.sqlite3", c("COMID", "GNIS_ID", "GNIS_NAME", "REACHCODE"))
+build_id_table(bbdf, "NHDWaterbody_projected.shp", "nhdh_waterbody_ids.sqlite3", c("COMID", "GNIS_ID", "GNIS_NAME", "REACHCODE"))
 
 for(i in 1:length(zipfiles)){
   system("cmd.exe", input = paste0("\"C:\\Program Files\\7-Zip\\7z.exe\" e ", Sys.glob(file.path(dirname(zipfiles[i]), paste0("NHDPlusV21_", regions[i],"_NHDPlusAttributes_*", ".7z"))), " -o\"", file.path(dest, regions[i])))
