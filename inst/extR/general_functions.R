@@ -9,6 +9,7 @@ project_and_get_bb = function(args){
   output_name = args["output_name"]
   shape = st_read(shape_path)
   shape = st_transform(shape, st_crs("+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs"))
+  shape = st_zm(shape)
   centroids = st_centroid(shape)
   shape$centroid.x = st_coordinates(centroids)[,"X"]
   shape$centroid.y = st_coordinates(centroids)[,"Y"]
