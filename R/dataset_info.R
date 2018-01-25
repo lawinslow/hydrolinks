@@ -28,6 +28,8 @@ dataset_info = function(dataset, feature_type){
 
   db_name = paste0(dataset, "_", feature_type, "_ids")
   db_path = file.path(cache_get_dir(), 'unzip', paste0(db_name, ".zip"), paste0(db_name, ".sqlite3"))
+  flowtable_from_column = NA
+  flowtable_to_column = NA
 
   if(tolower(dataset) == "nhdh"){
     if(feature_type == "waterbody"){
@@ -37,6 +39,8 @@ dataset_info = function(dataset, feature_type){
       bb_cache_path = system.file('extdata/nhd_bb_streams_cache.Rdata', package='hydrolinks')
     }
     id_column = "PERMANENT_"
+    flowtable_from_column = "From_Permanent_Identifier"
+    flowtable_to_column = "To_Permanent_Identifier"
   }
   else if(tolower(dataset) == "hydrolakes"){
     bb_cache_path = system.file('extdata/hydrolakes_bb_cache_projected.Rdata', package='hydrolinks')
@@ -50,6 +54,8 @@ dataset_info = function(dataset, feature_type){
       bb_cache_path=system.file('extdata/nhdplus_flowline_bb_cache.rdata', package='hydrolinks')
     }
     id_column = "COMID"
+    flowtable_from_column = "FROMCOMID"
+    flowtable_to_column = "TOCOMID"
   }
 
 
@@ -73,6 +79,8 @@ dataset_info = function(dataset, feature_type){
   out$shapefile_name = shapefile_name
   out$file_index_path = file_index_path
   out$id_column = id_column
+  out$flowtable_from_column = flowtable_from_column
+  out$flowtable_to_column = flowtable_to_column
 
   return(out)
 }

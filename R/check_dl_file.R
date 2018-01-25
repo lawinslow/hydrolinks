@@ -13,6 +13,7 @@
 #' @import rappdirs
 #' @import utils
 #'
+#' @export
 check_dl_file = function(master_file, fname = NULL, md5check = TRUE, dest=cache_get_dir()){
   files = read.csv(master_file)
   if(!is.null(fname)){

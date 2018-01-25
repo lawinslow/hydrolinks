@@ -1,7 +1,7 @@
 Package: hydrolinks
 Type: Package
 Title: Hydrologic Network Linking Data and Tools
-Version: 0.5.1
+Version: 0.6.0
 Authors@R: c( person("Tobi", "Hahn", role = c("aut"), 
       email = "hahnt2@rpi.edu"),
     person("Luke", "Winslow", role = c("aut", "cre"), 
@@ -14,6 +14,7 @@ Description: Tools to link geographic data with hydrologic network, including la
     Includes automated download of U.S. National Hydrography Network and other hydrolayers.
 Imports:
     dplyr,
+    dbplyr,
     httr,
     tools,
     rappdirs,
