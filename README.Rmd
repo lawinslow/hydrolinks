@@ -5,7 +5,9 @@ date: "January 29, 2018"
 output: html_document
 ---
 
-
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
 
 # hydrolinks R Package
 Hydrologic Network Linking Data and Tools for R
@@ -37,7 +39,9 @@ ID-based link to mapped aquatic features.
 
 
 hydrolinks is available on CRAN. Please install from there. 
-
+```{r eval=FALSE, echo=FALSE}
+install.packages('hydrolinks')
+```
 
 ## Example Usage
 
@@ -46,34 +50,29 @@ hydrolinks is available on CRAN. Please install from there.
 Lets say we have an observation `lakeobs1` that was taken at some point. We want to see
 if there is a lake at that point, and get the information, including ID, of that lake. 
 
-
+```{r eval=TRUE, echo=TRUE, warning=FALSE, include=FALSE}
+library(hydrolinks)
+linked_wb = link_to_waterbodies(39.086637, -120.052634, 'lakeobs1', dataset='nhdh')
+```
 
 Lo and behold, this point is over top of Lake Tahoe. We can get further information
 about this lake from the mapping layer we used to link. National Hydrography Dataset
 Highres (NHDH) has some other useful information included. 
 
-
-```
-##   PERMANENT_      FDATE RESOLUTION  GNIS_ID  GNIS_NAME AREASQKM ELEVATION
-## 1   44560536 2012-03-12          2 01654975 Lake Tahoe 498.1268      6229
-##        REACHCODE FTYPE FCODE SHAPE_LENG SHAPE_AREA VISIBILITY centroid_x
-## 1 16050101000339   390 39009   1.624393 0.05186653          0   -2037514
-##   centroid_y MATCH_ID
-## 1    2044681 lakeobs1
+```{r eval=TRUE, echo=FALSE}
+print(linked_wb)
 ```
 
 Now, lets generate map of the linked lake (Lake Tahoe). Using hydrolinks, we don't need
 to dig through shapefiles. We can just use the ID we got from linking. 
 
-
-```r
+```{r eval=TRUE, echo=TRUE, message=FALSE, warning=FALSE, results='hide'}
 library(sf)
 lake_poly = get_shape_by_id(linked_wb$PERMANENT_, dataset = 'nhdh', feature_type = 'waterbody')
 #Simple quick viz of polygon
 plot(st_geometry(lake_poly), main='Lake Tahoe', col='Dodgerblue')
-```
 
-![plot of chunk unnamed-chunk-22](figure/unnamed-chunk-22-1.png)
+```
 
 The polygon returned is fully functional, so it could be used for 
 quantiative analysis of the lake shape or location. We use the `sf` package
@@ -90,15 +89,14 @@ the lake and traverse up the hydrologic network. We will specify a max traversal
 distance of 50km to prevent the traversal from exploding (can happen with unlimited
 bounds going up the network, e.g., Mississippi). 
 
+```{r eval=TRUE, echo=TRUE, message=FALSE, warning=FALSE, results='hide'}
 
-```r
 upstream = traverse_flowlines(50, linked_wb$PERMANENT_, direction = 'in')
 upstream_shp = get_shape_by_id(upstream$PERMANENT_, dataset = 'nhdh', feature_type = 'flowline')
 plot(st_geometry(upstream_shp), col='palegreen')
 plot(st_geometry(lake_poly), main='Lake Tahoe', col='Dodgerblue', add=TRUE)
-```
 
-![plot of chunk unnamed-chunk-23](figure/unnamed-chunk-23-1.png)
+```
 
 Boom! We have Tahoe and all its input tributaries. 
 Again, the shape data returned are the same as from the underlying hydrologic 
