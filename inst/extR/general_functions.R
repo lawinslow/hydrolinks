@@ -1,6 +1,8 @@
 library(dplyr)
 library(sf)
 library(foreign)
+library(tools)
+library(RCurl)
 
 # args is a named vector with 3 columns: shape path, output layer name, bounding box entry file name
 project_and_get_bb = function(args){
@@ -97,3 +99,18 @@ format_flowtable = function(raw_tables, shape_directories, wbarea_column, from_c
   
 }
 
+
+upload_data = function(files, conf_file, remote_path){
+  hash = md5sum(files)
+  conf = read.csv(conf_file)
+  for(i in 1:length(files)){
+    result = ftpUpload(files[i], paste0("ftp://", conf$username, ":", conf$password, "@", conf$hostname, "/", remote_path, "/", basename(files[i])))
+    if(result != 0){
+      stop("upload failed!")
+    }
+  }
+  urls = file.path("http://cdn.bathybase.org", remote_path, basename(files))
+  #files = basename(files)
+  result = data.frame(filename = basename(files), url = urls, md5 = hash)
+  rownames(result) = c(1:nrow(result))
+}
