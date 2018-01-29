@@ -37,19 +37,26 @@ link_to_flowlines = function(lats, lons, ids, max_dist = 100, dataset = c("nhdh"
   sites = sites[complete.cases(sites),]
   pts = st_as_sf(sites, coords = c("lons", "lats"), crs = nhd_proj)
   pts = st_transform(pts, st_crs(nhd_projected_proj))
-  st_crs(bbdf) = nhd_projected_proj
-  
+  bbdf = st_transform(bbdf, st_crs(nhd_projected_proj))
+
   res   = list()
-  
+
   xmin = xmax = ymin = ymax = NULL
   for(i in 1:nrow(pts)){
     res = c(res, bbdf[unlist(st_intersects(pts[i,], bbdf)),"file", drop=TRUE])
     #res[[i]] = subset(bbdf, xmin <= pts$geom[[i]][1] & xmax >= pts$geom[[i]][1] & ymin <= pts$geom[[i]][2] & ymax >= pts$geom[[i]][2])
   }
-  
+
   to_check = as.data.frame(unique(do.call(rbind, res)), stringsAsFactors = FALSE)
+  ## If we have no files to check, geopoints must be *way* outside mapped territory for this dataset
+  #empty data frame indicates no match (throw in warning to try and be helpful)
+  if(length(to_check) == 0){
+    warning('hydrolinks::Supplied geopoints do not overlap ', dataset, ' dataset')
+    return(data.frame())
+  }
+
   colnames(to_check)[1] = "file"
-  
+
   match_res = list()
 
   #in keeping with "no match is data.frame of zero rows"

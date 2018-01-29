@@ -46,6 +46,13 @@ link_to_waterbodies = function(lats, lons, ids, dataset = c("nhdh", "hydrolakes"
   }
 
   to_check = as.data.frame(unique(do.call(rbind, res)), stringsAsFactors = FALSE)
+  ## If we have no files to check, geopoints must be *way* outside mapped territory for this dataset
+  #empty data frame indicates no match (throw in warning to try and be helpful)
+  if(length(to_check) == 0){
+    warning('hydrolinks::Supplied geopoints do not overlap ', dataset, ' dataset')
+    return(data.frame())
+  }
+
   colnames(to_check)[1] = "file"
 
   match_res = list()
