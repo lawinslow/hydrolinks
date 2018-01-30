@@ -102,7 +102,6 @@ link_waterbody_centroids = function(lats, lons, ids, dataset = c("nhdh", "nhdplu
     nhd_matched = centroids[unlist(matches),]
     nhd_matched$MATCH_ID = pts[which(lengths(matches) > 0),]$MATCH_ID
     st_geometry(nhd_matched) = NULL
-    #names(nhd_matched) = toupper(names(nhd_matched))
     match_res[[i]] = data.frame(nhd_matched, stringsAsFactors = FALSE)
   }
 
