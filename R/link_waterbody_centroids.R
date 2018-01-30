@@ -56,20 +56,16 @@ link_waterbody_centroids = function(lats, lons, ids, dataset = c("nhdh", "nhdplu
 
   ## If we have no files to check, geopoints must be *way* outside mapped territory for this dataset
   #empty data frame indicates no match (throw in warning to try and be helpful)
-  if(length(to_check) == 0){
-    warning('hydrolinks::Supplied geopoints do not overlap ', dataset, ' dataset')
-    return(data.frame())
-  }
-  colnames(to_check)[1] = "file"
-
-  match_res = list()
-
   if(nrow(to_check) == 0){
+    warning('hydrolinks::Supplied geopoints do not overlap ', dataset, ' dataset')
     ret = data.frame(MATCH_ID = rep(NA, 0))
     ret[,dinfo$id_column] = rep(NA, 0)
     return(ret)
   }
 
+  # start the big matching loop
+  colnames(to_check)[1] = "file"
+  match_res = list()
 
   for(i in 1:nrow(to_check)){
     #get waterbody layer
@@ -87,7 +83,10 @@ link_waterbody_centroids = function(lats, lons, ids, dataset = c("nhdh", "nhdplu
     centroids = st_sf(nhd_data, geometry = st_sfc(centroids), crs = nhd_projected_proj)
     centroids_buffer = st_buffer(centroids, max_dist)
     matches = st_intersects(pts, centroids_buffer)
-    if(length(unlist(matches)) == 0){
+
+    #ok, deal with this sparse predicate structure
+    # if nothing matches at all
+    if(sum(sapply(matches, length) > 0) == 0){
       next
     }
     matches_multiple = which(lengths(matches) > 1)
@@ -98,11 +97,11 @@ link_waterbody_centroids = function(lats, lons, ids, dataset = c("nhdh", "nhdplu
         matches[matches_multiple][[j]] = which.min(distance[1,])
       }
     }
-    matches[lengths(matches) == 0] = NA
+
+    #carefully peel apart the matches and put the IDs where they need to go
     nhd_matched = centroids[unlist(matches),]
-    nhd_matched$MATCH_ID = sites$ids
-    nhd_matched = nhd_matched[,,drop = TRUE]
-    nhd_matched$geometry = NULL
+    nhd_matched$MATCH_ID = pts[which(lengths(matches) > 0),]$MATCH_ID
+    st_geometry(nhd_matched) = NULL
     #names(nhd_matched) = toupper(names(nhd_matched))
     match_res[[i]] = data.frame(nhd_matched, stringsAsFactors = FALSE)
   }
