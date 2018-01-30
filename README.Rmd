@@ -2,7 +2,7 @@
 title: "readme"
 author: "Luke Winslow"
 date: "January 29, 2018"
-output: html_document
+output: md_document
 ---
 
 ```{r setup, include=FALSE}
