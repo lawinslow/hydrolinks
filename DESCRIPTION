@@ -28,7 +28,9 @@ Suggests:
     rmarkdown,
     dataRetrieval,
     USAboundaries,
-    ggplot2
+    ggplot2,
+    gridExtra,
+    kableExtra
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
