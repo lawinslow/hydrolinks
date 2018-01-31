@@ -65,7 +65,7 @@ get_shape_by_id = function(match_id, feature_type = c("flowline", "waterbody"), 
   if(length(files) > 0){
     for(i in 1:length(files)){
       check_dl_file(dinfo$file_index_path, fname = files[i])
-      shapefile = st_read(file.path(cache_get_dir(), "unzip", files[i], dinfo$shapefile_name))
+      shapefile = st_read(file.path(cache_get_dir(), "unzip", files[i], dinfo$shapefile_name), quiet = TRUE)
       features = shapefile[shapefile[,match_column, drop = TRUE] %in% match_id,]
       shapes[[i]] = features
     }
