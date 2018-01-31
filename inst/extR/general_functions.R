@@ -117,4 +117,5 @@ upload_data = function(files, conf_file, remote_path){
   #files = basename(files)
   result = data.frame(filename = basename(files), url = urls, md5 = hash)
   rownames(result) = c(1:nrow(result))
+  return(result)
 }

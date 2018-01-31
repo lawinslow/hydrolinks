@@ -40,4 +40,4 @@ setwd(hydrolakes_path)
 build_id_table(bbdf, "HydroLAKES_polys_v10_projected.shp", file.path(id_table_output_path, "hydrolakes_waterbody_ids.sqlite3"), c("Hylak_id", "Lake_name"), paste0("hydrolakes_", c(1:50)))
 
 processed_shapes = upload_data(output_zip, "upload_conf.csv", "hydrolinks/hydrolakes")
-write.csv(processed_shapes, "inst/extdata/nhdh.csv")
+write.csv(processed_shapes, "inst/extdata/hydrolakes.csv")

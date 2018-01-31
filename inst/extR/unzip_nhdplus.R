@@ -92,4 +92,4 @@ shape_directories = file.path(dest, regions)
 format_flowtable(raw_tables, shape_directories, "WBAREACOMI", "FROMCOMID", "TOCOMID", "COMID", "flowtable_nhdplusv2")
 
 processed_shapes = upload_data(output_zip, "upload_conf.csv", "hydrolinks/nhdplusv2")
-write.csv(processed_shapes, "inst/extdata/nhdh.csv")
+write.csv(processed_shapes, "inst/extdata/nhdplusv2.csv")
