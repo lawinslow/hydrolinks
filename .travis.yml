@@ -2,6 +2,7 @@ language: r
 cache: packages
 sudo: required
 warnings_are_errors: false
+r_check_args: "--no-vignettes"
 
 before_install:
   - sudo add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable
