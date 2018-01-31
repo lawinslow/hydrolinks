@@ -36,3 +36,20 @@ plot(st_geometry(downstream_lk_shp), main='Lake Tahoe', col='Dodgerblue', add=TR
 plot(st_geometry(lake_poly), main='Lake Tahoe', col='Dodgerblue', add=TRUE)
 
 
+## ----eval=TRUE, echo=TRUE, message=FALSE, warning=FALSE, results='hide'----
+id = link_to_waterbodies(43.112449, -89.429409, 'mendota')
+
+hmm = traverse_flowlines(100, id$PERMANENT_, "in")
+
+fls = get_shape_by_id(hmm$PERMANENT_, feature_type = 'flowline', dataset='nhdh')
+wbs = get_shape_by_id(hmm$PERMANENT_, feature_type = 'waterbody', dataset='nhdh')
+
+wb   = get_shape_by_id(id$PERMANENT_, feature_type = 'waterbody')
+
+plot(st_geometry(fls), col='green')
+plot(st_geometry(wb), col='orange', add=TRUE)
+plot(st_geometry(fls), add=TRUE, col='green')
+plot(st_geometry(wbs), add=TRUE, col='blue')
+
+111
+
