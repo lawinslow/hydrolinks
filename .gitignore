@@ -2,3 +2,4 @@
 *.Rproj
 figures
 .Rhistory
+inst/doc

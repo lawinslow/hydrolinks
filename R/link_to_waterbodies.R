@@ -63,8 +63,7 @@ link_to_waterbodies = function(lats, lons, ids, dataset = c("nhdh", "hydrolakes"
     #get waterbody layer
     check_dl_file(dinfo$file_index_path, to_check[i, 'file'])
 
-    shape         = st_read(file.path(cache_get_dir(), "unzip", to_check[i,'file'], dinfo$shapefile_name), stringsAsFactors=FALSE)
-    #st_crs(shape) = nhd_projected_proj
+    shape = st_read(file.path(cache_get_dir(), "unzip", to_check[i,'file'], dinfo$shapefile_name), stringsAsFactors=FALSE, quiet=TRUE)
     shape = st_transform(shape, nhd_projected_proj)
 
     if(tolower(dataset) == 'nhdh'){

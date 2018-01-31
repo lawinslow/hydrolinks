@@ -65,7 +65,7 @@ link_to_flowlines = function(lats, lons, ids, max_dist = 100, dataset = c("nhdh"
   for(i in 1:nrow(to_check)){
     #get nhd layer
     check_dl_file(dinfo$file_index_path, to_check[i, 'file'])
-    shape = st_read(file.path(cache_get_dir(), "unzip", to_check[i,'file'], dinfo$shapefile_name), stringsAsFactors=FALSE)
+    shape = st_read(file.path(cache_get_dir(), "unzip", to_check[i,'file'], dinfo$shapefile_name), stringsAsFactors=FALSE, quiet=TRUE)
     shape = st_transform(shape, nhd_projected_proj)
 
     #LAW: Ok, the buffer-based matching is very slow for a small lat/lon list. Conversely, simple distance is
