@@ -27,7 +27,8 @@ Suggests:
     knitr,
     rmarkdown,
     dataRetrieval,
-    USAboundaries
+    USAboundaries,
+    ggplot2
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
