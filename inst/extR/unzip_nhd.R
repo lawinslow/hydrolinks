@@ -2,8 +2,9 @@ library(hydrolinks)
 library(sf)
 library(parallel)
 source("inst/extR/general_functions.R")
+source("R/AAA.R")
 
-nhdh_path = "D:/nhdh/Shape"
+nhdh_path = "E:/nhdh/Shape"
 
 zipfiles = Sys.glob(file.path(nhdh_path, '*Shape.zip'))
 dest = file.path(nhdh_path, 'Shape_unzip')
@@ -50,10 +51,10 @@ for(i in 1:length(shapefiles_streams)){
   stream_args[i,3] = basename(dirname(dirname(shapefiles_streams[i])))
 }
 
-#bboxes_lakes = parApply(c1, lake_args, project_and_get_bb, MARGIN = 1)
-bboxes_lakes = parLapplyLB(c1, c(1:nrow(lake_args)), function(x){project_and_get_bb(lake_args[x,])})
-#bboxes_streams = parApply(c1, stream_args, project_and_get_bb, MARGIN = 1)
-bboxes_streams = parLapplyLB(c1, c(1:nrow(stream_args)), function(x){project_and_get_bb(stream_args[x,])})
+bboxes_lakes = parApply(c1, lake_args, project_and_get_bb, MARGIN = 1)
+#bboxes_lakes = parLapplyLB(c1, c(1:nrow(lake_args)), function(x){project_and_get_bb(lake_args[x,])})
+bboxes_streams = parApply(c1, stream_args, project_and_get_bb, MARGIN = 1)
+#bboxes_streams = parLapplyLB(c1, c(1:nrow(stream_args)), function(x){project_and_get_bb(stream_args[x,])})
 
 bbdf = do.call(rbind, bboxes_lakes)f
 save(bbdf, file = "inst/extdata/nhd_bb_cache_projected.Rdata")

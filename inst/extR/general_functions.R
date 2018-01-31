@@ -52,6 +52,8 @@ format_flowtable = function(raw_tables, shape_directories, wbarea_column, from_c
     waterbody = st_read(file.path(shape_directories[i], "NHDWaterbody_projected.shp"))
     st_geometry(flowline) = NULL
     st_geometry(waterbody) = NULL
+    colnames(flowline) = toupper(colnames(flowline))
+    colnames(waterbody) = toupper(colnames(waterbody))
     flowline = flowline[!is.na(flowline[,wbarea_column]),]
     flowline = flowline[flowline[,wbarea_column] %in% waterbody[,id_column],]
     change = data.frame(flowline[,id_column], flowline[,wbarea_column], stringsAsFactors = FALSE)
@@ -65,6 +67,8 @@ format_flowtable = function(raw_tables, shape_directories, wbarea_column, from_c
   
   for(i in 1:length(raw_tables)){
     tables[[i]] = read.dbf(raw_tables[i], as.is = TRUE)
+    
+    colnames(tables[[i]]) = toupper(colnames(tables[[i]]))
     
     changes_from = changes[[i]][changes[[i]][,"id_column"] %in% tables[[i]][,from_column], ]
     changes_to = changes[[i]][changes[[i]][,"id_column"] %in% tables[[i]][,to_column], ]

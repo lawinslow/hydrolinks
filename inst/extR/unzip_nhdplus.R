@@ -4,7 +4,7 @@ library(dplyr)
 source("R/AAA.R")
 source("inst/extR/general_functions.R")
 
-nhd_path = "D:/lakes/NHDPlusV21/Data"
+nhd_path = "D:/NHDPlusV21/Data"
 
 regions = c("NE_01", "MA_02", "SA_03N", "SA_03S", "SA_03W", "GL_04", "MS_05", "MS_06", "MS_07", "MS_08",
             "MS_10L", "MS_10U", "MS_11", "SR_09", "TX_12", "RG_13", "CO_14", "CO_15", "GB_16", "PN_17", "CA_18",
@@ -79,7 +79,7 @@ for(i in 1:length(regions)){
 setwd(dest)
 build_id_table(bbdf, "NHDFlowline_projected.shp", file.path(id_table_output_path, "nhdplusv2_flowline_ids.sqlite3"), c("COMID", "GNIS_ID", "GNIS_NAME", "REACHCODE"), regions)
 
-load("inst/extdata/nhd_bb_cache_projected.Rdata")
+bbdf = do.call(rbind, bboxes_flowline)
 build_id_table(bbdf, "NHDWaterbody_projected.shp", file.path(id_table_output_path, "nhdplusv2_waterbody_ids.sqlite3"), c("COMID", "GNIS_ID", "GNIS_NAME", "REACHCODE"), regions)
 
 for(i in 1:length(zipfiles)){
