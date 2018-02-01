@@ -5,7 +5,7 @@
 #' @param lats Vector of point latitudes
 #' @param lons Vector of point longitudes
 #' @param ids Vector of point identifiers (string or numeric)
-#' @param max_dist numeric maximum line snapping distance in meters
+#' @param buffer numeric maximum line snapping distance in meters
 #' @param dataset Character name of dataset to link against. Can be either "nhdh" or "nhdplusv2"
 #'
 #' @return flowline permanent ids
@@ -26,7 +26,7 @@
 #'
 #' @export
 
-link_to_flowlines = function(lats, lons, ids, max_dist = 100, dataset = c("nhdh", "nhdplusv2")){
+link_to_flowlines = function(lats, lons, ids, buffer = 100, dataset = c("nhdh", "nhdplusv2")){
   dataset = match.arg(dataset)
 
   dinfo = dataset_info(dataset, 'flowline')
@@ -72,15 +72,15 @@ link_to_flowlines = function(lats, lons, ids, max_dist = 100, dataset = c("nhdh"
     #slow for really long point lists. I'm trying to split the difference here and optimize for both.
     if(nrow(pts) > 300){ #magic number cutoff! Seems to balance performance
 
-      shape_buffer = st_buffer(shape, max_dist)
+      shape_buffer = st_buffer(shape, buffer)
       matches = st_intersects(pts, shape_buffer)
     }else{
-      units(max_dist) = with(units::ud_units, m) #input max dist is defineda as meters
+      units(buffer) = with(units::ud_units, m) #input max dist is defineda as meters
 
       matchmat = st_distance(shape, pts)
       mini = apply(matchmat, 2, which.min)
       matches = lapply(seq_along(mini), function(i){
-          if(matchmat[mini[i], i] <= max_dist){
+          if(matchmat[mini[i], i] <= buffer){
             return(mini[i])
           }else{
             return(double(length=0))

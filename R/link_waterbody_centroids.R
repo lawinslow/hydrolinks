@@ -6,7 +6,7 @@
 #' @param lons Vector of point longitudes
 #' @param ids Vector of point identifiers (string or numeric)
 #' @param dataset Character name of dataset to link against. Can be either "nhd" or "hydrolakes"
-#' @param max_dist maximum distance between points and centroids to match
+#' @param buffer maximum distance between points and centroids to match
 #'
 #'
 #' @return Water body permanent IDs
@@ -22,7 +22,7 @@
 #' }
 #'
 #' @export
-link_waterbody_centroids = function(lats, lons, ids, dataset = c("nhdh", "nhdplusv2", "hydrolakes"), max_dist = 25){
+link_waterbody_centroids = function(lats, lons, ids, dataset = c("nhdh", "nhdplusv2", "hydrolakes"), buffer = 25){
   dataset = match.arg(dataset)
 
   dinfo = dataset_info(dataset, 'waterbody')
@@ -81,7 +81,7 @@ link_waterbody_centroids = function(lats, lons, ids, dataset = c("nhdh", "nhdplu
     nhd_data = nhd[,,drop=TRUE]
     nhd_data$geometry = NULL
     centroids = st_sf(nhd_data, geometry = st_sfc(centroids), crs = nhd_projected_proj)
-    centroids_buffer = st_buffer(centroids, max_dist)
+    centroids_buffer = st_buffer(centroids, buffer)
     matches = st_intersects(pts, centroids_buffer)
 
     #ok, deal with this sparse predicate structure
