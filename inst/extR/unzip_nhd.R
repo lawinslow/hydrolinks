@@ -62,6 +62,7 @@ save(bbdf, file = "inst/extdata/nhd_bb_cache_projected.Rdata")
 bbdf = do.call(rbind, bboxes_streams)
 save(bbdf, file = "inst/extdata/nhd_bb_streams_cache.Rdata")
 
+working_directory = getwd()
 # save projected shapefiles
 
 dir.create(file.path(nhdh_path, "zip"))
@@ -77,6 +78,7 @@ for(i in 1:length(output_zip)){
 setwd(dest)
 build_id_table(bbdf, "Shape/NHDFlowline_projected.shp", file.path(id_table_output_path, "nhdh_flowline_ids.sqlite3"), c("PERMANENT_", "GNIS_ID", "GNIS_NAME", "REACHCODE"))
 
+setwd(working_directory)
 load("inst/extdata/nhd_bb_cache_projected.Rdata")
 build_id_table(bbdf, "Shape/NHDWaterbody_projected.shp", file.path(id_table_output_path, "nhdh_waterbody_ids.sqlite3"), c("PERMANENT_", "GNIS_ID", "GNIS_NAME", "REACHCODE"))
 
