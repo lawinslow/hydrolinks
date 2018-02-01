@@ -12,7 +12,7 @@
 
 <meta name="author" content="Luke Winslow" />
 
-<meta name="date" content="2018-01-31" />
+<meta name="date" content="2018-02-01" />
 
 <title>WQP Lake Linking Example</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">WQP Lake Linking Example</h1>
 <h4 class="author"><em>Luke Winslow</em></h4>
-<h4 class="date"><em>2018-01-31</em></h4>
+<h4 class="date"><em>2018-02-01</em></h4>
 
 
 
@@ -93,7 +93,7 @@ lsites =<span class="st"> </span><span class="kw">whatWQPsites</span>(<span clas
 
 unlinked =<span class="st"> </span><span class="kw">subset</span>(lsites, !(MonitoringLocationIdentifier %in%<span class="st"> </span>linked_lakes$MATCH_ID))
 <span class="co">#now, try linking just the previously unlinked sites</span>
-linked_lcent =<span class="st"> </span><span class="kw">link_waterbody_centroids</span>(unlinked$LatitudeMeasure, unlinked$LongitudeMeasure, unlinked$MonitoringLocationIdentifier, <span class="dt">dataset =</span> <span class="st">'nhdh'</span>, <span class="dt">max_dist =</span> <span class="dv">25</span>)</code></pre></div>
+linked_lcent =<span class="st"> </span><span class="kw">link_waterbody_centroids</span>(unlinked$LatitudeMeasure, unlinked$LongitudeMeasure, unlinked$MonitoringLocationIdentifier, <span class="dt">dataset =</span> <span class="st">'nhdh'</span>, <span class="dt">buffer =</span> <span class="dv">25</span>)</code></pre></div>
 <p>Here are the overarching number of sites linked/centroid-linked/not-linked.</p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <thead>

@@ -17,7 +17,7 @@ linked_lakes = link_to_waterbodies(lsites$LatitudeMeasure, lsites$LongitudeMeasu
 
 unlinked = subset(lsites, !(MonitoringLocationIdentifier %in% linked_lakes$MATCH_ID))
 #now, try linking just the previously unlinked sites
-linked_lcent = link_waterbody_centroids(unlinked$LatitudeMeasure, unlinked$LongitudeMeasure, unlinked$MonitoringLocationIdentifier, dataset = 'nhdh', max_dist = 25)
+linked_lcent = link_waterbody_centroids(unlinked$LatitudeMeasure, unlinked$LongitudeMeasure, unlinked$MonitoringLocationIdentifier, dataset = 'nhdh', buffer = 25)
 
 ## ----build_table, echo=FALSE, message=FALSE, warning=FALSE---------------
 library(knitr)
