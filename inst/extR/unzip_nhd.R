@@ -85,5 +85,5 @@ raw_tables = Sys.glob(file.path(nhdh_path, 'Shape_unzip', '*', 'Shape', 'NHDFlow
 shape_directories = Sys.glob(file.path(nhdh_path, 'Shape_unzip', '*', 'Shape'))
 format_flowtable(raw_tables, shape_directories, "WBAREA_PER", "FROM_PERMA", "TO_PERMANE", "PERMANENT_", "flowtable_nhdh")
 
-processed_shapes = upload_data(output_zip, "upload_conf.csv", "hydrolinks/nhdh")
+processed_shapes = gen_upload_file(output_zip, "hydrolinks/0.7/nhdh")
 write.csv(processed_shapes, "inst/extdata/nhdh.csv")

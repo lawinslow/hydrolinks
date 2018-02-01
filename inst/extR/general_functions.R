@@ -99,20 +99,20 @@ format_flowtable = function(raw_tables, shape_directories, wbarea_column, from_c
   colnames(distances) = c(from_column, "LENGTHKM")
   flowtable = merge(flowtable, distances, by = from_column)
   ids_db = src_sqlite(paste0(output_name, ".sqlite3"), create = TRUE)
-  copy_to(ids_db, flowtable, overwrite = TRUE, temporary = fALSE, indexes = list(from_column, to_column))
+  copy_to(ids_db, flowtable, overwrite = TRUE, temporary = FALSE, indexes = list(from_column, to_column))
   
 }
 
 
-upload_data = function(files, conf_file, remote_path){
+gen_upload_file = function(files, remote_path){
   hash = md5sum(files)
-  conf = read.csv(conf_file)
-  for(i in 1:length(files)){
-    result = ftpUpload(files[i], paste0("ftp://", conf$username, ":", conf$password, "@", conf$hostname, "/", remote_path, "/", basename(files[i])))
-    if(result != 0){
-      stop("upload failed!")
-    }
-  }
+  #conf = read.csv(conf_file)
+  # for(i in 1:length(files)){
+  #   result = ftpUpload(files[i], paste0("ftp://", conf$username, ":", conf$password, "@", conf$hostname, "/", remote_path, "/", basename(files[i])))
+  #   if(result != 0){
+  #     stop("upload failed!")
+  #   }
+  # }
   urls = file.path("http://cdn.bathybase.org", remote_path, basename(files))
   #files = basename(files)
   result = data.frame(filename = basename(files), url = urls, md5 = hash)
