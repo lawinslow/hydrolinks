@@ -44,13 +44,13 @@ flowline_shapes = file.path(dest, regions, "NHDFlowline.shp")
 lake_args = data.frame(shape_path = waterbody_shapes, layer = rep("NHDWaterbody_projected", length(waterbody_shapes)),
                        output_name = rep(NA, length(waterbody_shapes)), stringsAsFactors = FALSE)
 for(i in 1:length(waterbody_shapes)){
-  lake_args[i,3] = basename(dirname(waterbody_shapes[i]))
+  lake_args[i,3] = paste0(basename(dirname(waterbody_shapes[i])), ".zip")
 }
 
 stream_args = data.frame(shape_path = flowline_shapes, layer = rep("NHDFlowline_projected", length(flowline_shapes)),
                        output_name = rep(NA, length(flowline_shapes)), stringsAsFactors = FALSE)
 for(i in 1:length(waterbody_shapes)){
-  stream_args[i,3] = basename(dirname(flowline_shapes[i]))
+  stream_args[i,3] = paste0(basename(dirname(flowline_shapes[i])), ".zip")
 }
 
 # project and generate bounding boxes 
