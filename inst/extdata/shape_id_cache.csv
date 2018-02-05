@@ -1,6 +1,6 @@
-filename,url,md5
-hydrolakes_waterbody_ids.zip,http://cdn.bathybase.org/hydrolinks/shape_id_cache/hydrolakes_waterbody_ids.zip,a1f9921d54100f3f033772dfc4983b5a
-nhdh_flowline_ids.zip,http://cdn.bathybase.org/hydrolinks/shape_id_cache/nhdh_flowline_ids.zip,7aad3148c4a05333e4f700e002b0a7f8
-nhdh_waterbody_ids.zip,http://cdn.bathybase.org/hydrolinks/shape_id_cache/nhdh_waterbody_ids.zip,6dffc1e5d7f8dd846fe86e15551751b2
-nhdplusv2_flowline_ids.zip,http://cdn.bathybase.org/hydrolinks/shape_id_cache/nhdplusv2_flowline_ids.zip,9381bdbcae75aa2bf385a632281a0d21
-nhdplusv2_waterbody_ids.zip,http://cdn.bathybase.org/hydrolinks/shape_id_cache/nhdplusv2_waterbody_ids.zip,a1ec6ca332065f9d966bef3cc6947c97
+"","filename","url","md5"
+"1","hydrolakes_waterbody_ids.sqlite3","http://cdn.bathybase.org/hydrolinks/0.7/shape_id_cache/hydrolakes_waterbody_ids.sqlite3","396200705dea1e6addf40c55001cd9e9"
+"2","nhdh_flowline_ids.sqlite3","http://cdn.bathybase.org/hydrolinks/0.7/shape_id_cache/nhdh_flowline_ids.sqlite3","2bc696a46a8e93a626be04dd3495b803"
+"3","nhdh_waterbody_ids.sqlite3","http://cdn.bathybase.org/hydrolinks/0.7/shape_id_cache/nhdh_waterbody_ids.sqlite3","76245d4e79164a26a6fb4ee4f1ffbe5c"
+"4","nhdplusv2_flowline_ids.sqlite3","http://cdn.bathybase.org/hydrolinks/0.7/shape_id_cache/nhdplusv2_flowline_ids.sqlite3","94639bc6606aeeb2f9df24b484489b25"
+"5","nhdplusv2_waterbody_ids.sqlite3","http://cdn.bathybase.org/hydrolinks/0.7/shape_id_cache/nhdplusv2_waterbody_ids.sqlite3","b79f3706c94c67c593bc6c5a85b83a0a"

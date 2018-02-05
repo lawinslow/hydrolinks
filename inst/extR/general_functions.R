@@ -1,6 +1,8 @@
 library(dplyr)
 library(sf)
 library(foreign)
+library(tools)
+library(RCurl)
 
 # args is a named vector with 3 columns: shape path, output layer name, bounding box entry file name
 project_and_get_bb = function(args){
@@ -50,6 +52,8 @@ format_flowtable = function(raw_tables, shape_directories, wbarea_column, from_c
     waterbody = st_read(file.path(shape_directories[i], "NHDWaterbody_projected.shp"))
     st_geometry(flowline) = NULL
     st_geometry(waterbody) = NULL
+    colnames(flowline) = toupper(colnames(flowline))
+    colnames(waterbody) = toupper(colnames(waterbody))
     flowline = flowline[!is.na(flowline[,wbarea_column]),]
     flowline = flowline[flowline[,wbarea_column] %in% waterbody[,id_column],]
     change = data.frame(flowline[,id_column], flowline[,wbarea_column], stringsAsFactors = FALSE)
@@ -63,6 +67,8 @@ format_flowtable = function(raw_tables, shape_directories, wbarea_column, from_c
   
   for(i in 1:length(raw_tables)){
     tables[[i]] = read.dbf(raw_tables[i], as.is = TRUE)
+    
+    colnames(tables[[i]]) = toupper(colnames(tables[[i]]))
     
     changes_from = changes[[i]][changes[[i]][,"id_column"] %in% tables[[i]][,from_column], ]
     changes_to = changes[[i]][changes[[i]][,"id_column"] %in% tables[[i]][,to_column], ]
@@ -93,7 +99,23 @@ format_flowtable = function(raw_tables, shape_directories, wbarea_column, from_c
   colnames(distances) = c(from_column, "LENGTHKM")
   flowtable = merge(flowtable, distances, by = from_column)
   ids_db = src_sqlite(paste0(output_name, ".sqlite3"), create = TRUE)
-  copy_to(ids_db, flowtable, overwrite = TRUE, temporary = fALSE, indexes = list(from_column, to_column))
+  copy_to(ids_db, flowtable, overwrite = TRUE, temporary = FALSE, indexes = list(from_column, to_column))
   
 }
 
+
+gen_upload_file = function(files, remote_path){
+  hash = md5sum(files)
+  #conf = read.csv(conf_file)
+  # for(i in 1:length(files)){
+  #   result = ftpUpload(files[i], paste0("ftp://", conf$username, ":", conf$password, "@", conf$hostname, "/", remote_path, "/", basename(files[i])))
+  #   if(result != 0){
+  #     stop("upload failed!")
+  #   }
+  # }
+  urls = file.path("http://cdn.bathybase.org", remote_path, basename(files))
+  #files = basename(files)
+  result = data.frame(filename = basename(files), url = urls, md5 = hash)
+  rownames(result) = c(1:nrow(result))
+  return(result)
+}

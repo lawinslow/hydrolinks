@@ -2,7 +2,9 @@ library(sf)
 source("R/AAA.R")
 source("inst/extR/general_functions.R")
 
-hydrolakes_path = "D:/lakes/hydrolakes/HydroLAKES_polys_v10_shp"
+hydrolakes_path = "D:/hydrolakes/HydroLAKES_polys_v10_shp"
+
+id_table_output_path = "D:/hydrolinks_tables"
 
 hydrolakes = st_read(file.path(hydrolakes_path, "HydroLAKES_polys_v10.shp"))
 
@@ -35,5 +37,7 @@ for(i in 1:50){
 }
 
 setwd(hydrolakes_path)
-build_id_table(bbdf, "HydroLAKES_polys_v10_projected.shp", "hydrolakes_waterbody_ids.sqlite3", c("Hylak_id", "Lake_name"), paste0("hydrolakes_", c(1:50)))
+build_id_table(bbdf, "HydroLAKES_polys_v10_projected.shp", file.path(id_table_output_path, "hydrolakes_waterbody_ids.sqlite3"), c("Hylak_id", "Lake_name"), paste0("hydrolakes_", c(1:50)))
 
+processed_shapes = gen_upload_file(output_zip, "hydrolinks/0.7/hydrolakes")
+write.csv(processed_shapes, "inst/extdata/hydrolakes.csv")
