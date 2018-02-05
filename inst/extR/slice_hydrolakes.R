@@ -33,6 +33,7 @@ for(i in c(1:50)){
 bbdf = do.call(rbind, bboxes)
 save(bbdf, file='inst/extdata/hydrolakes_bb_cache.Rdata')
 
+working_directory = getwd()
 dir.create(file.path(hydrolakes_path, "zip"))
 output_zip = file.path(hydrolakes_path, "zip", paste0("hydrolakes_", c(1:50), ".zip"))
 for(i in 1:50){
@@ -43,5 +44,6 @@ for(i in 1:50){
 setwd(hydrolakes_path)
 build_id_table(bbdf, "HydroLAKES_polys_v10_projected.shp", file.path(id_table_output_path, "hydrolakes_waterbody_ids.sqlite3"), c("Hylak_id", "Lake_name"), paste0("hydrolakes_", c(1:50)))
 
+setwd(working_directory)
 processed_shapes = gen_upload_file(output_zip, "hydrolinks/0.7/hydrolakes")
 write.csv(processed_shapes, "inst/extdata/hydrolakes.csv")
