@@ -4,11 +4,17 @@
 \alias{cache_set_dir}
 \title{Set local cache path}
 \usage{
-cache_set_dir(path = NULL)
+cache_set_dir(path = NULL, temppath = FALSE)
 }
 \arguments{
-\item{path}{character path to new local files path. If null, path will be
+\item{path}{Character path to new local files path. If null, path will be
 reset to default user data directory location.}
+
+\item{temppath}{Boolean flag indicating if the default R temp directory should
+be used instead of a custom or user-workspace area. Warning:
+This setting will not persist between R sessions and the
+temp directory is cleared when R is closed. Using temp will result
+in frequent file downloads and extremely slow performance}
 }
 \description{
 Set location of local data file cache. If the directory does not exist, it
@@ -20,7 +26,6 @@ default user data directory for the package will be used. See
 \dontrun{
   #set a different cache path
   set_cache_path('z:/big_datasets/hydrolinks')
-
 }
 
 }
