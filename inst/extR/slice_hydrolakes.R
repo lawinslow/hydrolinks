@@ -9,8 +9,10 @@ id_table_output_path = "D:/hydrolinks_tables"
 #id_table_output_path = "B:/big_data/hydrolinks_tables"
 
 hydrolakes = st_read(file.path(hydrolakes_path, "HydroLAKES_polys_v10.shp"))
+hydrolakes = st_transform(hydrolakes, nhd_projected_proj)
 centroids = st_centroid(hydrolakes)
 hydrolakes$centroid.x = st_coordinates(centroids)[,"X"]
+hydrolakes$centroid.x = st_coordinates(centroids)[,"Y"]
 hydrolakes = hydrolakes[order(hydrolakes$centroid.x), ]
 
 #setup the slices, evenly distributed across the whole dataset
@@ -21,10 +23,10 @@ bboxes = list()
 for(i in 1:(length(indx)-1)){
   slice = hydrolakes[indx[i]:indx[i+1], ]
   dir.create(file.path(hydrolakes_path, paste0("hydrolakes_", i)))
-  slice = st_transform(slice, nhd_projected_proj)
-  centroids = st_centroid(slice)
-  slice$centroid.x = st_coordinates(centroids)[,"X"]
-  slice$centroid.y = st_coordinates(centroids)[,"Y"]
+  #slice = st_transform(slice, nhd_projected_proj)
+  #centroids = st_centroid(slice)
+  #slice$centroid.x = st_coordinates(centroids)[,"X"]
+  #slice$centroid.y = st_coordinates(centroids)[,"Y"]
   st_write(slice, dsn = file.path(hydrolakes_path, paste0("hydrolakes_", i)), layer = "HydroLAKES_polys_v10_projected",
            driver = "ESRI Shapefile")
   bboxes[[i]] = st_sf(file = paste0("hydrolakes_", i, ".zip"), geometry=st_as_sfc(st_bbox(slice), crs=nhd_projected_proj), stringsAsFactors = FALSE)
