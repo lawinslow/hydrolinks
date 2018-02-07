@@ -1,4 +1,5 @@
 library(dplyr)
+library(dbplyr) #this is an implicit dependency of dplyr when using sqlite DB 
 library(sf)
 library(foreign)
 library(tools)
