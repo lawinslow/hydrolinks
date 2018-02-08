@@ -43,7 +43,7 @@ dataset_info = function(dataset, feature_type){
     flowtable_to_column = "To_Permanent_Identifier"
   }
   else if(tolower(dataset) == "hydrolakes"){
-    bb_cache_path = system.file('extdata/hydrolakes_bb_cache_projected.Rdata', package='hydrolinks')
+    bb_cache_path = system.file('extdata/hydrolakes_bb_cache.Rdata', package='hydrolinks')
     id_column = "Hylak_id"
   }
   else if(tolower(dataset) == "nhdplusv2"){

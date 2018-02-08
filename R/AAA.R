@@ -1,5 +1,8 @@
 #AAA
 
+cache_options = new.env()
+cache_options$usetemp = FALSE
+
 #nhd_proj = '+proj=longlat +datum=NAD83 +no_defs +ellps=GRS80 +towgs84=0,0,0'
 nhd_proj = '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs'
 
