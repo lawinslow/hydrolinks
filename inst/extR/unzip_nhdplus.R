@@ -64,6 +64,7 @@ save(bbdf, file = "inst/extdata/nhdplus_waterbody_bb_cache.rdata")
 
 bbdf = do.call(rbind, bboxes_flowline)
 save(bbdf, file = "inst/extdata/nhdplus_flowline_bb_cache.rdata")
+stopCluster(c1)
 
 # zip projected shapes
 
@@ -79,7 +80,7 @@ for(i in 1:length(regions)){
 setwd(dest)
 build_id_table(bbdf, "NHDFlowline_projected.shp", file.path(id_table_output_path, "nhdplusv2_flowline_ids.sqlite3"), c("COMID", "GNIS_ID", "GNIS_NAME", "REACHCODE"), regions)
 
-bbdf = do.call(rbind, bboxes_flowline)
+bbdf = do.call(rbind, bboxes_waterbody)
 build_id_table(bbdf, "NHDWaterbody_projected.shp", file.path(id_table_output_path, "nhdplusv2_waterbody_ids.sqlite3"), c("COMID", "GNIS_ID", "GNIS_NAME", "REACHCODE"), regions)
 
 for(i in 1:length(zipfiles)){
