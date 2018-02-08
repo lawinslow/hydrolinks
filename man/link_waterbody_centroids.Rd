@@ -5,7 +5,7 @@
 \title{Link geopoints to Waterbodies by centroids}
 \usage{
 link_waterbody_centroids(lats, lons, ids, dataset = c("nhdh", "nhdplusv2",
-  "hydrolakes"), max_dist = 25)
+  "hydrolakes"), buffer = 25)
 }
 \arguments{
 \item{lats}{Vector of point latitudes}
@@ -16,7 +16,7 @@ link_waterbody_centroids(lats, lons, ids, dataset = c("nhdh", "nhdplusv2",
 
 \item{dataset}{Character name of dataset to link against. Can be either "nhd" or "hydrolakes"}
 
-\item{max_dist}{maximum distance between points and centroids to match}
+\item{buffer}{maximum distance between points and centroids to match}
 }
 \value{
 Water body permanent IDs

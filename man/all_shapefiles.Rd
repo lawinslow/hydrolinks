@@ -9,12 +9,19 @@ all_shapefiles(check_dl = FALSE, dataset = c("nhdh", "hydrolakes",
 }
 \arguments{
 \item{check_dl}{If TRUE, checks to ensure all files for that dataset have been downloaded.
-This check takes some time (~30 seconds) to check all files (and much longer to dowload if necessary)}
+This check takes some time (~30 seconds) to check all files (and much longer to dowload if necessary).}
 
 \item{dataset}{name of dataset to use for matching.}
 
 \item{feature_type}{name of feature layer to match. The hydrolakes dataset does not include a flowline layer.}
 }
 \description{
-Returns list of paths to shapefiles for use in custom processing.
+Returns list of paths to all locally cached shapefiles for a specific dataset
+for use in custom processing.
+If \code{check_dl == TRUE}, all shapefiles for the specified dataset
+are downloaded to your local machine (skipping those that have been
+previously downloaded). This is a great way to pre-cache all
+shapefiles for a specific dataset. The files can be loaded into R and iterated
+over for custom mapping or processing of entire U.S. National or
+Global datasets.
 }

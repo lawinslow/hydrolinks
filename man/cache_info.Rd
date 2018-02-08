@@ -6,8 +6,12 @@
 \usage{
 cache_info()
 }
+\value{
+Returns a data.frame that has the columns \code{file, type, size.MB}.
+}
 \description{
-prints files stored at the current cache location and their size in megabytes.
+Returns info on all locally cached files stored at the current cache.
+By default, prints a summary of cache info including total size.
 }
 \examples{
 \dontshow{cache_set_dir(temppath=TRUE)}

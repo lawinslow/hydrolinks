@@ -2,5 +2,5 @@
 ^\.Rproj\.user$
 northAmProj.prj
 northAmProj.proj4string
-figures/
+figure/
 .travis.yml

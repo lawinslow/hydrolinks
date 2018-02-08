@@ -3,7 +3,6 @@
 cache_options = new.env()
 cache_options$usetemp = FALSE
 
-#nhd_proj = '+proj=longlat +datum=NAD83 +no_defs +ellps=GRS80 +towgs84=0,0,0'
 nhd_proj = '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs'
 
 nhd_projected_proj = "+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs"
