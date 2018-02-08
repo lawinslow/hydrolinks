@@ -82,8 +82,8 @@ format_flowtable = function(raw_tables, shape_directories, wbarea_column, from_c
       tables[[i]][which(tables[[i]][,to_column] %in% changes_to$id_column[j]), to_column] = changes_to$wbarea_column[j]
     }
   }
-  
-  flowtable = bind_rows(tables)
+  tables = lapply(tables, function(x){x = sapply(x, as.character)})
+  flowtable = do.call(rbind, tables)
   save(flowtable, file = paste0(output_name, "_complete.Rdata"))
   flowtable = flowtable[,c(from_column, to_column)]
   
@@ -92,6 +92,7 @@ format_flowtable = function(raw_tables, shape_directories, wbarea_column, from_c
   for(i in 1:length(shape_directories)){
     flowline = st_read(file.path(shape_directories[i], "NHDFlowline_projected.shp"))
     st_geometry(flowline) = NULL
+    colnames(flowline) = toupper(colnames(flowline))
     distances[[i]] = data.frame(flowline[,id_column], flowline$LENGTHKM)
   }
   
