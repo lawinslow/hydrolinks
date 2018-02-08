@@ -9,3 +9,8 @@ cache_info()
 \description{
 prints files stored at the current cache location and their size in megabytes.
 }
+\examples{
+\dontshow{cache_set_dir(temppath=TRUE)}
+cache_info()
+
+}

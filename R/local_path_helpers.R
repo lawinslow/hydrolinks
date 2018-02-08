@@ -10,24 +10,41 @@
 #'
 #' @examples
 #' #see where cached files are being stored
+#'
+#' \dontshow{cache_set_dir(temppath=TRUE)}
+#'
 #' print(cache_get_dir())
 #'
 #'
 #' @export
 
 cache_get_dir = function(){
+
   path = ""
-  pathFile = file.path(rappdirs::user_data_dir(appname = 'hydrolinks'), "path")
-  if(!file.exists(pathFile)){
-    path = rappdirs::user_data_dir(appname = 'hydrolinks')
+  #if we are using temp directory, then get out early
+  # this is for CRAN so we don't create user path directories
+  if(cache_options$usetemp){
+
+    path = file.path(tempdir(), 'hydrolinks_cache')
+  }else{
+
+    #If we aren't using a temp directory, us rappdirs or custom path
+    pathFile = file.path(rappdirs::user_data_dir(appname = 'hydrolinks'), "path")
+    if(!file.exists(pathFile)){
+      path = rappdirs::user_data_dir(appname = 'hydrolinks')
+    }
+    else{
+      path = readChar(pathFile, file.info(pathFile)$size)
+      path = gsub("[\r\n]", "", path)
+    }
+
   }
-  else{
-    path = readChar(pathFile, file.info(pathFile)$size)
-    path = gsub("[\r\n]", "", path)
-  }
+
+  #create the cache directory if it doesn't exist
   if(!dir.exists(path)){
     dir.create(path, recursive = TRUE)
   }
+
   return(path)
 }
 
@@ -41,8 +58,14 @@ cache_get_dir = function(){
 #' \code{\link[rappdirs]{user_data_dir}} for details.
 #'
 #' @param path
-#' character path to new local files path. If null, path will be
+#' Character path to new local files path. If null, path will be
 #' reset to default user data directory location.
+#' @param temppath
+#' Boolean flag indicating if the default R temp directory should
+#' be used instead of a custom or user-workspace area. Warning:
+#' This setting will not persist between R sessions and the
+#' temp directory is cleared when R is closed. Using temp will result
+#' in frequent file downloads and extremely slow performance
 #'
 #' @seealso \code{\link{cache_get_dir}}
 #'
@@ -50,25 +73,33 @@ cache_get_dir = function(){
 #' \dontrun{
 #'   #set a different cache path
 #'   set_cache_path('z:/big_datasets/hydrolinks')
-#'
 #' }
 #'
 #' @export
-cache_set_dir = function(path = NULL){
-  app_dir = rappdirs::user_data_dir(appname = 'hydrolinks')
-  if(!dir.exists(app_dir)){
-    dir.create(app_dir, recursive = TRUE)
-  }
-  if(!is.null(path)){
-    if(!dir.exists(path)){
-      dir.create(path, recursive = TRUE)
+cache_set_dir = function(path = NULL, temppath=FALSE){
+
+  #two paths here.
+  # 1.Tempfile path (do nothing other than set cache_options)
+  # 2.!temp path, then rappdirs or custom cache directory (Do a bunch of stuff)
+
+  cache_options$usetemp = temppath
+
+  if(!temppath){
+    app_dir = rappdirs::user_data_dir(appname = 'hydrolinks')
+    if(!dir.exists(app_dir)){
+      dir.create(app_dir, recursive = TRUE)
     }
-    write(path, file = file.path(rappdirs::user_data_dir(appname = 'hydrolinks'), "path"))
-  }
-  else{
-    pathFile = file.path(rappdirs::user_data_dir(appname = 'hydrolinks'), "path")
-    if(file.exists(pathFile)){
-      file.remove(pathFile)
+    if(!is.null(path)){
+      if(!dir.exists(path)){
+        dir.create(path, recursive = TRUE)
+      }
+      write(path, file = file.path(rappdirs::user_data_dir(appname = 'hydrolinks'), "path"))
+    }
+    else{
+      pathFile = file.path(rappdirs::user_data_dir(appname = 'hydrolinks'), "path")
+      if(file.exists(pathFile)){
+        file.remove(pathFile)
+      }
     }
   }
 }
@@ -87,7 +118,11 @@ cache_clear = function(){
 #' @title Get local file cache info
 #'
 #' @description prints files stored at the current cache location and their size in megabytes.
-#' 
+#'
+#' @examples
+#' \dontshow{cache_set_dir(temppath=TRUE)}
+#' cache_info()
+#'
 #' @export
 cache_info = function(){
   cat("<hydrolinks cached files>", sep = "\n")

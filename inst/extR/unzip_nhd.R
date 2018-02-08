@@ -85,7 +85,10 @@ build_id_table(bbdf, "Shape/NHDWaterbody_projected.shp", file.path(id_table_outp
 #build flowtable
 raw_tables = Sys.glob(file.path(nhdh_path, 'Shape_unzip', '*', 'Shape', 'NHDFlow.dbf'))
 shape_directories = Sys.glob(file.path(nhdh_path, 'Shape_unzip', '*', 'Shape'))
-format_flowtable(raw_tables, shape_directories, "WBAREA_PER", "FROM_PERMA", "TO_PERMANE", "PERMANENT_", "flowtable_nhdh")
+format_flowtable(raw_tables, shape_directories, "WBAREA_PER", "FROM_PERMA", "TO_PERMANE", "PERMANENT_", file.path(id_table_output_path, "flowtable_nhdh"))
+
+zip(file.path(id_table_output_path, "flowtable_nhdh.zip"), files = file.path(id_table_output_path, "flowtable_nhdh.sqlite3"))
+flowtable_upload = gen_upload_file(file.path(id_table_output_path, "flowtable_nhdh.zip"), "hydrolinks/0.7")
 
 processed_shapes = gen_upload_file(output_zip, "hydrolinks/0.7/nhdh")
 write.csv(processed_shapes, "inst/extdata/nhdh.csv")

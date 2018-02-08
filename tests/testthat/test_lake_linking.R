@@ -18,7 +18,6 @@ test_that("Test non-buffer, buffer, and centroid lake linking", {
 test_that("test PIP linking across different datasets", {
 
   skip_on_cran()
-  skip_on_travis()
 
   expect_equal(nrow(link_to_waterbodies(43.108728, -89.418293, 'id1', dataset = 'nhdh')), 1)
   expect_equal(nrow(link_to_waterbodies(43.108728, -89.418293, 'id1', dataset = 'hydrolakes')), 1)
