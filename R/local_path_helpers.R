@@ -168,3 +168,4 @@ print.hydrolinks_cache_info <- function(x, ...) {
       cat("\n")
     }
   }
+}
