@@ -15,3 +15,10 @@
 * Added initial WQP linking example Vignette
 * Silenced the loading of spatial data in the linking procedures
 
+# hydrolinks v0.7.1
+* Improvements in response to Environmental Modeling and Software
+* New and improved vignettes to highlight functionality
+* Exposed several new functions to improve caching 
+* Added cache handling functions to enable better cache transparency
+* Many other minor bugfixes and improvements
+

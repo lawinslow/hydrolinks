@@ -14,6 +14,9 @@ or large secondary hard drive may be used.
 }
 \examples{
 #see where cached files are being stored
+
+\dontshow{cache_set_dir(temppath=TRUE)}
+
 print(cache_get_dir())
 
 

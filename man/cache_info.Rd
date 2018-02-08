@@ -13,3 +13,8 @@ Returns a data.frame that has the columns \code{file, type, size.MB}.
 Returns info on all locally cached files stored at the current cache.
 By default, prints a summary of cache info including total size.
 }
+\examples{
+\dontshow{cache_set_dir(temppath=TRUE)}
+cache_info()
+
+}
