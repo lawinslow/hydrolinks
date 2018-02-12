@@ -31,37 +31,39 @@ link_to_waterbodies = function(lats, lons, ids, dataset = c("nhdh", "hydrolakes"
   bbdf = NULL #to prevent warnings
   load(file=dinfo$bb_cache_path) #will bring in a var named bbdf
 
-
+  #Convert lat/lons to a proper sf spatial object
   sites = data.frame(lats, lons, ids)
   sites = sites[complete.cases(sites),]
   pts = st_as_sf(sites, coords = c("lons", "lats"), crs = nhd_proj)
   pts = st_transform(pts, st_crs(nhd_projected_proj))
   st_crs(bbdf) = nhd_projected_proj
 
+  #For all points, find overlapping dataset subsets.
   res   = list()
-
   for(i in 1:nrow(pts)){
     res = c(res, bbdf[unlist(st_intersects(pts[i,], bbdf)),"file", drop=TRUE])
     #res[[i]] = subset(bbdf, xmin <= pts$geom[[i]][1] & xmax >= pts$geom[[i]][1] & ymin <= pts$geom[[i]][2] & ymax >= pts$geom[[i]][2])
   }
 
+
   to_check = as.data.frame(unique(do.call(rbind, res)), stringsAsFactors = FALSE)
-  colnames(to_check)[1] = "file"
-
-  match_res = list()
-
+  ## If we have no files to check, geopoints must be *way* outside mapped territory for this dataset
+  #empty data frame indicates no match (throw in warning to try and be helpful)
   if(nrow(to_check) == 0){
+    warning('hydrolinks::Supplied geopoints do not overlap ', dataset, ' dataset')
     ret = data.frame(MATCH_ID = rep(NA, 0))
     ret[,dinfo$id_column] = rep(NA, 0)
     return(ret)
   }
 
+  # start the big matching loop
+  colnames(to_check)[1] = "file"
+  match_res = list()
   for(i in 1:nrow(to_check)){
     #get waterbody layer
     check_dl_file(dinfo$file_index_path, to_check[i, 'file'])
 
-    shape         = st_read(file.path(cache_get_dir(), "unzip", to_check[i,'file'], dinfo$shapefile_name), stringsAsFactors=FALSE)
-    #st_crs(shape) = nhd_projected_proj
+    shape = st_read(file.path(cache_get_dir(), "unzip", to_check[i,'file'], dinfo$shapefile_name), stringsAsFactors=FALSE, quiet=TRUE)
     shape = st_transform(shape, nhd_projected_proj)
 
     if(tolower(dataset) == 'nhdh'){
@@ -87,12 +89,10 @@ link_to_waterbodies = function(lats, lons, ids, dataset = c("nhdh", "hydrolakes"
         matches[matches_multiple][[j]] = which.min(distance[1,])
       }
     }
-    matches[lengths(matches) == 0] = NA
     shape_matched = shape[unlist(matches),]
-    shape_matched$MATCH_ID = sites$ids
-    #shape_matched = shape_matched[,,drop = TRUE]
-    shape_matched$geometry = NULL
-    match_res[[i]] = as.data.frame(shape_matched)
+    shape_matched$MATCH_ID = pts[which(lengths(matches) > 0),]$ids
+    st_geometry(shape_matched) = NULL
+    match_res[[i]] = as.data.frame(shape_matched, stringsAsFactors = FALSE)
   }
 
   unique_matches = unique(bind_rows(match_res))

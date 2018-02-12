@@ -17,7 +17,6 @@
 #'
 #'
 #' @export
-
 cache_get_dir = function(){
 
   path = ""
@@ -117,28 +116,56 @@ cache_clear = function(){
 
 #' @title Get local file cache info
 #'
-#' @description prints files stored at the current cache location and their size in megabytes.
+#' @description
+#' Returns info on all locally cached files stored at the current cache.
+#' By default, prints a summary of cache info including total size.
 #'
+#' @return Returns a data.frame that has the columns \code{file, type, size.MB}.
 #' @examples
 #' \dontshow{cache_set_dir(temppath=TRUE)}
 #' cache_info()
 #'
 #' @export
 cache_info = function(){
-  cat("<hydrolinks cached files>", sep = "\n")
-  cat(sprintf("  directory: %s\n", cache_get_dir()), sep = "\n")
-  x = list.files(cache_get_dir())
-  for (i in seq_along(x)) {
-    info = file.info(file.path(cache_get_dir(), x[i]))
-    if(!info$isdir){
-      cat(paste0("  file: ", sub(cache_get_dir(), "", basename(x[i]))), sep = "\n")
-      size = file.info(file.path(cache_get_dir(), x[i]))$size / 1024 / 1024
+  #cat("<hydrolinks cached files>", sep = "\n")
+  #cat(sprintf("  directory: %s\n", cache_get_dir()), sep = "\n")
+
+  x = list.files(cache_get_dir(), recursive = TRUE, full.names = TRUE)
+
+  if(length(x) == 0){
+    return(structure(data.frame(), class=c('hydrolinks_cache_info', 'data.frame')))
+
+  }else{
+    return(structure(do.call(rbind.data.frame, lapply(x, file_info_)),
+                     class=c('hydrolinks_cache_info', 'data.frame')))
+  }
+}
+
+
+file_info_ <- function(x) {
+  fs <- file.size(x)
+  list(file = x,
+       type = tools::file_ext(x),
+       `size MB` = if (!is.na(fs)) round(fs/10e6,3) else NA
+  )
+}
+
+
+#' @export
+print.hydrolinks_cache_info <- function(x, ...) {
+  cat("<landsat cached files>\n", sep = "")
+  cat(sprintf(" directory: %s\n", cache_get_dir()), sep = "")
+
+  if(nrow(x) < 1){
+    cat(sprintf("  total size: %g MB\n", 0), sep = "")
+    cat(sprintf("  number of files:%g\n", 0), sep = "")
+  }else{
+    cat(sprintf("  total size: %g MB\n", sum(sum(x$size.MB), na.rm=TRUE)), sep = "")
+    cat(sprintf("  number of files:%g\n", nrow(x)), sep = "")
+    for (i in 1:min(nrow(x),10)) {
+      cat(paste0("    size: ", x$size.MB[i], " mb"), sep = "")
+      cat(paste0("    file: ", sub(cache_get_dir(), "", x$file[i])), sep = "")
+      cat("\n")
     }
-    else{
-      cat(paste0("  directory: ", sub(cache_get_dir(), "", basename(x[i]))), sep = "\n")
-      size = sum(file.info(list.files(file.path(cache_get_dir(), x[i]), all.files = TRUE, recursive = TRUE, full.names = TRUE))$size) / 1024 / 1024
-    }
-    cat(paste0("  size: ", size, " mb"), sep = "\n")
-    cat("\n")
   }
 }

@@ -6,7 +6,7 @@
 #' @param lons Vector of point longitudes
 #' @param ids Vector of point identifiers (string or numeric)
 #' @param dataset Character name of dataset to link against. Can be either "nhd" or "hydrolakes"
-#' @param max_dist maximum distance between points and centroids to match
+#' @param buffer maximum distance between points and centroids to match
 #'
 #'
 #' @return Water body permanent IDs
@@ -22,7 +22,7 @@
 #' }
 #'
 #' @export
-link_waterbody_centroids = function(lats, lons, ids, dataset = c("nhdh", "nhdplusv2", "hydrolakes"), max_dist = 25){
+link_waterbody_centroids = function(lats, lons, ids, dataset = c("nhdh", "nhdplusv2", "hydrolakes"), buffer = 25){
   dataset = match.arg(dataset)
 
   dinfo = dataset_info(dataset, 'waterbody')
@@ -43,32 +43,35 @@ link_waterbody_centroids = function(lats, lons, ids, dataset = c("nhdh", "nhdplu
   pts = st_sf(MATCH_ID = ids[not_na, drop = FALSE], geom = st_sfc(pts), row.names = c(1:nrow(sites)), crs = nhd_proj)
   pts = st_transform(pts, st_crs(nhd_projected_proj))
   st_crs(bbdf) = nhd_projected_proj
-  
+
   res   = list()
-  
+
   xmin = xmax = ymin = ymax = NULL
   for(i in 1:nrow(pts)){
     res = c(res, bbdf[unlist(st_intersects(pts[i,], bbdf)),"file", drop=TRUE])
     #res[[i]] = subset(bbdf, xmin <= pts$geom[[i]][1] & xmax >= pts$geom[[i]][1] & ymin <= pts$geom[[i]][2] & ymax >= pts$geom[[i]][2])
   }
-  
+
   to_check = as.data.frame(unique(do.call(rbind, res)), stringsAsFactors = FALSE)
-  colnames(to_check)[1] = "file"
 
-  match_res = list()
-
+  ## If we have no files to check, geopoints must be *way* outside mapped territory for this dataset
+  #empty data frame indicates no match (throw in warning to try and be helpful)
   if(nrow(to_check) == 0){
+    warning('hydrolinks::Supplied geopoints do not overlap ', dataset, ' dataset')
     ret = data.frame(MATCH_ID = rep(NA, 0))
     ret[,dinfo$id_column] = rep(NA, 0)
     return(ret)
   }
 
+  # start the big matching loop
+  colnames(to_check)[1] = "file"
+  match_res = list()
 
   for(i in 1:nrow(to_check)){
     #get waterbody layer
     check_dl_file(dinfo$file_index_path, to_check[i, 'file'])
 
-    nhd       = st_read(file.path(cache_get_dir(), "unzip", to_check[i,'file'], dinfo$shapefile_name), stringsAsFactors=FALSE)
+    nhd = st_read(file.path(cache_get_dir(), "unzip", to_check[i,'file'], dinfo$shapefile_name), stringsAsFactors=FALSE, quiet=TRUE)
 
     centroids = list()
     for(j in 1:nrow(nhd)){
@@ -78,9 +81,12 @@ link_waterbody_centroids = function(lats, lons, ids, dataset = c("nhdh", "nhdplu
     nhd_data = nhd[,,drop=TRUE]
     nhd_data$geometry = NULL
     centroids = st_sf(nhd_data, geometry = st_sfc(centroids), crs = nhd_projected_proj)
-    centroids_buffer = st_buffer(centroids, max_dist)
+    centroids_buffer = st_buffer(centroids, buffer)
     matches = st_intersects(pts, centroids_buffer)
-    if(length(unlist(matches)) == 0){
+
+    #ok, deal with this sparse predicate structure
+    # if nothing matches at all
+    if(sum(sapply(matches, length) > 0) == 0){
       next
     }
     matches_multiple = which(lengths(matches) > 1)
@@ -91,12 +97,11 @@ link_waterbody_centroids = function(lats, lons, ids, dataset = c("nhdh", "nhdplu
         matches[matches_multiple][[j]] = which.min(distance[1,])
       }
     }
-    matches[lengths(matches) == 0] = NA
+
+    #carefully peel apart the matches and put the IDs where they need to go
     nhd_matched = centroids[unlist(matches),]
-    nhd_matched$MATCH_ID = sites$ids
-    nhd_matched = nhd_matched[,,drop = TRUE]
-    nhd_matched$geometry = NULL
-    #names(nhd_matched) = toupper(names(nhd_matched))
+    nhd_matched$MATCH_ID = pts[which(lengths(matches) > 0),]$MATCH_ID
+    st_geometry(nhd_matched) = NULL
     match_res[[i]] = data.frame(nhd_matched, stringsAsFactors = FALSE)
   }
 
