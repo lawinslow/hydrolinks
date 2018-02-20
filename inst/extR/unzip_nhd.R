@@ -4,7 +4,7 @@ library(parallel)
 source("inst/extR/general_functions.R")
 source("R/AAA.R")
 
-nhdh_path = "E:/nhdh/Shape"
+nhdh_path = "E:/nhdh/Shape/"
 
 zipfiles = Sys.glob(file.path(nhdh_path, '*Shape.zip'))
 dest = file.path(nhdh_path, 'Shape_unzip')
@@ -36,7 +36,7 @@ lapply(zipfiles, unzip_flow)
 shapefiles_lakes = Sys.glob(file.path(nhdh_path,'Shape_unzip', '*', 'Shape', 'NHDWaterbody.shp'))
 shapefiles_streams = Sys.glob(file.path(nhdh_path, 'Shape_unzip', '*', 'Shape', 'NHDFlowline.shp'))
 
-c1 = makePSOCKcluster(rep('localhost', 8))
+c1 = makePSOCKcluster(rep('localhost', 4))
 parallel::clusterEvalQ(c1, {library(sf)})
 
 lake_args = data.frame(shape_path = shapefiles_lakes, layer = rep("NHDWaterbody_projected", length(shapefiles_lakes)),
@@ -56,7 +56,7 @@ bboxes_lakes = parApply(c1, lake_args, project_and_get_bb, MARGIN = 1)
 bboxes_streams = parApply(c1, stream_args, project_and_get_bb, MARGIN = 1)
 #bboxes_streams = parLapplyLB(c1, c(1:nrow(stream_args)), function(x){project_and_get_bb(stream_args[x,])})
 
-bbdf = do.call(rbind, bboxes_lakes)f
+bbdf = do.call(rbind, bboxes_lakes)
 save(bbdf, file = "inst/extdata/nhd_bb_cache_projected.Rdata")
 
 bbdf = do.call(rbind, bboxes_streams)
@@ -80,6 +80,7 @@ build_id_table(bbdf, "Shape/NHDFlowline_projected.shp", file.path(id_table_outpu
 
 setwd(working_directory)
 load("inst/extdata/nhd_bb_cache_projected.Rdata")
+setwd(dest)
 build_id_table(bbdf, "Shape/NHDWaterbody_projected.shp", file.path(id_table_output_path, "nhdh_waterbody_ids.sqlite3"), c("PERMANENT_", "GNIS_ID", "GNIS_NAME", "REACHCODE"))
 
 #build flowtable
@@ -90,5 +91,5 @@ format_flowtable(raw_tables, shape_directories, "WBAREA_PER", "FROM_PERMA", "TO_
 zip(file.path(id_table_output_path, "flowtable_nhdh.zip"), files = file.path(id_table_output_path, "flowtable_nhdh.sqlite3"))
 flowtable_upload = gen_upload_file(file.path(id_table_output_path, "flowtable_nhdh.zip"), "hydrolinks/0.7")
 
-processed_shapes = gen_upload_file(output_zip, "hydrolinks/0.7/nhdh")
+processed_shapes = gen_upload_file(output_zip, "hydrolinks/0.8/nhdh")
 write.csv(processed_shapes, "inst/extdata/nhdh.csv")

@@ -99,6 +99,7 @@ format_flowtable = function(raw_tables, shape_directories, wbarea_column, from_c
   
   distances = bind_rows(distances)
   colnames(distances) = c(from_column, "LENGTHKM")
+  distances[,from_column] = as.character(distances[,from_column])
   flowtable = merge(flowtable, distances, by = from_column)
   ids_db = src_sqlite(paste0(output_name, ".sqlite3"), create = TRUE)
   copy_to(ids_db, flowtable, overwrite = TRUE, temporary = FALSE, indexes = list(from_column, to_column))

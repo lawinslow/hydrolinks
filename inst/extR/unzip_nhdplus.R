@@ -4,7 +4,7 @@ library(dplyr)
 source("R/AAA.R")
 source("inst/extR/general_functions.R")
 
-nhd_path = "D:/NHDPlusV21/Data"
+nhd_path = "E:/NHDPlusV21/Data"
 
 regions = c("NE_01", "MA_02", "SA_03N", "SA_03S", "SA_03W", "GL_04", "MS_05", "MS_06", "MS_07", "MS_08",
             "MS_10L", "MS_10U", "MS_11", "SR_09", "TX_12", "RG_13", "CO_14", "CO_15", "GB_16", "PN_17", "CA_18",
@@ -95,5 +95,5 @@ format_flowtable(raw_tables, shape_directories, "WBAREACOMI", "FROMCOMID", "TOCO
 zip(file.path(id_table_output_path, "flowtable_nhdplusv2.zip"), files = file.path(id_table_output_path, "flowtable_nhdplusv2.sqlite3"))
 flowtable_upload = gen_upload_file(file.path(id_table_output_path, "flowtable_nhdplusv2.zip"), "hydrolinks/0.7")
 
-processed_shapes = gen_upload_file(output_zip, "hydrolinks/0.7/nhdplusv2")
+processed_shapes = gen_upload_file(output_zip, "hydrolinks/0.8/nhdplusv2")
 write.csv(processed_shapes, "inst/extdata/nhdplusv2.csv")
