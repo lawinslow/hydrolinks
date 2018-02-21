@@ -5,7 +5,8 @@
 \title{traverse_flowlines}
 \usage{
 traverse_flowlines(max_distance, start, direction = c("out", "in"),
-  dataset = c("nhdh", "nhdplusv2"), max_steps = 10000, db_path = NULL)
+  dataset = c("nhdh", "nhdplusv2"), max_steps = 10000, db_path = NULL,
+  ...)
 }
 \arguments{
 \item{max_distance}{maximum distance to traverse in km. If negative, traverse until the ocean (node 0) or max_steps is reached.}
@@ -19,6 +20,8 @@ traverse_flowlines(max_distance, start, direction = c("out", "in"),
 \item{max_steps}{maximum traversal steps before terminating}
 
 \item{db_path}{manually specify path to flowtable database. Useful for avoiding database locks when running traversals in parallel.}
+
+\item{...}{options passed on to check_dl_file}
 }
 \value{
 dataframe of nodes traversed, distance from the start node to each node, and the children of each node.

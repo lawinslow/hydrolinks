@@ -14,21 +14,18 @@
 #' @import utils
 #'
 #' @export
-check_dl_file = function(master_file, fname = NULL, md5check = TRUE, dest=cache_get_dir()){
+check_dl_file = function(master_file, fname = NULL, md5check = TRUE, 
+                         dest = cache_get_dir()){
   files = read.csv(master_file)
   if(!is.null(fname)){
     files = files[files$filename == fname,]
   }
   apply(files, 1, function(x){
     if(!file.exists(file.path(dest, x["filename"]))){
-      print(paste0("Downloading ", x["filename"]))
-      r = RETRY("GET", url=x["url"], write_disk(file.path(dest,x["filename"]), overwrite=TRUE), times = 2)
+      print(paste0("Downloading ", x["filename"], " from ", x["url"]))
+      r = RETRY("GET", url=x["url"], progress(), write_disk(file.path(dest,x["filename"]), overwrite=TRUE), times = 2)
       stop_for_status(r)
       if(!file.exists(file.path(dest, x["filename"]))){
-        stop("Data downloaded was incomplete or corrupted - please try again later or submit a bug report.")
-      }
-      if(md5sum(file.path(dest, x["filename"])) != x["md5"]){
-        file.remove(file.path(dest, x["filename"]))
         stop("Data downloaded was incomplete or corrupted - please try again later or submit a bug report.")
       }
       if(file_ext(x["filename"]) == "zip"){
@@ -40,8 +37,8 @@ check_dl_file = function(master_file, fname = NULL, md5check = TRUE, dest=cache_
   if(md5check){
     apply(files, 1, function(x){
       if(md5sum(file.path(dest, x["filename"])) != x["md5"]){
-        print(paste0("Redownloading ", x["filename"]))
-        r = RETRY("GET", url=x["url"], write_disk(file.path(dest, x["filename"]), overwrite=TRUE))
+        print(paste0("Redownloading ", x["filename"], " from ", x["url"]))
+        r = RETRY("GET", url=x["url"], progress(), write_disk(file.path(dest, x["filename"]), overwrite=TRUE))
         stop_for_status(r)
         if(!file.exists(file.path(dest, x["filename"]))){
           stop("Data downloaded was incomplete or corrupted - please try again later or submit a bug report.")
