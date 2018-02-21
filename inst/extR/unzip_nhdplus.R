@@ -90,7 +90,7 @@ for(i in 1:length(zipfiles)){
 #build flowtable
 raw_tables = file.path(dest, regions, "PlusFlow.dbf")
 shape_directories = file.path(dest, regions)
-format_flowtable(raw_tables, shape_directories, "WBAREACOMI", "FROMCOMID", "TOCOMID", "COMID", file.path(id_table_output_path, "flowtable_nhdplusv2.zip"))
+format_flowtable(raw_tables, shape_directories, "WBAREACOMI", "FROMCOMID", "TOCOMID", "COMID", file.path(id_table_output_path, "flowtable_nhdplusv2"))
 
 zip(file.path(id_table_output_path, "flowtable_nhdplusv2.zip"), files = file.path(id_table_output_path, "flowtable_nhdplusv2.sqlite3"))
 flowtable_upload = gen_upload_file(file.path(id_table_output_path, "flowtable_nhdplusv2.zip"), "hydrolinks/0.7")
