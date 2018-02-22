@@ -8,6 +8,7 @@
 #' @param dataset which network dataset to traverse. May be either NHD high-res or NHD Plus v2.
 #' @param max_steps maximum traversal steps before terminating
 #' @param db_path manually specify path to flowtable database. Useful for avoiding database locks when running traversals in parallel.
+#' @param ... options passed on to check_dl_file
 #'
 #' @import dplyr
 #'
@@ -20,15 +21,15 @@
 #' traverse_flowlines(1000, "141329377", "out", "nhdh")
 #' # this example traverses until a cycle is found and the end of the network is reached.
 #' }
-traverse_flowlines = function(max_distance, start, direction = c("out", "in"), dataset = c("nhdh", "nhdplusv2"), max_steps = 10000, db_path = NULL){
+traverse_flowlines = function(max_distance, start, direction = c("out", "in"), dataset = c("nhdh", "nhdplusv2"), max_steps = 10000, db_path = NULL, ...){
   direction = match.arg(direction)
   dataset = match.arg(dataset)
-  check_dl_file(system.file('extdata/shape_id_cache.csv', package='hydrolinks'), fname = paste0(dataset, "_flowline_ids.zip"))
+  check_dl_file(system.file('extdata/shape_id_cache.csv', package='hydrolinks'),
+                fname = paste0(dataset, "_flowline_ids.zip"), ...)
   if(is.null(db_path)){
     db_name = paste0("flowtable_", dataset)
     #db_name = "flowtable"
-    check_dl_file(system.file("extdata/flowtable.csv", package = "hydrolinks"), fname = paste0(db_name, ".zip"))
-
+    check_dl_file(system.file("extdata/flowtable.csv", package = "hydrolinks"), fname = paste0(db_name, ".zip"), ...)
     con = dbConnect(RSQLite::SQLite(), file.path(cache_get_dir(), 'unzip', paste0(db_name, ".zip"), paste0(db_name, ".sqlite3")))
   }
   else{
