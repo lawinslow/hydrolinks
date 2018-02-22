@@ -53,7 +53,7 @@ dataset_info = function(dataset, feature_type){
     else if(feature_type == "flowline"){
       bb_cache_path=system.file('extdata/nhdplus_flowline_bb_cache.rdata', package='hydrolinks')
     }
-    id_column = "COMID"
+    id_column = "ComID"
     flowtable_from_column = "FROMCOMID"
     flowtable_to_column = "TOCOMID"
   }

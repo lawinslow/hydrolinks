@@ -1,7 +1,7 @@
 #' @title traverse_flowlines
 #'
 #' @description traverse hydrological network
-#' 
+#'
 #' @param max_distance maximum distance to traverse in km. If negative, traverse until the ocean (node 0) or max_steps is reached.
 #' @param start character node to start
 #' @param direction character; either "out" or "in"
@@ -10,7 +10,7 @@
 #' @param db_path manually specify path to flowtable database. Useful for avoiding database locks when running traversals in parallel.
 #'
 #' @import dplyr
-#' 
+#'
 #' @return dataframe of nodes traversed, distance from the start node to each node, and the children of each node.
 #'
 #' @export
@@ -28,7 +28,7 @@ traverse_flowlines = function(max_distance, start, direction = c("out", "in"), d
     db_name = paste0("flowtable_", dataset)
     #db_name = "flowtable"
     check_dl_file(system.file("extdata/flowtable.csv", package = "hydrolinks"), fname = paste0(db_name, ".zip"))
-    
+
     con = dbConnect(RSQLite::SQLite(), file.path(cache_get_dir(), 'unzip', paste0(db_name, ".zip"), paste0(db_name, ".sqlite3")))
   }
   else{
@@ -43,7 +43,7 @@ traverse_flowlines = function(max_distance, start, direction = c("out", "in"), d
   iterations = 1
   n = neighbors(start, direction, dataset, con)
   if(nrow(n) == 0){
-    flowline = get_shape_by_id(start, feature_type = "flowline", dataset = "nhdh", match_column = "PERMANENT_")
+    flowline = get_shape_by_id(start, feature_type = "flowline", dataset = dataset)
     if(!is.na(flowline) && !is.na(flowline$WBAREA_PER)){
       warning(paste0("Start ID provided is a virtual flowline inside a waterbody. Continuing from ", flowline$WBAREA_PER))
       n = neighbors(flowline$WBAREA_PER, direction, dataset, con)
@@ -65,24 +65,24 @@ traverse_flowlines = function(max_distance, start, direction = c("out", "in"), d
   }
   while(1){
     next_check = c()
-    
+
     to_check = to_check[names(to_check) != "0"]
-    
+
     to_check = to_check[which(!(names(to_check) %in% nodes[,1]))]
-    
+
     if(length(to_check) == 0){
       nodes = nodes[!is.na(nodes$PERMANENT_),]
       dbDisconnect(con)
       return(nodes)
     }
-    
+
     if(length(names(to_check)) > 1){
       nodes[c(iterations:(iterations+length(names(to_check)) - 1)), ] = cbind(names(to_check), to_check, NA)
     }
     else{
       nodes[iterations, ] = cbind(names(to_check), to_check, NA)
     }
-    
+
     iterations = iterations + length(to_check)
     for(j in 1:length(to_check)){
       n = neighbors(names(to_check)[j], direction, dataset, con)
@@ -93,8 +93,8 @@ traverse_flowlines = function(max_distance, start, direction = c("out", "in"), d
       next_check = c(next_check, next_check_tmp)
     }
     next_check = next_check[unique(names(next_check))]
-    
-    
+
+
     if(iterations > max_steps){
       next_nodes = data.frame(names(next_check), next_check, "STUCK")
       colnames(next_nodes) = c("PERMANENT_", "LENGTHKM", "CHILDREN")
@@ -103,22 +103,22 @@ traverse_flowlines = function(max_distance, start, direction = c("out", "in"), d
       dbDisconnect(con)
       return(nodes)
     }
-    
+
     # if max_distance is less than zero, continue traversing until an end is reached
     if(max_distance < 0 && any(names(next_check) == '0')){
       nodes = nodes[!is.na(nodes$PERMANENT_),]
       dbDisconnect(con)
       return(nodes)
     }
-    
+
     #We need a stop condition where all further neighbors go nowhere
     if(all(names(next_check) == '0')){
       nodes = nodes[!is.na(nodes$PERMANENT_),]
       dbDisconnect(con)
       return(nodes)
     }
-    
-    
+
+
     for(j in names(next_check)){
       if(max_distance > 0 && next_check[j] > max_distance){
         nodes = nodes[!is.na(nodes$PERMANENT_),]
@@ -133,15 +133,15 @@ traverse_flowlines = function(max_distance, start, direction = c("out", "in"), d
 neighbors = function(node, direction = c("in", "out"), dataset = c("nhdh", "nhdplusv2"), con){
   From_Permanent_Identifier = NULL
   To_Permanent_Identifier = NULL
-  
+
   direction = match.arg(direction)
   dataset = match.arg(dataset)
   dinfo = dataset_info(dataset, "flowline")
   from_column = dinfo$flowtable_from_column
   to_column = dinfo$flowtable_to_column
-  
+
   sql = ""
-  
+
   if(direction == "out"){
     sql = paste0("SELECT * from flowtable where ", from_column, " IN ('", paste(node, collapse = "','"), "')")
   }
