@@ -1,3 +1,3 @@
-filename,url,md5
-flowtable_nhdh.zip,http://cdn.bathybase.org/hydrolinks/0.7/flowtable_nhdh.zip,049d0a63ba379b7ba73dd01fbd5d7952
-flowtable_nhdplusv2.zip,http://cdn.bathybase.org/hydrolinks/0.7/flowtable_nhdplusv2.zip,85be00aca829246d3403f7a2740fecdc
+"filename","url","md5"
+"flowtable_nhdh.sqlite3","http://cdn.bathybase.org/hydrolinks/0.8/flowtable_nhdh.sqlite3","d2e0856df63b9e741f1664a25ecf6fbf"
+"flowtable_nhdplusv2.sqlite3","http://cdn.bathybase.org/hydrolinks/0.8/flowtable_nhdplusv2.sqlite3","c51a41d6ec61676670ea89be903a7da7"

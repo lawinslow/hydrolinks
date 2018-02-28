@@ -20,3 +20,6 @@ shape_id_zips = sapply(shape_id_caches, function(x){
 source("inst/extR/general_functions.R")
 id_cache_dl = gen_upload_file(shape_id_zips, "hydrolinks/0.8/shape_id_cache")
 write.csv(id_cache_dl, file = "inst/extdata/shape_id_cache.csv", row.names=FALSE)
+flowtables = Sys.glob(file.path(id_table_output_path, "flowtable_*.sqlite3"))
+flowtable_dl = gen_upload_file(flowtables, "hydrolinks/0.8")
+write.csv(flowtable_dl, file = "inst/extdata/flowtable.csv", row.names = FALSE)

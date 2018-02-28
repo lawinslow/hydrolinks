@@ -105,7 +105,7 @@ format_flowtable = function(raw_tables, shape_directories, wbarea_column, from_c
   colnames(distances) = c(from_column, "LENGTHKM")
   distances[,from_column] = as.character(distances[,from_column])
   flowtable = merge(flowtable, distances, by = from_column, all.x = TRUE)
-  flowtable = flowtable[-which(flowtable$FROMCOMID == flowtable$TOCOMID), ] # remove links to self
+  flowtable = flowtable[-which(flowtable[,from_column] == flowtable[, to_column]), ] # remove links to self
   ids_db = src_sqlite(paste0(output_name, ".sqlite3"), create = TRUE)
   copy_to(ids_db, flowtable, overwrite = TRUE, temporary = FALSE, indexes = list(from_column, to_column))
   
