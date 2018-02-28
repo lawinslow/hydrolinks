@@ -123,7 +123,7 @@ gen_upload_file = function(files, remote_path){
   # }
   urls = file.path("http://cdn.bathybase.org", remote_path, basename(files))
   #files = basename(files)
-  result = data.frame(filename = tolower(basename(files)), url = urls, md5 = hash)
+  result = data.frame(filename = basename(files), url = urls, md5 = hash)
   rownames(result) = c(1:nrow(result))
   return(result)
 }

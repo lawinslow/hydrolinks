@@ -91,4 +91,4 @@ format_flowtable(raw_tables, shape_directories, "WBAREA_PER", "FROM_PERMA", "TO_
 zip(file.path(id_table_output_path, "flowtable_nhdh.zip"), files = file.path(id_table_output_path, "flowtable_nhdh.sqlite3"))
 
 processed_shapes = gen_upload_file(output_zip, "hydrolinks/0.8/nhdh")
-write.csv(processed_shapes, "inst/extdata/nhdh.csv")
+write.csv(processed_shapes, "inst/extdata/nhdh.csv", row.names = FALSE)
