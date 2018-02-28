@@ -67,24 +67,28 @@ format_flowtable = function(raw_tables, shape_directories, wbarea_column, from_c
   tables = list()
   
   for(i in 1:length(raw_tables)){
-    tables[[i]] = read.dbf(raw_tables[i], as.is = TRUE)
+    table = read.dbf(raw_tables[i], as.is = TRUE)
     
-    colnames(tables[[i]]) = toupper(colnames(tables[[i]]))
+    colnames(table) = toupper(colnames(table))
     
-    changes_from = changes[[i]][changes[[i]][,"id_column"] %in% tables[[i]][,from_column], ]
-    changes_to = changes[[i]][changes[[i]][,"id_column"] %in% tables[[i]][,to_column], ]
+    #changes_from = changes[[i]][changes[[i]][,"id_column"] %in% tables[[i]][,from_column], ]
+    #changes_to = changes[[i]][changes[[i]][,"id_column"] %in% tables[[i]][,to_column], ]
+    change = changes[[i]]
     
-    if(nrow(changes_from) == 0){
-      next
-    }
+    table = merge(table, change, by.x = from_column, by.y = "id_column", all.x = TRUE)
+    table[!is.na(table$wbarea_column), from_column] = table$wbarea_column[!is.na(table$wbarea_column)]
+    table$wbarea_column = NULL
     
-    for(j in 1:nrow(changes_from)){
-      tables[[i]][which(tables[[i]][,from_column] %in% changes_from$id_column[j]), from_column] = changes_from$wbarea_column[j]
-      tables[[i]][which(tables[[i]][,to_column] %in% changes_to$id_column[j]), to_column] = changes_to$wbarea_column[j]
-    }
+    table = merge(table, change, by.x = to_column, by.y = "id_column", all.x = TRUE)
+    table[!is.na(table$wbarea_column), to_column] = table$wbarea_column[!is.na(table$wbarea_column)]
+    table$wbarea_column = NULL
+    
+    tables[[i]] = table
+    
   }
-  tables = lapply(tables, function(x){x = sapply(x, as.character)})
+  #tables = lapply(tables, function(x){x = sapply(x, as.character)})
   flowtable = do.call(rbind, tables)
+  flowtable = as.data.frame(flowtable)
   save(flowtable, file = paste0(output_name, "_complete.Rdata"))
   flowtable = flowtable[,c(from_column, to_column)]
   
@@ -100,7 +104,8 @@ format_flowtable = function(raw_tables, shape_directories, wbarea_column, from_c
   distances = bind_rows(distances)
   colnames(distances) = c(from_column, "LENGTHKM")
   distances[,from_column] = as.character(distances[,from_column])
-  flowtable = merge(flowtable, distances, by = from_column)
+  flowtable = merge(flowtable, distances, by = from_column, all.x = TRUE)
+  flowtable = flowtable[-which(flowtable$FROMCOMID == flowtable$TOCOMID), ] # remove links to self
   ids_db = src_sqlite(paste0(output_name, ".sqlite3"), create = TRUE)
   copy_to(ids_db, flowtable, overwrite = TRUE, temporary = FALSE, indexes = list(from_column, to_column))
   
@@ -118,7 +123,7 @@ gen_upload_file = function(files, remote_path){
   # }
   urls = file.path("http://cdn.bathybase.org", remote_path, basename(files))
   #files = basename(files)
-  result = data.frame(filename = basename(files), url = urls, md5 = hash)
+  result = data.frame(filename = tolower(basename(files)), url = urls, md5 = hash)
   rownames(result) = c(1:nrow(result))
   return(result)
 }

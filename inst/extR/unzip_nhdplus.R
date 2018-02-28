@@ -12,7 +12,7 @@ regions = c("NE_01", "MA_02", "SA_03N", "SA_03S", "SA_03W", "GL_04", "MS_05", "M
 dir_names = paste0("NHDPlus", substr(regions, 1, 2))
 
 dest = file.path(nhd_path, "unzip")
-id_table_output_path = "D:/hydrolinks_tables"
+id_table_output_path = "E:/hydrolinks_tables"
 
 zipfiles = c()
 

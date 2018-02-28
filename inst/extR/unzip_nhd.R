@@ -9,7 +9,7 @@ nhdh_path = "E:/nhdh/Shape/"
 zipfiles = Sys.glob(file.path(nhdh_path, '*Shape.zip'))
 dest = file.path(nhdh_path, 'Shape_unzip')
 
-id_table_output_path = "D:/hydrolinks_tables"
+id_table_output_path = "E:/hydrolinks_tables"
 
 # unzip shapefiles
 
