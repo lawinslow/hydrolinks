@@ -2,10 +2,10 @@ library(sf)
 source("R/AAA.R")
 source("inst/extR/general_functions.R")
 
-hydrolakes_path = "D:/hydrolakes/HydroLAKES_polys_v10_shp"
+hydrolakes_path = "E:/hydrolakes/HydroLAKES_polys_v10_shp"
 #hydrolakes_path = "B:/big_data/HydroLAKES_polys_v10_shp"
 
-id_table_output_path = "D:/hydrolinks_tables"
+id_table_output_path = "E:/hydrolinks_tables"
 #id_table_output_path = "B:/big_data/hydrolinks_tables"
 
 hydrolakes = st_read(file.path(hydrolakes_path, "HydroLAKES_polys_v10.shp"))
