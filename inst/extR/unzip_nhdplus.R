@@ -92,7 +92,7 @@ raw_tables = file.path(dest, regions, "PlusFlow.dbf")
 shape_directories = file.path(dest, regions)
 format_flowtable(raw_tables, shape_directories, "WBAREACOMI", "FROMCOMID", "TOCOMID", "COMID", file.path(id_table_output_path, "flowtable_nhdplusv2"))
 
-zip(file.path(id_table_output_path, "flowtable_nhdplusv2.zip"), files = file.path(id_table_output_path, "flowtable_nhdplusv2.sqlite3"))
+zip(file.path(id_table_output_path, "flowtable_nhdplusv2.zip"), files = file.path(id_table_output_path, "flowtable_nhdplusv2.sqlite3"), flags = "-j")
 
 processed_shapes = gen_upload_file(output_zip, "hydrolinks/0.8/nhdplusv2")
 write.csv(processed_shapes, "inst/extdata/nhdplusv2.csv")
