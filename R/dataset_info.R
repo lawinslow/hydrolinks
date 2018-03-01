@@ -39,8 +39,8 @@ dataset_info = function(dataset, feature_type){
       bb_cache_path = system.file('extdata/nhd_bb_streams_cache.Rdata', package='hydrolinks')
     }
     id_column = "PERMANENT_"
-    flowtable_from_column = "From_Permanent_Identifier"
-    flowtable_to_column = "To_Permanent_Identifier"
+    flowtable_from_column = "FROM_PERMA"
+    flowtable_to_column = "TO_PERMANE"
   }
   else if(tolower(dataset) == "hydrolakes"){
     bb_cache_path = system.file('extdata/hydrolakes_bb_cache.Rdata', package='hydrolinks')
