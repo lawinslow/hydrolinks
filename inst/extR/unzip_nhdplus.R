@@ -4,7 +4,7 @@ library(dplyr)
 source("R/AAA.R")
 source("inst/extR/general_functions.R")
 
-nhd_path = "D:/NHDPlusV21/Data"
+nhd_path = "E:/NHDPlusV21/Data"
 
 regions = c("NE_01", "MA_02", "SA_03N", "SA_03S", "SA_03W", "GL_04", "MS_05", "MS_06", "MS_07", "MS_08",
             "MS_10L", "MS_10U", "MS_11", "SR_09", "TX_12", "RG_13", "CO_14", "CO_15", "GB_16", "PN_17", "CA_18",
@@ -12,7 +12,7 @@ regions = c("NE_01", "MA_02", "SA_03N", "SA_03S", "SA_03W", "GL_04", "MS_05", "M
 dir_names = paste0("NHDPlus", substr(regions, 1, 2))
 
 dest = file.path(nhd_path, "unzip")
-id_table_output_path = "D:/hydrolinks_tables"
+id_table_output_path = "E:/hydrolinks_tables"
 
 zipfiles = c()
 
@@ -90,7 +90,9 @@ for(i in 1:length(zipfiles)){
 #build flowtable
 raw_tables = file.path(dest, regions, "PlusFlow.dbf")
 shape_directories = file.path(dest, regions)
-format_flowtable(raw_tables, shape_directories, "WBAREACOMI", "FROMCOMID", "TOCOMID", "COMID", "flowtable_nhdplusv2")
+format_flowtable(raw_tables, shape_directories, "WBAREACOMI", "FROMCOMID", "TOCOMID", "COMID", file.path(id_table_output_path, "flowtable_nhdplusv2"))
 
-processed_shapes = gen_upload_file(output_zip, "hydrolinks/0.7/nhdplusv2")
+zip(file.path(id_table_output_path, "flowtable_nhdplusv2.zip"), files = file.path(id_table_output_path, "flowtable_nhdplusv2.sqlite3"), flags = "-j")
+
+processed_shapes = gen_upload_file(output_zip, "hydrolinks/0.8/nhdplusv2")
 write.csv(processed_shapes, "inst/extdata/nhdplusv2.csv")

@@ -9,7 +9,7 @@ rm(list=ls())
 source("inst/extR/slice_hydrolakes.R")
 rm(list=ls())
 
-id_table_output_path = "D:/hydrolinks_tables"
+id_table_output_path = "E:/hydrolinks_tables"
 shape_id_caches = Sys.glob(file.path(id_table_output_path, "*_ids.sqlite3"))
 shape_id_zips = sapply(shape_id_caches, function(x){
   outzip = paste0(tools::file_path_sans_ext(x), '.zip')
@@ -18,5 +18,8 @@ shape_id_zips = sapply(shape_id_caches, function(x){
   })
 
 source("inst/extR/general_functions.R")
-id_cache_dl = gen_upload_file(shape_id_zips, "hydrolinks/0.7/shape_id_cache")
+id_cache_dl = gen_upload_file(shape_id_zips, "hydrolinks/0.8/shape_id_cache")
 write.csv(id_cache_dl, file = "inst/extdata/shape_id_cache.csv", row.names=FALSE)
+flowtables = Sys.glob(file.path(id_table_output_path, "flowtable_*.zip"))
+flowtable_dl = gen_upload_file(flowtables, "hydrolinks/0.8")
+write.csv(flowtable_dl, file = "inst/extdata/flowtable.csv", row.names = FALSE)

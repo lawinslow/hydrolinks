@@ -24,8 +24,8 @@
 traverse_flowlines = function(max_distance, start, direction = c("out", "in"), dataset = c("nhdh", "nhdplusv2"), max_steps = 10000, db_path = NULL, ...){
   direction = match.arg(direction)
   dataset = match.arg(dataset)
-  check_dl_file(system.file('extdata/shape_id_cache.csv', package='hydrolinks'),
-                fname = paste0(dataset, "_flowline_ids.zip"), ...)
+  dinfo = dataset_info(dataset, "flowline")
+  check_dl_file(system.file('extdata/shape_id_cache.csv', package='hydrolinks'), fname = paste0(dataset, "_flowline_ids.zip"))
   if(is.null(db_path)){
     db_name = paste0("flowtable_", dataset)
     #db_name = "flowtable"
@@ -40,14 +40,14 @@ traverse_flowlines = function(max_distance, start, direction = c("out", "in"), d
     stop("Cannot traverse from node 0!")
   }
   nodes = data.frame(rep(NA, max_steps), rep(NA, max_steps), rep(NA, max_steps), stringsAsFactors = FALSE)
-  colnames(nodes) = c("PERMANENT_", "LENGTHKM", "CHILDREN")
+  colnames(nodes) = c(dinfo$id_column, "LENGTHKM", "CHILDREN")
   iterations = 1
   n = neighbors(start, direction, dataset, con)
   if(nrow(n) == 0){
-    flowline = get_shape_by_id(start, feature_type = "flowline", dataset = dataset)
-    if(!is.na(flowline) && !is.na(flowline$WBAREA_PER)){
-      warning(paste0("Start ID provided is a virtual flowline inside a waterbody. Continuing from ", flowline$WBAREA_PER))
-      n = neighbors(flowline$WBAREA_PER, direction, dataset, con)
+    flowline = get_shape_by_id(start, feature_type = "flowline", dataset = dataset, match_column = dinfo$id_column)
+    if(!is.na(flowline) && !is.na(flowline[,dinfo$virtual_fl_waterbody_column])){
+      warning(paste0("Start ID provided is a virtual flowline inside a waterbody. Continuing from ", flowline[,dinfo$virtual_fl_waterbody_column]))
+      n = neighbors(flowline[,dinfo$virtual_fl_waterbody_column], direction, dataset, con)
     }
     else{
       nodes = nodes[1, ]
@@ -72,7 +72,7 @@ traverse_flowlines = function(max_distance, start, direction = c("out", "in"), d
     to_check = to_check[which(!(names(to_check) %in% nodes[,1]))]
 
     if(length(to_check) == 0){
-      nodes = nodes[!is.na(nodes$PERMANENT_),]
+      nodes = nodes[!is.na(nodes[,dinfo$id_column]),]
       dbDisconnect(con)
       return(nodes)
     }
@@ -98,23 +98,23 @@ traverse_flowlines = function(max_distance, start, direction = c("out", "in"), d
 
     if(iterations > max_steps){
       next_nodes = data.frame(names(next_check), next_check, "STUCK")
-      colnames(next_nodes) = c("PERMANENT_", "LENGTHKM", "CHILDREN")
+      colnames(next_nodes) = c(dinfo$id_column, "LENGTHKM", "CHILDREN")
       nodes = rbind(nodes, next_nodes)
-      nodes = nodes[!is.na(nodes$PERMANENT_),]
+      nodes = nodes[!is.na(nodes[,dinfo$id_column]),]
       dbDisconnect(con)
       return(nodes)
     }
 
     # if max_distance is less than zero, continue traversing until an end is reached
     if(max_distance < 0 && any(names(next_check) == '0')){
-      nodes = nodes[!is.na(nodes$PERMANENT_),]
+      nodes = nodes[!is.na(nodes[,dinfo$id_column]),]
       dbDisconnect(con)
       return(nodes)
     }
 
     #We need a stop condition where all further neighbors go nowhere
     if(all(names(next_check) == '0')){
-      nodes = nodes[!is.na(nodes$PERMANENT_),]
+      nodes = nodes[!is.na(nodes[,dinfo$id_column]),]
       dbDisconnect(con)
       return(nodes)
     }
@@ -122,7 +122,7 @@ traverse_flowlines = function(max_distance, start, direction = c("out", "in"), d
 
     for(j in names(next_check)){
       if(max_distance > 0 && next_check[j] > max_distance){
-        nodes = nodes[!is.na(nodes$PERMANENT_),]
+        nodes = nodes[!is.na(nodes[,dinfo$id_column]),]
         dbDisconnect(con)
         return(nodes)
       }
