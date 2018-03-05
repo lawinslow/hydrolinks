@@ -46,7 +46,8 @@ traverse_flowlines = function(max_distance, start, direction = c("out", "in"), d
   if(nrow(n) == 0){
     flowline = get_shape_by_id(start, feature_type = "flowline", dataset = dataset, match_column = dinfo$id_column)
     if(!is.na(flowline) && !is.na(flowline[,dinfo$virtual_fl_waterbody_column])){
-      warning(paste0("Start ID provided is a virtual flowline inside a waterbody. Continuing from ", flowline[,dinfo$virtual_fl_waterbody_column]))
+      st_geometry(flowline) = NULL
+      warning(paste0("Start ID provided is a virtual flowline inside a waterbody. Continuing from ", flowline[1,dinfo$virtual_fl_waterbody_column]))
       n = neighbors(flowline[,dinfo$virtual_fl_waterbody_column], direction, dataset, con)
     }
     else{
