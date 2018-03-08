@@ -84,6 +84,7 @@ dataset_info = function(dataset, feature_type){
   out$id_column = id_column
   out$flowtable_from_column = flowtable_from_column
   out$flowtable_to_column = flowtable_to_column
+  out$virtual_fl_waterbody_column = virtual_fl_waterbody_column
 
   return(out)
 }

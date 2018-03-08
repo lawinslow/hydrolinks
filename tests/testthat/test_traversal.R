@@ -4,8 +4,8 @@ library(hydrolinks)
 test_that("traversal out has correct amount of steps and end", {
   skip_on_cran()
   traversal1 = traverse_flowlines(1000, "141329377", "out", "nhdh")
-  expect_equal(nrow(traversal1), 2325)
-  expect_equal(traversal1$PERMANENT_[2325], "{8B4EA914-C76E-4C60-BBFF-BB46578B1AEE}")
+  expect_equal(nrow(traversal1), 2642)
+  expect_equal(traversal1$PERMANENT_[2642], "139025232")
 })
 
 test_that("nhdh traversal in has correct amount of steps and end", {
