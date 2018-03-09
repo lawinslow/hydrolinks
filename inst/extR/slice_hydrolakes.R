@@ -48,5 +48,5 @@ build_id_table(bbdf, "HydroLAKES_polys_v10_projected.shp", file.path(id_table_ou
                c("Hylak_id", "Lake_name"), file.path(hydrolakes_path, paste0("hydrolakes_", 1:nslices)))
 
 #setwd(working_directory)
-processed_shapes = gen_upload_file(output_zip, file.path(output_folder, "hydrolakes"))
+processed_shapes = gen_upload_file(output_zip, file.path(remote_path, "hydrolakes"))
 write.csv(processed_shapes, "inst/extdata/hydrolakes.csv", row.names=FALSE, quote=FALSE)
