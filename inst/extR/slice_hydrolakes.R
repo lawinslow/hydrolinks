@@ -27,6 +27,7 @@ for(i in 1:(length(indx)-1)){
   #centroids = st_centroid(slice)
   #slice$centroid.x = st_coordinates(centroids)[,"X"]
   #slice$centroid.y = st_coordinates(centroids)[,"Y"]
+  names(slice) = tolower(names(slice))
   st_write(slice, dsn = file.path(hydrolakes_path, paste0("hydrolakes_", i)), layer = "HydroLAKES_polys_v10_projected",
            driver = "ESRI Shapefile")
   bboxes[[i]] = st_sf(file = paste0("hydrolakes_", i, ".zip"), geometry=st_as_sfc(st_bbox(slice), crs=nhd_projected_proj), stringsAsFactors = FALSE)
