@@ -7,11 +7,11 @@ id_table_output_path = file.path(output_folder, 'shape_id_cache')
 dir.create(id_table_output_path, recursive = TRUE)
 
 source("inst/extR/unzip_nhd.R")
-rm(list=ls())
+#rm(list=ls())
 source("inst/extR/unzip_nhdplus.R")
-rm(list=ls())
+#rm(list=ls())
 source("inst/extR/slice_hydrolakes.R")
-rm(list=ls())
+#rm(list=ls())
 
 shape_id_caches = Sys.glob(file.path(id_table_output_path, "*_ids.sqlite3"))
 shape_id_zips = sapply(shape_id_caches, function(x){

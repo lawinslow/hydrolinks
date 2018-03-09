@@ -108,7 +108,8 @@ format_flowtable = function(raw_tables, shape_directories, wbarea_column, from_c
   flowtable = flowtable[-which(flowtable[,from_column] == flowtable[, to_column]), ] # remove links to self
   ids_db = src_sqlite(paste0(output_name, ".sqlite3"), create = TRUE)
   copy_to(ids_db, flowtable, overwrite = TRUE, temporary = FALSE, indexes = list(from_column, to_column))
-  
+  rm(ids_db)
+  gc()
 }
 
 
