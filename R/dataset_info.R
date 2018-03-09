@@ -40,13 +40,13 @@ dataset_info = function(dataset, feature_type){
       bb_cache_path = system.file('extdata/nhd_bb_streams_cache.Rdata', package='hydrolinks')
       virtual_fl_waterbody_column = "WBAREA_PER"
     }
-    id_column = "PERMANENT_"
+    id_column = "permanent_"
     flowtable_from_column = "FROM_PERMA"
     flowtable_to_column = "TO_PERMANE"
   }
   else if(tolower(dataset) == "hydrolakes"){
     bb_cache_path = system.file('extdata/hydrolakes_bb_cache.Rdata', package='hydrolinks')
-    id_column = "Hylak_id"
+    id_column = "hylak_id"
   }
   else if(tolower(dataset) == "nhdplusv2"){
     if(feature_type == "waterbody"){
@@ -56,7 +56,7 @@ dataset_info = function(dataset, feature_type){
       bb_cache_path=system.file('extdata/nhdplus_flowline_bb_cache.rdata', package='hydrolinks')
       virtual_fl_waterbody_column = "WBAREACOMI"
     }
-    id_column = "ComID"
+    id_column = "comid"
     flowtable_from_column = "FROMCOMID"
     flowtable_to_column = "TOCOMID"
   }
