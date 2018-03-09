@@ -9,7 +9,8 @@ nhdh_path = "E:/nhdh/Shape/"
 zipfiles = Sys.glob(file.path(nhdh_path, '*Shape.zip'))
 dest = file.path(nhdh_path, 'Shape_unzip')
 
-id_table_output_path = "E:/hydrolinks_tables"
+#supplied from top calling script
+#id_table_output_path = "E:/hydrolinks_tables"
 
 # unzip shapefiles
 
@@ -65,23 +66,26 @@ save(bbdf, file = "inst/extdata/nhd_bb_streams_cache.Rdata")
 working_directory = getwd()
 # save projected shapefiles
 
-dir.create(file.path(nhdh_path, "zip"))
-output_zip = file.path(nhdh_path, "zip", basename(dirname(dirname(shapefiles_lakes))))
+#dir.create(file.path(nhdh_path, "zip"))
+output_zip = file.path(output_folder, "nhdh", basename(dirname(dirname(shapefiles_lakes))))
+dir.create(file.path(output_folder, 'nhdh'))
 for(i in 1:length(output_zip)){
-  setwd(dirname(shapefiles_lakes[i]))
-  zip(output_zip[i], Sys.glob("*_projected.*"))
+  #setwd(dirname(shapefiles_lakes[i]))
+  zip(output_zip[i], Sys.glob(file.path(dirname(shapefiles_lakes[i]), "*_projected.*")), flags='-j')
 }
 
 
 # generate id lookup tables
 
-setwd(dest)
-build_id_table(bbdf, "Shape/NHDFlowline_projected.shp", file.path(id_table_output_path, "nhdh_flowline_ids.sqlite3"), c("PERMANENT_", "GNIS_ID", "GNIS_NAME", "REACHCODE"))
+#setwd(dest)
+build_id_table(bbdf, "NHDFlowline_projected.shp", file.path(id_table_output_path, "nhdh_flowline_ids.sqlite3"), 
+               c("PERMANENT_", "GNIS_ID", "GNIS_NAME", "REACHCODE"), shape_locations = dirname(shapefiles_lakes))
 
-setwd(working_directory)
+#setwd(working_directory)
 load("inst/extdata/nhd_bb_cache_projected.Rdata")
-setwd(dest)
-build_id_table(bbdf, "Shape/NHDWaterbody_projected.shp", file.path(id_table_output_path, "nhdh_waterbody_ids.sqlite3"), c("PERMANENT_", "GNIS_ID", "GNIS_NAME", "REACHCODE"))
+#setwd(dest)
+build_id_table(bbdf, "NHDWaterbody_projected.shp", file.path(id_table_output_path, "nhdh_waterbody_ids.sqlite3"), 
+               c("PERMANENT_", "GNIS_ID", "GNIS_NAME", "REACHCODE"), shape_locations = dirname(shapefiles_lakes))
 
 #build flowtable
 raw_tables = Sys.glob(file.path(nhdh_path, 'Shape_unzip', '*', 'Shape', 'NHDFlow.dbf'))
@@ -90,5 +94,5 @@ format_flowtable(raw_tables, shape_directories, "WBAREA_PER", "FROM_PERMA", "TO_
 
 zip(file.path(id_table_output_path, "flowtable_nhdh.zip"), files = file.path(id_table_output_path, "flowtable_nhdh.sqlite3"), flags = "-j")
 
-processed_shapes = gen_upload_file(output_zip, "hydrolinks/0.8/nhdh")
+processed_shapes = gen_upload_file(output_zip, file.path(output_folder, "nhdh"))
 write.csv(processed_shapes, "inst/extdata/nhdh.csv", row.names = FALSE)

@@ -5,7 +5,7 @@ source("inst/extR/general_functions.R")
 hydrolakes_path = "E:/hydrolakes/HydroLAKES_polys_v10_shp"
 #hydrolakes_path = "B:/big_data/HydroLAKES_polys_v10_shp"
 
-id_table_output_path = "E:/hydrolinks_tables"
+#id_table_output_path = "E:/hydrolinks_tables"
 #id_table_output_path = "B:/big_data/hydrolinks_tables"
 
 hydrolakes = st_read(file.path(hydrolakes_path, "HydroLAKES_polys_v10.shp"))
@@ -36,16 +36,17 @@ bbdf = do.call(rbind, bboxes)
 save(bbdf, file='inst/extdata/hydrolakes_bb_cache.Rdata')
 
 working_directory = getwd()
-dir.create(file.path(hydrolakes_path, "zip"))
-output_zip = file.path(hydrolakes_path, "zip", paste0("hydrolakes_", 1:nslices, ".zip"))
+dir.create(file.path(output_folder, "hydrolakes"))
+output_zip = file.path(output_folder, "hydrolakes", paste0("hydrolakes_", 1:nslices, ".zip"))
 for(i in 1:nslices){
   tozip = Sys.glob(file.path(hydrolakes_path, paste0("hydrolakes_", i), '*'))
   zip(output_zip[i], files=tozip, flags='-j')
 }
 
-setwd(hydrolakes_path)
-build_id_table(bbdf, "HydroLAKES_polys_v10_projected.shp", file.path(id_table_output_path, "hydrolakes_waterbody_ids.sqlite3"), c("Hylak_id", "Lake_name"), paste0("hydrolakes_", c(1:50)))
+#setwd(hydrolakes_path)
+build_id_table(bbdf, "HydroLAKES_polys_v10_projected.shp", file.path(id_table_output_path, "hydrolakes_waterbody_ids.sqlite3"), 
+               c("Hylak_id", "Lake_name"), file.path(hydrolakes_path, paste0("hydrolakes_", 1:nslices)))
 
-setwd(working_directory)
-processed_shapes = gen_upload_file(output_zip, "hydrolinks/0.8/hydrolakes")
-write.csv(processed_shapes, "inst/extdata/hydrolakes.csv", row.names=FALSE)
+#setwd(working_directory)
+processed_shapes = gen_upload_file(output_zip, file.path(output_folder, "hydrolakes"))
+write.csv(processed_shapes, "inst/extdata/hydrolakes.csv", row.names=FALSE, quote=FALSE)

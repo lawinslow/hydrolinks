@@ -12,7 +12,8 @@ regions = c("NE_01", "MA_02", "SA_03N", "SA_03S", "SA_03W", "GL_04", "MS_05", "M
 dir_names = paste0("NHDPlus", substr(regions, 1, 2))
 
 dest = file.path(nhd_path, "unzip")
-id_table_output_path = "E:/hydrolinks_tables"
+#id_table_output_path = "D:/hydrolinks_tables"
+#this is inherited from the calling script
 
 zipfiles = c()
 
@@ -35,7 +36,7 @@ for(i in 1:length(dir_names)){
 }
 
 for(i in 1:length(zipfiles)){
-  system("cmd.exe", input = paste0("\"C:\\Program Files\\7-Zip\\7z.exe\" e ", zipfiles[i], " -o\"", file.path(dest, regions[i])))
+  system("cmd.exe", input = paste0('"C:/Program Files/7-Zip/7z.exe" e ', zipfiles[i], " -o\"", file.path(dest, regions[i])))
 }
 
 waterbody_shapes = file.path(dest, regions, "NHDWaterbody.shp")
@@ -68,20 +69,22 @@ stopCluster(c1)
 
 # zip projected shapes
 
-dir.create(file.path(nhd_path, "zip"))
-output_zip = file.path(nhd_path, "zip", paste0(basename(regions), ".zip"))
+#dir.create(file.path(nhd_path, "zip"))
+output_zip = file.path(output_folder, 'nhdplusv2', paste0(basename(regions), ".zip"))
+dir.create(dirname(output_zip[1]))
 for(i in 1:length(regions)){
-  setwd(file.path(dest, regions[i]))
-  zip(output_zip[i], Sys.glob("*_projected.*"))
+  #setwd(file.path(dest, regions[i]))
+  zip(output_zip[i], Sys.glob(file.path(dest, regions[i], "*_projected.*")))
 }
 
 #build id lookup tables
 
-setwd(dest)
-build_id_table(bbdf, "NHDFlowline_projected.shp", file.path(id_table_output_path, "nhdplusv2_flowline_ids.sqlite3"), c("COMID", "GNIS_ID", "GNIS_NAME", "REACHCODE"), regions)
+build_id_table(bbdf, layer="NHDFlowline_projected.shp", file_name=file.path(id_table_output_path, "nhdplusv2_flowline_ids.sqlite3"), 
+               index_columns=c("COMID", "GNIS_ID", "GNIS_NAME", "REACHCODE"), shape_locations=file.path(dest, regions))
 
 bbdf = do.call(rbind, bboxes_waterbody)
-build_id_table(bbdf, "NHDWaterbody_projected.shp", file.path(id_table_output_path, "nhdplusv2_waterbody_ids.sqlite3"), c("COMID", "GNIS_ID", "GNIS_NAME", "REACHCODE"), regions)
+build_id_table(bbdf, layer="NHDWaterbody_projected.shp", file_name=file.path(id_table_output_path, "nhdplusv2_waterbody_ids.sqlite3"), 
+               index_columns=c("COMID", "GNIS_ID", "GNIS_NAME", "REACHCODE"), shape_locations=file.path(dest, regions))
 
 for(i in 1:length(zipfiles)){
   system("cmd.exe", input = paste0("\"C:\\Program Files\\7-Zip\\7z.exe\" e ", Sys.glob(file.path(dirname(zipfiles[i]), paste0("NHDPlusV21_", regions[i],"_NHDPlusAttributes_*", ".7z"))), " -o\"", file.path(dest, regions[i])))
@@ -90,9 +93,7 @@ for(i in 1:length(zipfiles)){
 #build flowtable
 raw_tables = file.path(dest, regions, "PlusFlow.dbf")
 shape_directories = file.path(dest, regions)
-format_flowtable(raw_tables, shape_directories, "WBAREACOMI", "FROMCOMID", "TOCOMID", "COMID", file.path(id_table_output_path, "flowtable_nhdplusv2"))
+format_flowtable(raw_tables, shape_directories, "WBAREACOMI", "FROMCOMID", "TOCOMID", "COMID", file.path(output_folder, "flowtable_nhdplusv2"))
 
-zip(file.path(id_table_output_path, "flowtable_nhdplusv2.zip"), files = file.path(id_table_output_path, "flowtable_nhdplusv2.sqlite3"), flags = "-j")
-
-processed_shapes = gen_upload_file(output_zip, "hydrolinks/0.8/nhdplusv2")
-write.csv(processed_shapes, "inst/extdata/nhdplusv2.csv")
+processed_shapes = gen_upload_file(output_zip, file.path(remote_path, "nhdplusv2"))
+write.csv(processed_shapes, "inst/extdata/nhdplusv2.csv", quote=FALSE, row.names=FALSE)

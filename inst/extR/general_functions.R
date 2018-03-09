@@ -16,6 +16,7 @@ project_and_get_bb = function(args){
   centroids = st_centroid(shape)
   shape$centroid.x = st_coordinates(centroids)[,"X"]
   shape$centroid.y = st_coordinates(centroids)[,"Y"]
+  colnames(shape) = tolower(colnames(shape))
   st_write(shape, dsn = shape_path, layer = layer, driver = "ESRI Shapefile", update=TRUE)
   ret = st_sf(file = output_name,
               geometry=st_as_sfc(st_bbox(shape), crs=nhd_projected_proj), stringsAsFactors = FALSE)
@@ -29,8 +30,7 @@ build_id_table = function(bbdf, layer, file_name, index_columns, shape_locations
     shape = NULL
     if(is.null(shape_locations)){
       shape = st_read(file.path(bbdf$file[i], layer), stringsAsFactors = FALSE)
-    }
-    else{
+    }else{
       shape = st_read(file.path(shape_locations[i], layer), stringsAsFactors = FALSE)
     }
     st_geometry(shape) = NULL
@@ -121,7 +121,7 @@ gen_upload_file = function(files, remote_path){
   #     stop("upload failed!")
   #   }
   # }
-  urls = file.path("http://cdn.bathybase.org", remote_path, basename(files))
+  urls = file.path(remote_path, basename(files))
   #files = basename(files)
   result = data.frame(filename = basename(files), url = urls, md5 = hash)
   rownames(result) = c(1:nrow(result))
