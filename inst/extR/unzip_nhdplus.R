@@ -74,7 +74,7 @@ output_zip = file.path(output_folder, 'nhdplusv2', paste0(basename(regions), ".z
 dir.create(dirname(output_zip[1]))
 for(i in 1:length(regions)){
   #setwd(file.path(dest, regions[i]))
-  zip(output_zip[i], Sys.glob(file.path(dest, regions[i], "*_projected.*")))
+  zip(output_zip[i], Sys.glob(file.path(dest, regions[i], "*_projected.*")), flags='-j')
 }
 
 #build id lookup tables
