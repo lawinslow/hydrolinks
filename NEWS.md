@@ -22,3 +22,10 @@
 * Added cache handling functions to enable better cache transparency
 * Many other minor bugfixes and improvements
 
+# hydrolinks v0.9.1
+* Fixed problem #42 with flowline traversal with nhdplusv2
+* Improved workflow for data generation
+* Faster network creation and more organized, unified file organization
+* Normalized all data colnames to lowercase to fix #43 and potential future issues
+* Some test and vignette cleanup based on above changes
+* Minted new data release with all above changes incorporated
