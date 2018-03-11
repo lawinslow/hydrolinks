@@ -38,7 +38,7 @@ dataset_info = function(dataset, feature_type){
     }
     else if(feature_type == "flowline"){
       bb_cache_path = system.file('extdata/nhd_bb_streams_cache.Rdata', package='hydrolinks')
-      virtual_fl_waterbody_column = "WBAREA_PER"
+      virtual_fl_waterbody_column = "wbarea_per"
     }
     id_column = "permanent_"
     flowtable_from_column = "FROM_PERMA"

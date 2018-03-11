@@ -33,14 +33,17 @@ test_that("test ID lookup of polygons for different datasets", {
 
   shape = get_shape_by_id('13293262', feature_type = 'waterbody', dataset='nhdplusv2')
   #should be a plot of mendota
+  expect_equal(shape$comid, 13293262)
   plot(st_geometry(shape))
 
   shape = get_shape_by_id('9086', feature_type = 'waterbody', dataset='hydrolakes')
   #should be a different plot of mendota
+  expect_equal(shape$hylak_id, 9086)
   plot(st_geometry(shape))
 
   shape = get_shape_by_id('143249470', feature_type = 'waterbody', dataset='nhdh')
   #should be a different plot of mendota
+  expect_equal(shape$permanent_, '143249470')
   plot(st_geometry(shape))
 
 })
