@@ -35,7 +35,7 @@ traverse_flowlines = function(max_distance, start, direction = c("out", "in"), d
   else{
     con = dbConnect(RSQLite::SQLite(), db_path)
   }
-  if(start == 0){
+  if(is.null(start) || start == 0){
     dbDisconnect(con)
     stop("Cannot traverse from node 0!")
   }
