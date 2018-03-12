@@ -30,6 +30,7 @@ dataset_info = function(dataset, feature_type){
   db_path = file.path(cache_get_dir(), 'unzip', paste0(db_name, ".zip"), paste0(db_name, ".sqlite3"))
   flowtable_from_column = NA
   flowtable_to_column = NA
+  virtual_fl_waterbody_column = NA
 
   if(tolower(dataset) == "nhdh"){
     if(feature_type == "waterbody"){
@@ -37,14 +38,15 @@ dataset_info = function(dataset, feature_type){
     }
     else if(feature_type == "flowline"){
       bb_cache_path = system.file('extdata/nhd_bb_streams_cache.Rdata', package='hydrolinks')
+      virtual_fl_waterbody_column = "wbarea_per"
     }
-    id_column = "PERMANENT_"
-    flowtable_from_column = "From_Permanent_Identifier"
-    flowtable_to_column = "To_Permanent_Identifier"
+    id_column = "permanent_"
+    flowtable_from_column = "FROM_PERMA"
+    flowtable_to_column = "TO_PERMANE"
   }
   else if(tolower(dataset) == "hydrolakes"){
     bb_cache_path = system.file('extdata/hydrolakes_bb_cache.Rdata', package='hydrolinks')
-    id_column = "Hylak_id"
+    id_column = "hylak_id"
   }
   else if(tolower(dataset) == "nhdplusv2"){
     if(feature_type == "waterbody"){
@@ -52,8 +54,9 @@ dataset_info = function(dataset, feature_type){
     }
     else if(feature_type == "flowline"){
       bb_cache_path=system.file('extdata/nhdplus_flowline_bb_cache.rdata', package='hydrolinks')
+      virtual_fl_waterbody_column = "WBAREACOMI"
     }
-    id_column = "COMID"
+    id_column = "comid"
     flowtable_from_column = "FROMCOMID"
     flowtable_to_column = "TOCOMID"
   }
@@ -81,6 +84,7 @@ dataset_info = function(dataset, feature_type){
   out$id_column = id_column
   out$flowtable_from_column = flowtable_from_column
   out$flowtable_to_column = flowtable_to_column
+  out$virtual_fl_waterbody_column = virtual_fl_waterbody_column
 
   return(out)
 }

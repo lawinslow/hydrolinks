@@ -67,7 +67,7 @@ link_to_waterbodies = function(lats, lons, ids, dataset = c("nhdh", "hydrolakes"
     shape = st_transform(shape, nhd_projected_proj)
 
     if(tolower(dataset) == 'nhdh'){
-      shape = shape[shape$FTYPE %in% c('390', '361', '436'), ]
+      shape = shape[shape$ftype %in% c('390', '361', '436'), ]
     }
 
     if(buffer > 0){
