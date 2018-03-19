@@ -5,4 +5,5 @@ northAmProj.proj4string
 figure/
 .travis.yml
 ^README\.Rmd$
+^README\.md$
 ^README-.*\.png$
