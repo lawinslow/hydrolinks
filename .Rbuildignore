@@ -7,3 +7,4 @@ figure/
 ^README\.Rmd$
 ^README\.md$
 ^README-.*\.png$
+^vignettes/wqp_lake_linking_example_cache/.*$
