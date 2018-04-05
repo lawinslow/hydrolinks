@@ -23,7 +23,7 @@ First things first, if you are having an issue, please consider reporting bugs a
 
 This package provides tools for linking latitude and longitude (geopoint) data with 
 hydrologic networks, such as the [U.S. Geologic Survey's National Hydrologic Dataset (NHD)](http://nhd.usgs.gov)
-or they global [hydroLakes](http://www.hydrosheds.org/page/hydrolakes) dataset. The function automates 
+or the global [hydroLakes](http://www.hydrosheds.org/page/hydrolakes) dataset. The function automates 
 the access and download of these large, cumbersome datasets and provides a number of techniques for 
 geographic data to the hydro networks. 
 
