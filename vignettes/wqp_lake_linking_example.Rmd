@@ -11,6 +11,11 @@ vignette: >
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, cache=TRUE)
+
+is_check <- ("CheckExEnv" %in% search()) || any(c("_R_CHECK_TIMINGS_",
+             "_R_CHECK_LICENSE_") %in% names(Sys.getenv()))
+knitr::opts_chunk$set(eval = !is_check)
+
 ```
 
 ## Linking Water Quality Portal 
@@ -35,6 +40,7 @@ library(USAboundaries)
 #library(ggplot2)
 #library(gridExtra)
 library(sf)
+hydrolinks::cache_set_dir(temppath = TRUE)
 
 lsites = whatWQPsites(siteType ="Lake, Reservoir, Impoundment", statecode='US:55')
 ```

@@ -12,8 +12,12 @@ vignette: >
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
-)
+  comment = "#>")
+
+is_check <- ("CheckExEnv" %in% search()) || any(c("_R_CHECK_TIMINGS_",
+             "_R_CHECK_LICENSE_") %in% names(Sys.getenv()))
+knitr::opts_chunk$set(eval = !is_check)
+
 ```
 
 ## Find a place in the network to start
@@ -24,6 +28,7 @@ if there is a lake at that point, and get the information, including ID, of that
 ```{r eval=TRUE, echo=TRUE, warning=FALSE, include=FALSE}
 library(hydrolinks)
 library(sf)
+hydrolinks::cache_set_dir(temppath = TRUE)
 linked_wb = link_to_waterbodies(39.086637, -120.052634, 'lakeobs1', dataset='nhdh')
 ```
 

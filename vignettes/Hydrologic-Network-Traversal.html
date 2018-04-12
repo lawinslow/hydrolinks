@@ -12,7 +12,7 @@
 
 <meta name="author" content="Vignette Author" />
 
-<meta name="date" content="2018-02-01" />
+<meta name="date" content="2018-04-12" />
 
 <title>Traversing the Hydrologic Network</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Traversing the Hydrologic Network</h1>
 <h4 class="author"><em>Vignette Author</em></h4>
-<h4 class="date"><em>2018-02-01</em></h4>
+<h4 class="date"><em>2018-04-12</em></h4>
 
 
 
@@ -78,14 +78,14 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h2>Find a place in the network to start</h2>
 <p>Lets say we have an observation <code>lakeobs1</code> that was taken at some point. We want to see if there is a lake at that point, and get the information, including ID, of that lake.</p>
 <p>Lo and behold, this point is over top of Lake Tahoe. We can get further information about this lake from the mapping layer we used to link. National Hydrography Dataset Highres (NHDH) has some other useful information included.</p>
-<pre><code>#&gt;   PERMANENT_      FDATE RESOLUTION  GNIS_ID  GNIS_NAME AREASQKM ELEVATION
+<pre><code>#&gt;   permanent_      fdate resolution  gnis_id  gnis_name areasqkm elevation
 #&gt; 1   44560536 2012-03-12          2 01654975 Lake Tahoe 498.1268      6229
-#&gt;        REACHCODE FTYPE FCODE SHAPE_LENG SHAPE_AREA VISIBILITY centroid_x
+#&gt;        reachcode ftype fcode shape_leng shape_area visibility centroid_x
 #&gt; 1 16050101000339   390 39009   1.624393 0.05186653          0   -2037514
 #&gt;   centroid_y MATCH_ID
 #&gt; 1    2044681 lakeobs1</code></pre>
 <p>Now, lets generate map of the linked lake (Lake Tahoe). Using hydrolinks, we don’t need to dig through shapefiles. We can just use the ID we got from linking.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lake_poly =<span class="st"> </span><span class="kw">get_shape_by_id</span>(linked_wb$PERMANENT_, <span class="dt">dataset =</span> <span class="st">'nhdh'</span>, <span class="dt">feature_type =</span> <span class="st">'waterbody'</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lake_poly =<span class="st"> </span><span class="kw">get_shape_by_id</span>(linked_wb$permanent_, <span class="dt">dataset =</span> <span class="st">'nhdh'</span>, <span class="dt">feature_type =</span> <span class="st">'waterbody'</span>)
 <span class="co">#Simple quick viz of polygon</span>
 <span class="kw">plot</span>(<span class="kw">st_geometry</span>(lake_poly), <span class="dt">main=</span><span class="st">'Lake Tahoe'</span>, <span class="dt">col=</span><span class="st">'Dodgerblue'</span>)</code></pre></div>
 <p><img src="data:image/png;base64,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" /><!-- --></p>
@@ -98,8 +98,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h3>Upstream traversal</h3>
 <p>For example, lets grab and plot all inflows into Lake Tahoe. We will start from the lake and traverse up the hydrologic network. We will specify a max traversal distance of 50km to prevent the traversal from exploding (can happen with unlimited bounds going up the network, e.g., Mississippi).</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
-upstream =<span class="st"> </span><span class="kw">traverse_flowlines</span>(<span class="dv">50</span>, linked_wb$PERMANENT_, <span class="dt">direction =</span> <span class="st">'in'</span>)
-upstream_shp =<span class="st"> </span><span class="kw">get_shape_by_id</span>(upstream$PERMANENT_, <span class="dt">dataset =</span> <span class="st">'nhdh'</span>, <span class="dt">feature_type =</span> <span class="st">'flowline'</span>)
+upstream =<span class="st"> </span><span class="kw">traverse_flowlines</span>(<span class="dv">50</span>, linked_wb$permanent_, <span class="dt">direction =</span> <span class="st">'in'</span>)
+upstream_shp =<span class="st"> </span><span class="kw">get_shape_by_id</span>(upstream$permanent_, <span class="dt">dataset =</span> <span class="st">'nhdh'</span>, <span class="dt">feature_type =</span> <span class="st">'flowline'</span>)
 <span class="kw">plot</span>(<span class="kw">st_geometry</span>(upstream_shp), <span class="dt">col=</span><span class="st">'palegreen'</span>)
 <span class="kw">plot</span>(<span class="kw">st_geometry</span>(lake_poly), <span class="dt">main=</span><span class="st">'Lake Tahoe'</span>, <span class="dt">col=</span><span class="st">'Dodgerblue'</span>, <span class="dt">add=</span><span class="ot">TRUE</span>)</code></pre></div>
 <p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASAAAAEgCAMAAAAjXV6yAAAADFBMVEUAAAAekP+Y+5j///9axkqPAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAEZklEQVR4nO3dzXKiQBhGYWnu/55n1KgNAsfV1y/FOQvLyizsPNU/oEnmNttht9EDSE8gSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCDozECt4kVODNRahZBA0MmAOpMm0Lr/IC+UxzOBVrU/lPau4EVPBNS+K3jVEwDdGVprG0AVr34KoC2cIp94oI5jiE84UM/zPYtKhpAKtDqvbvdezwSaV0fWf5Rpmp40H6qagZwB6PYEuhO1P6q5bBKFAi0n0PTqNr+lLg7UE906oNfzulWWCrTpc4eZeqGCgaQCzW+j3qenEui5O88CLeq+6/vieh9gAt1bXiPv0Xz2oIoxJQGtbiKOfKYqnyigufdpOIFqxhQJ9EA6nECXnEEbt1/HW9B196B59+pnCXTdU+x4A/rcixWMKQnoZ5+p7l41CagJdFj7HahwheUALc+wmAmUCURHfOEEygFa7NE/zR+Bjjeg691qfK4T8Tb+mkD9p2ApCywL6EO0L1S8wNKAWKh6AoUBddvQDlHtGT+nAfUfmMIcqhpRJtDBWX/tGdQQ6OJLrOPZ24OuvEl/vvf9i+nq68RIoKNzXqDXKX98hpWtsCigH95zLb+QPh1Q9R6dCrR7yFf75AJtCr0nkDNoW6h+hWUB0S40YIWlAR2/4TFghQUDZaywPKD9n93sfgnhyjPoCKgJ9PHZ2INGTKA4oDfPN9CQFXYqoBE+uUDfm9CQLSgMaHEpLdB3C6D1IhtxFZQMtCYqfy/xWTLQ3+8avh6G7NHhQI9PWG+Px/6LlYUDteev8C7+pXZIwUBz9zjMJwtoBbHJVD2meKCx8ycYaP56ItByK96aP1dfYturaqxQGNAPQsUDEggSCEoDQqLq4cQBdRTdY/eseDzBQDtHffF4zgZUPp44IPegnxKIi+A5F9CQYeQCDfrDkutygVY4Aq0KWWGhQBHb8zOBoEygkA36XiZQDM9JgEYORSDoBEBjhxIJlMMjEJYIFMSTDjR6JHMm0Lgf5dgoEqjuT/pzAkECQZlAYz4j3CwZaPQgHoUCVf0PhlwqUEwCQQJBAkECQQJBAkECQQJBAkECQQJBAkECQQJBAkECQQJBAkECQQJBAkECQQJBAkECQQJBAkECQQJBAkECQQJBAkECQQJBAkECQQJBAkECQQJBAkECQQJBAkECQQJBAkECQQJBAkECQQJBAkECQQJBAkECQQJBAkECQQJBAkECQQJBAkECQQJBAkECQQJBAkECQQJBAkECQQJBAkECQQJBAkECQQJBAkECQQJBAkECQQJBAkECQQJBAkECQQJBAkECQQJBAkECQQJB/wCSJ7lj5KQGrAAAAABJRU5ErkJggg==" /><!-- --></p>
@@ -110,9 +110,9 @@ upstream_shp =<span class="st"> </span><span class="kw">get_shape_by_id</span>(u
 <h3>Downstream traversal</h3>
 <p>We can also do downstream traversal. We’ll start at Lake Tahoe above and see where the water goes. One of the unique aspects of this is we have combined the flow network for both lakes and streams. This means when we do the traversal, we can examine the stream and lake portion of the flow network independently. Below is an example using Tahoe, which, I did not earlier know, doesn’t drain to the ocean.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
-downstream =<span class="st"> </span><span class="kw">traverse_flowlines</span>(<span class="dv">2000</span>, linked_wb$PERMANENT_, <span class="dt">direction =</span> <span class="st">'out'</span>)
-downstream_shp =<span class="st"> </span><span class="kw">get_shape_by_id</span>(downstream$PERMANENT_, <span class="dt">dataset =</span> <span class="st">'nhdh'</span>, <span class="dt">feature_type =</span> <span class="st">'flowline'</span>)
-downstream_lk_shp =<span class="st"> </span><span class="kw">get_shape_by_id</span>(downstream$PERMANENT_, <span class="dt">dataset =</span> <span class="st">'nhdh'</span>, <span class="dt">feature_type =</span> <span class="st">'waterbody'</span>)
+downstream =<span class="st"> </span><span class="kw">traverse_flowlines</span>(<span class="dv">2000</span>, linked_wb$permanent_, <span class="dt">direction =</span> <span class="st">'out'</span>)
+downstream_shp =<span class="st"> </span><span class="kw">get_shape_by_id</span>(downstream$permanent_, <span class="dt">dataset =</span> <span class="st">'nhdh'</span>, <span class="dt">feature_type =</span> <span class="st">'flowline'</span>)
+downstream_lk_shp =<span class="st"> </span><span class="kw">get_shape_by_id</span>(downstream$permanent_, <span class="dt">dataset =</span> <span class="st">'nhdh'</span>, <span class="dt">feature_type =</span> <span class="st">'waterbody'</span>)
 <span class="kw">plot</span>(<span class="kw">st_geometry</span>(downstream_shp), <span class="dt">col=</span><span class="st">'palegreen'</span>)
 <span class="kw">plot</span>(<span class="kw">st_geometry</span>(downstream_lk_shp), <span class="dt">main=</span><span class="st">'Lake Tahoe'</span>, <span class="dt">col=</span><span class="st">'Dodgerblue'</span>, <span class="dt">add=</span><span class="ot">TRUE</span>)
 <span class="kw">plot</span>(<span class="kw">st_geometry</span>(lake_poly), <span class="dt">main=</span><span class="st">'Lake Tahoe'</span>, <span class="dt">col=</span><span class="st">'Dodgerblue'</span>, <span class="dt">add=</span><span class="ot">TRUE</span>)</code></pre></div>
@@ -123,12 +123,12 @@ downstream_lk_shp =<span class="st"> </span><span class="kw">get_shape_by_id</sp
 <p>Here is another example of Lake Mendota, Wisconsin. This does an upstream traversal. You can see the multiple small impoundments and other ponds/lakes in the upstream network.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">id =<span class="st"> </span><span class="kw">link_to_waterbodies</span>(<span class="fl">43.112449</span>, -<span class="fl">89.429409</span>, <span class="st">'mendota'</span>)
 
-hmm =<span class="st"> </span><span class="kw">traverse_flowlines</span>(<span class="dv">100</span>, id$PERMANENT_, <span class="st">&quot;in&quot;</span>)
+hmm =<span class="st"> </span><span class="kw">traverse_flowlines</span>(<span class="dv">100</span>, id$permanent_, <span class="st">&quot;in&quot;</span>)
 
-fls =<span class="st"> </span><span class="kw">get_shape_by_id</span>(hmm$PERMANENT_, <span class="dt">feature_type =</span> <span class="st">'flowline'</span>, <span class="dt">dataset=</span><span class="st">'nhdh'</span>)
-wbs =<span class="st"> </span><span class="kw">get_shape_by_id</span>(hmm$PERMANENT_, <span class="dt">feature_type =</span> <span class="st">'waterbody'</span>, <span class="dt">dataset=</span><span class="st">'nhdh'</span>)
+fls =<span class="st"> </span><span class="kw">get_shape_by_id</span>(hmm$permanent_, <span class="dt">feature_type =</span> <span class="st">'flowline'</span>, <span class="dt">dataset=</span><span class="st">'nhdh'</span>)
+wbs =<span class="st"> </span><span class="kw">get_shape_by_id</span>(hmm$permanent_, <span class="dt">feature_type =</span> <span class="st">'waterbody'</span>, <span class="dt">dataset=</span><span class="st">'nhdh'</span>)
 
-wb   =<span class="st"> </span><span class="kw">get_shape_by_id</span>(id$PERMANENT_, <span class="dt">feature_type =</span> <span class="st">'waterbody'</span>)
+wb   =<span class="st"> </span><span class="kw">get_shape_by_id</span>(id$permanent_, <span class="dt">feature_type =</span> <span class="st">'waterbody'</span>)
 
 <span class="kw">plot</span>(<span class="kw">st_geometry</span>(fls), <span class="dt">col=</span><span class="st">'green'</span>)
 <span class="kw">plot</span>(<span class="kw">st_geometry</span>(wb), <span class="dt">col=</span><span class="st">'orange'</span>, <span class="dt">add=</span><span class="ot">TRUE</span>)

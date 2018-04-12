@@ -1,7 +1,7 @@
 Package: hydrolinks
 Type: Package
 Title: Hydrologic Network Linking Data and Tools
-Version: 0.9.3
+Version: 0.10.0
 Authors@R: c( person("Tobi", "Hahn", role = c("aut"), 
       email = "hahnt2@rpi.edu"),
     person("Luke", "Winslow", role = c("aut", "cre"), 
@@ -30,9 +30,10 @@ Suggests:
     USAboundaries,
     ggplot2,
     gridExtra,
-    kableExtra
+    kableExtra,
+    R.rsp
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1
-VignetteBuilder: knitr
+VignetteBuilder: R.rsp
