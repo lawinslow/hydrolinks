@@ -51,7 +51,7 @@ returned by this query.
 Now, lets link all these sites to the NHDH. After the initial point-in-polygon linking, I will take
 the remainder and use the centroid matching. 
 
-```{r link, eval=TRUE, echo=TRUE, warning=FALSE, include=TRUE, message=FALSE}
+```{r link, eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, results='hide'}
 
 linked_lakes = link_to_waterbodies(lsites$LatitudeMeasure, lsites$LongitudeMeasure, lsites$MonitoringLocationIdentifier, dataset = 'nhdh', buffer = 0)
 
